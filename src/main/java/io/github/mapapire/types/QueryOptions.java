@@ -1,5 +1,6 @@
 package io.github.mapapire.types;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,5 +13,17 @@ public class QueryOptions {
         this.isTerseResults = _isTerseResults;
         this.isClCommand = _isClCommand;
         this.parameters = _parameters;
+    }
+
+    public boolean getIsTerseResults() {
+        return isTerseResults;
+    }
+
+    public boolean getIsClCommand() {
+        return isClCommand;
+    }
+
+    public List<Object> getParameters() {
+        return parameters;
     }
 }
