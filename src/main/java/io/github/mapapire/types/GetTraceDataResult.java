@@ -8,4 +8,8 @@ public class GetTraceDataResult extends ServerResponse {
         super(_id, _success, _error, _sql_rc, _sql_state);
         this.tracedata = _tracedata;
     }
+
+    public String getTracedata() {
+        return tracedata;
+    }
 }

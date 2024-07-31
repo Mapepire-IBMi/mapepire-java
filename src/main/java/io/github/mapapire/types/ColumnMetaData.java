@@ -12,4 +12,20 @@ public class ColumnMetaData {
         this.name = _name;
         this.type = _type;
     }
+
+    public int getDisplaySize() {
+        return display_size;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

@@ -10,4 +10,12 @@ public class SetConfigResult extends ServerResponse {
         this.tracedest = _tracedest;
         this.tracelevel = _tracelevel;
     }
+
+    public ServerTraceDest getTracedest() {
+        return tracedest;
+    }
+
+    public ServerTraceLevel getTracelevel() {
+        return tracelevel;
+    }
 }

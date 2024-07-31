@@ -17,4 +17,28 @@ public class DaemonServer {
         this.ignoreUnauthorized = _ignoreUnauthorized;
         this.ca = _ca;
     }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean isIgnoreUnauthorized() {
+        return ignoreUnauthorized;
+    }
+
+    public String getCa() {
+        return ca;
+    }
 }

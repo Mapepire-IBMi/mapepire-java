@@ -12,4 +12,16 @@ public class QueryMetaData {
         this.columns = _columns;
         this.job = _job;
     }
+
+    public int getColumnCount() {
+        return column_count;
+    }
+
+    public List<ColumnMetaData> getColumns() {
+        return columns;
+    }
+
+    public String getJob() {
+        return job;
+    }
 }

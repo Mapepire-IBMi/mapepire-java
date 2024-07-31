@@ -10,4 +10,12 @@ public class VersionCheckResult extends ServerResponse {
         this.buildDate = _buildDate;
         this.version = _version;
     }
+
+    public String getBuildDate() {
+        return buildDate;
+    }
+
+    public String getVersion() {
+        return version;
+    }
 }

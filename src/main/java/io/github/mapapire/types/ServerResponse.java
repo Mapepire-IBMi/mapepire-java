@@ -14,4 +14,24 @@ public class ServerResponse {
         this.sql_rc = _sql_rc;
         this.sql_state = _sql_state;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public int getSqlRc() {
+        return sql_rc;
+    }
+
+    public String getSqlState() {
+        return sql_state;
+    }
 }

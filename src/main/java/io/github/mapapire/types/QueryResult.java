@@ -18,4 +18,24 @@ public class QueryResult<T> extends ServerResponse {
         this.update_count = _update_count;
         this.data = _data;
     }
+
+    public QueryMetaData getMetadata() {
+        return metadata;
+    }
+
+    public boolean isDone() {
+        return is_done;
+    }
+
+    public boolean hasResults() {
+        return has_results;
+    }
+
+    public int getUpdateCount() {
+        return update_count;
+    }
+
+    public List<T> getData() {
+        return data;
+    }
 }

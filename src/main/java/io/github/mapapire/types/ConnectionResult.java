@@ -7,4 +7,8 @@ public class ConnectionResult extends ServerResponse {
         super(_id, _success, _error, _sql_rc, _sql_state);
         this.job = _job;
     }
+
+    public String getJob() {
+        return job;
+    }
 }

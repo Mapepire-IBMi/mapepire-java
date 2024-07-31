@@ -10,4 +10,8 @@ public class CLCommandResult extends ServerResponse {
         super(_id, _success, _error, _sql_rc, _sql_state);
         this.joblog = _joblog;
     }
+
+    public List<JobLogEntry> getJoblog() {
+        return joblog;
+    }
 }

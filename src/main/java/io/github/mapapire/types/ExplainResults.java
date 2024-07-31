@@ -13,4 +13,12 @@ public class ExplainResults<T> extends QueryResult<T> {
         this.vemetadata = _vemetadata;
         this.vedata = _vedata;
     }
+
+    public QueryMetaData getVemetadata() {
+        return vemetadata;
+    }
+
+    public Object getVedata() {
+        return vedata;
+    }
 }

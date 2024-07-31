@@ -22,4 +22,36 @@ public class JobLogEntry {
         this.MESSAGE_TEXT = _MESSAGE_TEXT;
         this.MESSAGE_SECOND_LEVEL_TEXT = _MESSAGE_SECOND_LEVEL_TEXT;
     }
+
+    public String getMessageId() {
+        return MESSAGE_ID;
+    }
+
+    public String getSeverity() {
+        return SEVERITY;
+    }
+
+    public String getMessageTimestamp() {
+        return MESSAGE_TIMESTAMP;
+    }
+
+    public String getFromLibrary() {
+        return FROM_LIBRARY;
+    }
+
+    public String getFromProgram() {
+        return FROM_PROGRAM;
+    }
+
+    public String getMessageType() {
+        return MESSAGE_TYPE;
+    }
+
+    public String getMessageText() {
+        return MESSAGE_TEXT;
+    }
+
+    public String getMessageSecondLevelText() {
+        return MESSAGE_SECOND_LEVEL_TEXT;
+    }
 }
