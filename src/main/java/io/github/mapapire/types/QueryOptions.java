@@ -15,11 +15,11 @@ public class QueryOptions {
         this.parameters = _parameters;
     }
 
-    public boolean getIsTerseResults() {
+    public boolean isTerseResults() {
         return isTerseResults;
     }
 
-    public boolean getIsClCommand() {
+    public boolean isClCommand() {
         return isClCommand;
     }
 
