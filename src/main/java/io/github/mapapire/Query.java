@@ -3,6 +3,7 @@ package io.github.mapapire;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,7 +63,7 @@ public class Query<T> {
     }
 
     public void cleanup() {
-        List<CompletableFuture<Void>> closeFutures = globalQueryList.stream()
+        List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
                 .map(query -> CompletableFuture.runAsync(() -> {
                     try {
@@ -74,10 +75,12 @@ public class Query<T> {
                 .collect(Collectors.toList());
 
         // TODO: Fix this logic
-        CompletableFuture<Void> allOf = CompletableFuture.allOf(closeFutures.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         try {
             allOf.get();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
