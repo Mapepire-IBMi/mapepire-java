@@ -1,17 +1,26 @@
 package io.github.mapapire.types;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CLCommandResult extends ServerResponse {
-    private final List<JobLogEntry> joblog;
+    private List<JobLogEntry> joblog = new ArrayList<JobLogEntry>();
 
-    public CLCommandResult(String _id, boolean _success, String _error, int _sql_rc, String _sql_state,
-            List<JobLogEntry> _joblog) {
-        super(_id, _success, _error, _sql_rc, _sql_state);
-        this.joblog = _joblog;
+    public CLCommandResult() {
+        super();
+    }
+
+    public CLCommandResult(String id, boolean success, String error, int sql_rc, String sql_state,
+            List<JobLogEntry> joblog) {
+        super(id, success, error, sql_rc, sql_state);
+        this.joblog = joblog;
     }
 
     public List<JobLogEntry> getJoblog() {
         return joblog;
+    }
+
+    public void setJoblog(List<JobLogEntry> joblog) {
+        this.joblog = joblog;
     }
 }

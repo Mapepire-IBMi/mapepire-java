@@ -3,22 +3,34 @@ package io.github.mapapire.types;
 import java.util.List;
 
 public class ExplainResults<T> extends QueryResult<T> {
-    private final QueryMetaData vemetadata;
-    private final Object vedata;
+    private QueryMetaData vemetadata;
+    private Object vedata;
 
-    public ExplainResults(String _id, boolean _success, String _error, int _sql_rc, String _sql_state,
-            QueryMetaData _metadata, boolean _is_done, boolean _has_results, int _update_count, List<T> _data,
-            QueryMetaData _vemetadata, Object _vedata) {
-        super(_id, _success, _error, _sql_rc, _sql_state, _metadata, _is_done, _has_results, _update_count, _data);
-        this.vemetadata = _vemetadata;
-        this.vedata = _vedata;
+    public ExplainResults() {
+        super();
+    }
+
+    public ExplainResults(String id, boolean success, String error, int sql_rc, String sql_state,
+            QueryMetaData metadata, boolean is_done, boolean has_results, int update_count, List<T> data,
+            QueryMetaData vemetadata, Object vedata) {
+        super(id, success, error, sql_rc, sql_state, metadata, is_done, has_results, update_count, data);
+        this.vemetadata = vemetadata;
+        this.vedata = vedata;
     }
 
     public QueryMetaData getVemetadata() {
         return vemetadata;
     }
 
+    public void setVemetadata(QueryMetaData vemetadata) {
+        this.vemetadata = vemetadata;
+    }
+
     public Object getVedata() {
         return vedata;
+    }
+
+    public void setVedata(Object vedata) {
+        this.vedata = vedata;
     }
 }

@@ -1,15 +1,23 @@
 package io.github.mapapire.types;
 
 public class GetTraceDataResult extends ServerResponse {
-    private final String tracedata;
+    private String tracedata;
 
-    public GetTraceDataResult(String _id, boolean _success, String _error, int _sql_rc, String _sql_state,
+    public GetTraceDataResult() {
+        super();
+    }
+
+    public GetTraceDataResult(String id, boolean success, String error, int sql_rc, String sql_state,
             String _tracedata) {
-        super(_id, _success, _error, _sql_rc, _sql_state);
+        super(id, success, error, sql_rc, sql_state);
         this.tracedata = _tracedata;
     }
 
     public String getTracedata() {
         return tracedata;
+    }
+
+    public void setTracedata(String tracedata) {
+        this.tracedata = tracedata;
     }
 }

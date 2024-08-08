@@ -6,7 +6,7 @@ public enum ServerTraceDest {
 
     private String serverTraceDest;
 
-    ServerTraceDest(String _serverTraceDest) {
-        this.serverTraceDest = _serverTraceDest;
+    ServerTraceDest(String serverTraceDest) {
+        this.serverTraceDest = serverTraceDest;
     }
 }

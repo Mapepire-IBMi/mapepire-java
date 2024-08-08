@@ -1,14 +1,22 @@
 package io.github.mapapire.types;
 
 public class ConnectionResult extends ServerResponse {
-    private final String job;
+    private String job;
 
-    public ConnectionResult(String _id, boolean _success, String _error, int _sql_rc, String _sql_state, String _job) {
-        super(_id, _success, _error, _sql_rc, _sql_state);
-        this.job = _job;
+    public ConnectionResult() {
+        super();
+    }
+
+    public ConnectionResult(String id, boolean success, String error, int sql_rc, String sql_state, String job) {
+        super(id, success, error, sql_rc, sql_state);
+        this.job = job;
     }
 
     public String getJob() {
         return job;
+    }
+
+    public void setJob(String job) {
+        this.job = job;
     }
 }

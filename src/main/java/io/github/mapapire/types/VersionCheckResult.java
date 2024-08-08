@@ -1,21 +1,29 @@
 package io.github.mapapire.types;
 
 public class VersionCheckResult extends ServerResponse {
-    private final String buildDate;
-    private final String version;
+    private String buildDate;
+    private String version;
 
-    public VersionCheckResult(String _id, boolean _success, String _error, int _sql_rc, String _sql_state,
-            String _buildDate, String _version) {
-        super(_id, _success, _error, _sql_rc, _sql_state);
-        this.buildDate = _buildDate;
-        this.version = _version;
+    public VersionCheckResult(String id, boolean success, String error, int sql_rc, String sql_state,
+            String buildDate, String version) {
+        super(id, success, error, sql_rc, sql_state);
+        this.buildDate = buildDate;
+        this.version = version;
     }
 
     public String getBuildDate() {
         return buildDate;
     }
 
+    public void setBuildDate(String buildDate) {
+        this.buildDate = buildDate;
+    }
+
     public String getVersion() {
         return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

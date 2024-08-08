@@ -8,7 +8,7 @@ public enum ServerTraceLevel {
 
     private String serverTraceLevel;
 
-    ServerTraceLevel(String _serverTraceLevel) {
-        this.serverTraceLevel = _serverTraceLevel;
+    ServerTraceLevel(String serverTraceLevel) {
+        this.serverTraceLevel = serverTraceLevel;
     }
 }

@@ -9,7 +9,7 @@ public enum JobStatus {
 
     private String jobStatus;
 
-    JobStatus(String _jobStatus) {
-        this.jobStatus = _jobStatus;
+    JobStatus(String jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }

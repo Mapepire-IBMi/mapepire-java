@@ -1,21 +1,33 @@
 package io.github.mapapire.types;
 
 public class SetConfigResult extends ServerResponse {
-    private final ServerTraceDest tracedest;
-    private final ServerTraceLevel tracelevel;
+    private ServerTraceDest tracedest;
+    private ServerTraceLevel tracelevel;
 
-    public SetConfigResult(String _id, boolean _success, String _error, int _sql_rc, String _sql_state,
-            ServerTraceDest _tracedest, ServerTraceLevel _tracelevel) {
-        super(_id, _success, _error, _sql_rc, _sql_state);
-        this.tracedest = _tracedest;
-        this.tracelevel = _tracelevel;
+    public SetConfigResult() {
+        super();
+    }
+
+    public SetConfigResult(String id, boolean success, String error, int sql_rc, String sql_state,
+            ServerTraceDest tracedest, ServerTraceLevel tracelevel) {
+        super(id, success, error, sql_rc, sql_state);
+        this.tracedest = tracedest;
+        this.tracelevel = tracelevel;
     }
 
     public ServerTraceDest getTracedest() {
         return tracedest;
     }
 
+    public void setTracedest(ServerTraceDest tracedest) {
+        this.tracedest = tracedest;
+    }
+
     public ServerTraceLevel getTracelevel() {
         return tracelevel;
+    }
+
+    public void setTracelevel(ServerTraceLevel tracelevel) {
+        this.tracelevel = tracelevel;
     }
 }

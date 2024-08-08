@@ -8,7 +8,7 @@ public enum QueryState {
 
     private int queryState;
 
-    QueryState(int _queryState) {
-        this.queryState = _queryState;
+    QueryState(int queryState) {
+        this.queryState = queryState;
     }
 }
