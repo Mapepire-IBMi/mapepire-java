@@ -22,17 +22,17 @@ class PoolOptions {
     private int maxSize;
     private int startingSize;
 
-    PoolOptions(DaemonServer _creds, JDBCOptions _opts, int _maxSize, int _startingSize) {
-        this.creds = _creds;
-        this.opts = _opts;
-        this.maxSize = _maxSize;
-        this.startingSize = _startingSize;
+    PoolOptions(DaemonServer creds, JDBCOptions opts, int maxSize, int startingSize) {
+        this.creds = creds;
+        this.opts = opts;
+        this.maxSize = maxSize;
+        this.startingSize = startingSize;
     }
 
-    PoolOptions(DaemonServer _creds, int _maxSize, int _startingSize) {
-        this.creds = _creds;
-        this.maxSize = _maxSize;
-        this.startingSize = _startingSize;
+    PoolOptions(DaemonServer creds, int maxSize, int startingSize) {
+        this.creds = creds;
+        this.maxSize = maxSize;
+        this.startingSize = startingSize;
     }
 
     public DaemonServer getCreds() {
@@ -60,11 +60,12 @@ class PoolAddOptions {
     private boolean poolIgnore;
 
     public PoolAddOptions() {
+
     }
 
-    public PoolAddOptions(SqlJob _existingJob, boolean _poolIgnore) {
-        this.existingJob = _existingJob;
-        this.poolIgnore = _poolIgnore;
+    public PoolAddOptions(SqlJob existingJob, boolean poolIgnore) {
+        this.existingJob = existingJob;
+        this.poolIgnore = poolIgnore;
     }
 
     public SqlJob getExistingJob() {
@@ -90,8 +91,8 @@ public class Pool {
     private List<JobStatus> INVALID_STATES = new ArrayList<JobStatus>(
             Arrays.asList(JobStatus.Ended, JobStatus.NotStarted));
 
-    Pool(PoolOptions _options) {
-        this.options = _options;
+    Pool(PoolOptions options) {
+        this.options = options;
     }
 
     public CompletableFuture<Void> init() {

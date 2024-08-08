@@ -38,8 +38,8 @@ import io.github.mapapire.types.VersionCheckResult;
 class ReqRespFmt {
     String id;
 
-    public ReqRespFmt(String _id) {
-        this.id = _id;
+    public ReqRespFmt(String id) {
+        this.id = id;
     }
 };
 

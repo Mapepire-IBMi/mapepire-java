@@ -28,15 +28,15 @@ public class Query<T> {
     private boolean isTerseResults;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Query(SqlJob _job, String _query, QueryOptions _opts) {
-        this.job = _job;
-        this.sql = _query;
+    public Query(SqlJob job, String query, QueryOptions opts) {
+        this.job = job;
+        this.sql = query;
 
         // TODO: Fix constructor
-        this.isPrepared = _opts.getParameters() != null;
-        this.parameters = _opts.getParameters();
-        this.isCLCommand = _opts.isClCommand();
-        this.isTerseResults = _opts.isTerseResults();
+        this.isPrepared = opts.getParameters() != null;
+        this.parameters = opts.getParameters();
+        this.isCLCommand = opts.isClCommand();
+        this.isTerseResults = opts.isTerseResults();
 
         Query.globalQueryList.add(this);
     }
