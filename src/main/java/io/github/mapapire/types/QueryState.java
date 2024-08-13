@@ -6,9 +6,22 @@ public enum QueryState {
     RUN_DONE(3),
     ERROR(4);
 
-    private int queryState;
+    private int value;
 
-    QueryState(int queryState) {
-        this.queryState = queryState;
+    QueryState(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static QueryState fromValue(int value) {
+        for (QueryState type : values()) {
+            if (type.value == value) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown value: " + value);
     }
 }
