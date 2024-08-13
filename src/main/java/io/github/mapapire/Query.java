@@ -89,11 +89,11 @@ public class Query<T> {
                 .collect(Collectors.toList());
     }
 
-    public CompletableFuture<QueryResult<T>> execute() {
+    public <T> CompletableFuture<QueryResult<T>> execute() {
         return this.execute(100);
     }
 
-    public CompletableFuture<QueryResult<T>> execute(int rowsToFetch) {
+    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) {
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
                 throw new Error("Statement has already been run");
@@ -119,51 +119,52 @@ public class Query<T> {
 
         this.rowsToFetch = rowsToFetch;
 
+        String result;
         try {
-            return job.send(objectMapper.writeValueAsString(queryObject))
-                    .thenCompose(result -> {
-                        try {
-                            // TODO: Type safety: The expression of type QueryResult needs unchecked
-                            // conversion to conform to QueryResult<T>
-                            QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
+            result = job.send(objectMapper.writeValueAsString(queryObject)).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CompletableFuture.completedFuture(null);
+        }
 
-                            this.state = queryResult.isDone() ? QueryState.RUN_DONE
-                                    : QueryState.RUN_MORE_DATA_AVAILABLE;
-
-                            if (!queryResult.isSuccess() && !this.isCLCommand) {
-                                this.state = QueryState.ERROR;
-
-                                List<String> errorList = new ArrayList<>();
-                                String error = queryResult.getError();
-                                if (error != null) {
-                                    errorList.add(error);
-                                }
-                                String sqlState = queryResult.getSqlState();
-                                if (sqlState != null) {
-                                    errorList.add(sqlState);
-                                }
-                                String sqlRc = String.valueOf(queryResult.getSqlRc());
-                                if (sqlRc != null) {
-                                    errorList.add(sqlRc);
-                                }
-                                if (errorList.isEmpty()) {
-                                    errorList.add("Failed to run query (unknown error)");
-                                }
-
-                                throw new Error(String.join(", ", errorList));
-                            }
-
-                            this.correlationId = queryResult.getId();
-                            return CompletableFuture.completedFuture(queryResult);
-                        } catch (JsonProcessingException e) {
-                            e.printStackTrace();
-                            return CompletableFuture.completedFuture(null);
-                        }
-                    });
+        // TODO: Type safety: The expression of type QueryResult needs unchecked
+        // conversion to conform to QueryResult<T>
+        QueryResult<T> queryResult;
+        try {
+            queryResult = objectMapper.readValue(result, QueryResult.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
+
+        this.state = queryResult.isDone() ? QueryState.RUN_DONE
+                : QueryState.RUN_MORE_DATA_AVAILABLE;
+
+        if (!queryResult.isSuccess() && !this.isCLCommand) {
+            this.state = QueryState.ERROR;
+
+            List<String> errorList = new ArrayList<>();
+            String error = queryResult.getError();
+            if (error != null) {
+                errorList.add(error);
+            }
+            String sqlState = queryResult.getSqlState();
+            if (sqlState != null) {
+                errorList.add(sqlState);
+            }
+            String sqlRc = String.valueOf(queryResult.getSqlRc());
+            if (sqlRc != null) {
+                errorList.add(sqlRc);
+            }
+            if (errorList.isEmpty()) {
+                errorList.add("Failed to run query (unknown error)");
+            }
+
+            throw new Error(String.join(", ", errorList));
+        }
+
+        this.correlationId = queryResult.getId();
+        return CompletableFuture.completedFuture(queryResult);
     }
 
     public CompletableFuture<QueryResult<T>> fetchMore() {
