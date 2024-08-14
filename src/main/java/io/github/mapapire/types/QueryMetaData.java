@@ -4,21 +4,21 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class QueryMeta {
+public class QueryMetaData {
     @JsonProperty("column_count")
     private int columnCount;
 
     @JsonProperty("columns")
-    private List<ColumnMetadata> columns;
+    private List<ColumnMetaData> columns;
 
     @JsonProperty("job")
     private String job;
 
-    public QueryMeta() {
+    public QueryMetaData() {
 
     }
 
-    public QueryMeta(int columnCount, List<ColumnMetadata> columns, String job) {
+    public QueryMetaData(int columnCount, List<ColumnMetaData> columns, String job) {
         this.columnCount = columnCount;
         this.columns = columns;
         this.job = job;
@@ -32,11 +32,11 @@ public class QueryMeta {
         this.columnCount = columnCount;
     }
 
-    public List<ColumnMetadata> getColumns() {
+    public List<ColumnMetaData> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<ColumnMetadata> columns) {
+    public void setColumns(List<ColumnMetaData> columns) {
         this.columns = columns;
     }
 
