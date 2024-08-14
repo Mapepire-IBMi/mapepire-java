@@ -17,14 +17,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleTest {
+    private static final String CONFIG_FILE = "config.properties";
     private static DaemonServer creds;
 
     @BeforeAll
     public static void setup() throws Exception {
         Properties properties = new Properties();
-        try (InputStream input = SimpleTest.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream input = SimpleTest.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (input == null) {
-                throw new IOException("Unable to find config.properties");
+                throw new IOException("Unable to find " + CONFIG_FILE);
             }
             properties.load(input);
         }
