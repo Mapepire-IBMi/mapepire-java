@@ -86,20 +86,12 @@ public class SqlJob {
     private boolean isTracingChannelData = false;
     private String id;
     private JDBCOptions options;
-    private final HashMap<String, CompletableFuture<String>> responseMap = new HashMap<>();
+    private final Map<String, CompletableFuture<String>> responseMap = new HashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // currently unused but we will inevitably need a unique ID assigned to each
     // instance since server job names can be reused in some circumstances
     private String uniqueId = SqlJob.getNewUniqueId("sqljob");
-
-    public static String getNewUniqueId() {
-        return SqlJob.getNewUniqueId("id");
-    }
-
-    public static String getNewUniqueId(String prefix) {
-        return prefix + (++uniqueIdCounter);
-    }
 
     // TODO:
     public SqlJob() {
@@ -108,6 +100,14 @@ public class SqlJob {
 
     public SqlJob(JDBCOptions _options) {
         this.options = _options;
+    }
+
+    public static String getNewUniqueId() {
+        return SqlJob.getNewUniqueId("id");
+    }
+
+    public static String getNewUniqueId(String prefix) {
+        return prefix + (++uniqueIdCounter);
     }
 
     // LOGGING -> https://gist.github.com/luketn/4e7595cf39dab63fbcfdb62930fe8f4d
