@@ -1,6 +1,6 @@
 # mapepire-java
 
-[![build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/maven.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/maven.yml) [![license](https://img.shields.io/github/license/allenai/tango.svg?color=blue&cachedrop)](https://github.com/Mapepire-IBMi/mapepire-java/blob/main/LICENSE)
+[![build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml) [![license](https://img.shields.io/github/license/allenai/tango.svg?color=blue&cachedrop)](https://github.com/Mapepire-IBMi/mapepire-java/blob/main/LICENSE)
 
 ## Overview
 
