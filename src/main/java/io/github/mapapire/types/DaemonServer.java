@@ -1,11 +1,24 @@
 package io.github.mapapire.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DaemonServer {
+    @JsonProperty("host")
     private String host;
+
+    @JsonProperty("port")
     private int port;
+
+    @JsonProperty("user")
     private String user;
+
+    @JsonProperty("password")
     private String password;
+
+    @JsonProperty("ignoreUnauthorized")
     private boolean ignoreUnauthorized;
+
+    @JsonProperty("ca")
     private String ca;
 
     public DaemonServer() {
@@ -13,13 +26,13 @@ public class DaemonServer {
     }
 
     public DaemonServer(String host, int port, String user, String password, boolean ignoreUnauthorized,
-            String _ca) {
+            String ca) {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
         this.ignoreUnauthorized = ignoreUnauthorized;
-        this.ca = _ca;
+        this.ca = ca;
     }
 
     public String getHost() {
@@ -54,7 +67,7 @@ public class DaemonServer {
         this.password = password;
     }
 
-    public boolean isIgnoreUnauthorized() {
+    public boolean getIgnoreUnauthorized() {
         return ignoreUnauthorized;
     }
 

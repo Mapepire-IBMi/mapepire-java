@@ -2,24 +2,35 @@ package io.github.mapapire.types;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class QueryResult<T> extends ServerResponse {
+    @JsonProperty("metadata")
     private QueryMetaData metadata;
-    private boolean is_done;
-    private boolean has_results;
-    private int update_count;
+
+    @JsonProperty("is_done")
+    private boolean isDone;
+
+    @JsonProperty("has_results")
+    private boolean hasResults;
+
+    @JsonProperty("update_count")
+    private int updateCount;
+
+    @JsonProperty("data")
     private List<T> data;
 
     public QueryResult() {
         super();
     }
 
-    public QueryResult(String id, boolean success, String error, int sql_rc, String sql_state,
-            QueryMetaData metadata, boolean is_done, boolean has_results, int update_count, List<T> data) {
-        super(id, success, error, sql_rc, sql_state);
+    public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState,
+            QueryMetaData metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data) {
+        super(id, success, error, sqlRc, sqlState);
         this.metadata = metadata;
-        this.is_done = is_done;
-        this.has_results = has_results;
-        this.update_count = update_count;
+        this.isDone = isDone;
+        this.hasResults = hasResults;
+        this.updateCount = updateCount;
         this.data = data;
     }
 
@@ -31,28 +42,28 @@ public class QueryResult<T> extends ServerResponse {
         this.metadata = metadata;
     }
 
-    public boolean isDone() {
-        return is_done;
+    public boolean getIsDone() {
+        return isDone;
     }
 
-    public void setIsDone(boolean is_done) {
-        this.is_done = is_done;
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
     }
 
-    public boolean hasResults() {
-        return has_results;
+    public boolean getHasResults() {
+        return hasResults;
     }
 
-    public void setHasResults(boolean has_results) {
-        this.has_results = has_results;
+    public void setHasResults(boolean hasResults) {
+        this.hasResults = hasResults;
     }
 
     public int getUpdateCount() {
-        return update_count;
+        return updateCount;
     }
 
-    public void setUpdateCount(int update_count) {
-        this.update_count = update_count;
+    public void setUpdateCount(int updateCount) {
+        this.updateCount = updateCount;
     }
 
     public List<T> getData() {

@@ -3,16 +3,19 @@ package io.github.mapapire.types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CLCommandResult extends ServerResponse {
+    @JsonProperty("joblog")
     private List<JobLogEntry> joblog = new ArrayList<JobLogEntry>();
 
     public CLCommandResult() {
         super();
     }
 
-    public CLCommandResult(String id, boolean success, String error, int sql_rc, String sql_state,
+    public CLCommandResult(String id, boolean success, String error, int sqlRc, String sqlState,
             List<JobLogEntry> joblog) {
-        super(id, success, error, sql_rc, sql_state);
+        super(id, success, error, sqlRc, sqlState);
         this.joblog = joblog;
     }
 

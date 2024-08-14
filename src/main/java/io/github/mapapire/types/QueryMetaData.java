@@ -2,34 +2,41 @@ package io.github.mapapire.types;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class QueryMetaData {
-    private int column_count;
-    private List<ColumnMetaData> columns;
+    @JsonProperty("column_count")
+    private int columnCount;
+
+    @JsonProperty("columns")
+    private List<ColumnMetadata> columns;
+
+    @JsonProperty("job")
     private String job;
 
     public QueryMetaData() {
 
     }
 
-    public QueryMetaData(int column_count, List<ColumnMetaData> columns, String job) {
-        this.column_count = column_count;
+    public QueryMetaData(int columnCount, List<ColumnMetadata> columns, String job) {
+        this.columnCount = columnCount;
         this.columns = columns;
         this.job = job;
     }
 
     public int getColumnCount() {
-        return column_count;
+        return columnCount;
     }
 
-    public void setColumnCount(int column_count) {
-        this.column_count = column_count;
+    public void setColumnCount(int columnCount) {
+        this.columnCount = columnCount;
     }
 
-    public List<ColumnMetaData> getColumns() {
+    public List<ColumnMetadata> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<ColumnMetaData> columns) {
+    public void setColumns(List<ColumnMetadata> columns) {
         this.columns = columns;
     }
 
