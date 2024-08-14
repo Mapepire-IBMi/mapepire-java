@@ -16,6 +16,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    environment: OSSBUILD
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
