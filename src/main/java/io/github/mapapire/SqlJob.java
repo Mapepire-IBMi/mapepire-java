@@ -21,9 +21,8 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.mapapire.types.ConnectionResult;
 import io.github.mapapire.types.DaemonServer;
@@ -147,7 +146,7 @@ public class SqlJob {
                         if (future != null) {
                             future.complete(message);
                         }
-                    } catch (JsonProcessingException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -257,7 +256,7 @@ public class SqlJob {
         ConnectionResult connectResult;
         try {
             connectResult = objectMapper.readValue(result, ConnectionResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -328,7 +327,7 @@ public class SqlJob {
         VersionCheckResult version;
         try {
             version = objectMapper.readValue(result, VersionCheckResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -366,7 +365,7 @@ public class SqlJob {
         ExplainResults<?> explainResult;
         try {
             explainResult = objectMapper.readValue(result, ExplainResults.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -402,7 +401,7 @@ public class SqlJob {
         GetTraceDataResult rpy;
         try {
             rpy = objectMapper.readValue(result, GetTraceDataResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -438,7 +437,7 @@ public class SqlJob {
         SetConfigResult rpy;
         try {
             rpy = objectMapper.readValue(result, SetConfigResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }

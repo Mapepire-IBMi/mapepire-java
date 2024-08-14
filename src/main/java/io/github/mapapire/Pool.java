@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -143,9 +142,7 @@ public class Pool {
         if (newSqlJob.getStatus() == JobStatus.NotStarted) {
             try {
                 newSqlJob.connect(this.options.getCreds()).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -1,17 +1,16 @@
 package io.github.mapapire;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import io.github.mapapire.types.DaemonServer;
 import io.github.mapapire.types.QueryResult;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleTest {
     private static DaemonServer creds;
@@ -44,7 +43,7 @@ class SimpleTest {
             if (!isConnected) {
                 return;
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }
@@ -53,7 +52,7 @@ class SimpleTest {
         QueryResult<Object> result;
         try {
             result = query.execute().get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }

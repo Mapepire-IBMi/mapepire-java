@@ -3,10 +3,8 @@ package io.github.mapapire;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -78,9 +76,7 @@ public class Query<T> {
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         try {
             allOf.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -134,7 +130,7 @@ public class Query<T> {
         QueryResult<T> queryResult;
         try {
             queryResult = objectMapper.readValue(result, QueryResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -213,12 +209,12 @@ public class Query<T> {
                             }
 
                             return CompletableFuture.completedFuture(queryResult);
-                        } catch (JsonProcessingException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                             return CompletableFuture.completedFuture(null);
                         }
                     });
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -234,7 +230,7 @@ public class Query<T> {
 
             try {
                 return job.send(objectMapper.writeValueAsString(queryObject));
-            } catch (JsonProcessingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return CompletableFuture.completedFuture(null);
             }
