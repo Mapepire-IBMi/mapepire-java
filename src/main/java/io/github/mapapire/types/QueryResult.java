@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QueryResult<T> extends ServerResponse {
     @JsonProperty("metadata")
-    private QueryMetaData metadata;
+    private QueryMeta metadata;
 
     @JsonProperty("is_done")
     private boolean isDone;
@@ -25,7 +25,7 @@ public class QueryResult<T> extends ServerResponse {
     }
 
     public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            QueryMetaData metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data) {
+            QueryMeta metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data) {
         super(id, success, error, sqlRc, sqlState);
         this.metadata = metadata;
         this.isDone = isDone;
@@ -34,11 +34,11 @@ public class QueryResult<T> extends ServerResponse {
         this.data = data;
     }
 
-    public QueryMetaData getMetadata() {
+    public QueryMeta getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(QueryMetaData metadata) {
+    public void setMetadata(QueryMeta metadata) {
         this.metadata = metadata;
     }
 
