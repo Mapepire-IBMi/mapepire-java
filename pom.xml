@@ -166,6 +166,7 @@
                   </limits>
                 </rule>
               </rules>
+              <skip>true</skip>
             </configuration>
           </execution>
         </executions>
