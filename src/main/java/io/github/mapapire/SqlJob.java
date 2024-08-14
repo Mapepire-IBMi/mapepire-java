@@ -18,11 +18,11 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.mapapire.types.ConnectionResult;
 import io.github.mapapire.types.DaemonServer;
@@ -42,17 +42,17 @@ import io.github.mapapire.types.VersionCheckResult;
 import io.github.mapapire.types.jdbcOptions.Property;
 import io.github.mapapire.types.jdbcOptions.TransactionIsolation;
 
-class ReqRespFmt {
-    String id;
+// class ReqRespFmt {
+//     String id;
 
-    public ReqRespFmt(String id) {
-        this.id = id;
-    }
+//     public ReqRespFmt(String id) {
+//         this.id = id;
+//     }
 
-    String getId() {
-        return this.id;
-    }
-};
+//     String getId() {
+//         return this.id;
+//     }
+// };
 
 class NoAuthTrustManager implements X509TrustManager {
     @Override
@@ -85,9 +85,10 @@ public class SqlJob {
     private String traceFile;
     private boolean isTracingChannelData = false;
     private String id;
-    private JDBCOptions options;
+    private JDBCOptions options = new JDBCOptions();
     private final Map<String, CompletableFuture<String>> responseMap = new HashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    CompletableFuture<String> openedConnectionFuture;
 
     // currently unused but we will inevitably need a unique ID assigned to each
     // instance since server job names can be reused in some circumstances
@@ -124,10 +125,11 @@ public class SqlJob {
             String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
             httpHeaders.put("Authorization", "Basic " + encodedAuth);
 
-            WebSocketClient wsc = new WebSocketClient(uri, null, httpHeaders, 5000) {
+            WebSocketClient wsc = new WebSocketClient(uri, new Draft_6455(), httpHeaders, 5000) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                     System.out.println("Opened connection");
+                    openedConnectionFuture.complete("Opened connection");
                 }
 
                 @Override
@@ -137,12 +139,14 @@ public class SqlJob {
                     }
 
                     try {
-                        ReqRespFmt response = objectMapper.readValue(message, ReqRespFmt.class);
-                        CompletableFuture<String> future = responseMap.get(response.getId());
+                        Map<String, Object> response = objectMapper.readValue(message, Map.class);
+                        String id = (String) response.get("id");
+
+                        CompletableFuture<String> future = responseMap.get(id);
                         if (future != null) {
                             future.complete(message);
                         }
-                    } catch (JsonProcessingException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -161,7 +165,7 @@ public class SqlJob {
             };
             wsc.setSocketFactory(factory);
 
-            if (db2Server.isIgnoreUnauthorized()) {
+            if (db2Server.getIgnoreUnauthorized()) {
                 // TODO:
             }
 
@@ -183,18 +187,19 @@ public class SqlJob {
         }
 
         try {
-            ReqRespFmt req = objectMapper.readValue(content, ReqRespFmt.class);
+            Map<String, Object> req = objectMapper.readValue(content, Map.class);
+            String id = (String) req.get("id");
+
             CompletableFuture<String> future = new CompletableFuture<>();
-            responseMap.put(req.getId(), future);
+            responseMap.put(id, future);
             this.socket.send(content);
-            future.thenApply(message -> {
-                responseMap.remove(req.getId());
-                return message;
-            });
-        } catch (JsonProcessingException e) {
+            String message = future.get();
+            responseMap.remove(id);
+            return CompletableFuture.completedFuture(message);
+        } catch (Exception e) {
             e.printStackTrace();
+            return CompletableFuture.completedFuture(null);
         }
-        return null;
     }
 
     public JobStatus getStatus() {
@@ -212,6 +217,8 @@ public class SqlJob {
         try {
             this.socket = this.getChannel(db2Server).get();
             this.socket.connect();
+            openedConnectionFuture = new CompletableFuture<>();
+            openedConnectionFuture.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -234,7 +241,9 @@ public class SqlJob {
         connectionObject.put("type", "connect");
         connectionObject.put("technique", "tcp");// TODO: DOVE does not work in cli mode
         connectionObject.put("application", "Java client");
-        connectionObject.put("props", props.length() > 0 ? props : null);
+        if (props.length() > 0) {
+            connectionObject.put("props", props);
+        }
 
         String result;
         try {
@@ -247,12 +256,12 @@ public class SqlJob {
         ConnectionResult connectResult;
         try {
             connectResult = objectMapper.readValue(result, ConnectionResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        if (connectResult.isSuccess()) {
+        if (connectResult.getSuccess()) {
             this.status = JobStatus.Ready;
         } else {
             this.dispose();
@@ -318,12 +327,12 @@ public class SqlJob {
         VersionCheckResult version;
         try {
             version = objectMapper.readValue(result, VersionCheckResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        if (!version.isSuccess()) {
+        if (!version.getSuccess()) {
             if (version.getError() != null) {
                 throw new Error(version.getError());
             } else {
@@ -356,12 +365,12 @@ public class SqlJob {
         ExplainResults<?> explainResult;
         try {
             explainResult = objectMapper.readValue(result, ExplainResults.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        if (!explainResult.isSuccess()) {
+        if (!explainResult.getSuccess()) {
             if (explainResult.getError() != null) {
                 throw new Error(explainResult.getError());
             } else {
@@ -392,12 +401,12 @@ public class SqlJob {
         GetTraceDataResult rpy;
         try {
             rpy = objectMapper.readValue(result, GetTraceDataResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        if (!rpy.isSuccess()) {
+        if (!rpy.getSuccess()) {
             if (rpy.getError() != null) {
                 throw new Error(rpy.getError());
             } else {
@@ -428,12 +437,12 @@ public class SqlJob {
         SetConfigResult rpy;
         try {
             rpy = objectMapper.readValue(result, SetConfigResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        if (!rpy.isSuccess()) {
+        if (!rpy.getSuccess()) {
             if (rpy.getError() != null) {
                 throw new Error(rpy.getError());
             } else {
@@ -449,7 +458,7 @@ public class SqlJob {
 
     public Query<?> clcommand(String cmd) {
         QueryOptions options = new QueryOptions();
-        options.setClCommand(true);
+        options.setIsClCommand(true);
         return new Query(this, cmd, options);
     }
 

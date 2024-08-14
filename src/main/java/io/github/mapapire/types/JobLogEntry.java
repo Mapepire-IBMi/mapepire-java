@@ -1,93 +1,110 @@
 package io.github.mapapire.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class JobLogEntry {
-    private String MESSAGE_ID;
-    private String SEVERITY;
-    private String MESSAGE_TIMESTAMP;
-    private String FROM_LIBRARY;
-    private String FROM_PROGRAM;
-    private String MESSAGE_TYPE;
-    private String MESSAGE_TEXT;
-    private String MESSAGE_SECOND_LEVEL_TEXT;
+    @JsonProperty("MESSAGE_ID")
+    private String messageId;
+
+    @JsonProperty("SEVERITY")
+    private String severity;
+
+    @JsonProperty("MESSAGE_TIMESTAMP")
+    private String messageTimestamp;
+
+    @JsonProperty("FROM_LIBRARY")
+    private String fromLibrary;
+
+    @JsonProperty("FROM_PROGRAM")
+    private String fromProgram;
+
+    @JsonProperty("MESSAGE_TYPE")
+    private String messageType;
+
+    @JsonProperty("MESSAGE_TEXT")
+    private String messageText;
+
+    @JsonProperty("MESSAGE_SECOND_LEVEL_TEXT")
+    private String messageSecondLevelText;
 
     public JobLogEntry() {
 
     }
 
-    public JobLogEntry(String MESSAGE_ID, String SEVERITY, String MESSAGE_TIMESTAMP,
-            String FROM_LIBRARY, String FROM_PROGRAM, String MESSAGE_TYPE,
-            String MESSAGE_TEXT, String MESSAGE_SECOND_LEVEL_TEXT) {
-        this.MESSAGE_ID = MESSAGE_ID;
-        this.SEVERITY = SEVERITY;
-        this.MESSAGE_TIMESTAMP = MESSAGE_TIMESTAMP;
-        this.FROM_LIBRARY = FROM_LIBRARY;
-        this.FROM_PROGRAM = FROM_PROGRAM;
-        this.MESSAGE_TYPE = MESSAGE_TYPE;
-        this.MESSAGE_TEXT = MESSAGE_TEXT;
-        this.MESSAGE_SECOND_LEVEL_TEXT = MESSAGE_SECOND_LEVEL_TEXT;
+    public JobLogEntry(String messageId, String severity, String messageTimestamp,
+            String fromLibrary, String fromProgram, String messageType,
+            String messageText, String messageSecondLevelText) {
+        this.messageId = messageId;
+        this.severity = severity;
+        this.messageTimestamp = messageTimestamp;
+        this.fromLibrary = fromLibrary;
+        this.fromProgram = fromProgram;
+        this.messageType = messageType;
+        this.messageText = messageText;
+        this.messageSecondLevelText = messageSecondLevelText;
     }
 
     public String getMessageId() {
-        return MESSAGE_ID;
+        return messageId;
     }
 
-    public void setMessageId(String MESSAGE_ID) {
-        this.MESSAGE_ID = MESSAGE_ID;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getSeverity() {
-        return SEVERITY;
+        return severity;
     }
 
-    public void setSeverity(String SEVERITY) {
-        this.SEVERITY = SEVERITY;
+    public void setSeverity(String severity) {
+        this.severity = severity;
     }
 
     public String getMessageTimestamp() {
-        return MESSAGE_TIMESTAMP;
+        return messageTimestamp;
     }
 
-    public void setMessageTimestamp(String MESSAGE_TIMESTAMP) {
-        this.MESSAGE_TIMESTAMP = MESSAGE_TIMESTAMP;
+    public void setMessageTimestamp(String messageTimestamp) {
+        this.messageTimestamp = messageTimestamp;
     }
 
     public String getFromLibrary() {
-        return FROM_LIBRARY;
+        return fromLibrary;
     }
 
-    public void setFromLibrary(String FROM_LIBRARY) {
-        this.FROM_LIBRARY = FROM_LIBRARY;
+    public void setFromLibrary(String fromLibrary) {
+        this.fromLibrary = fromLibrary;
     }
 
     public String getFromProgram() {
-        return FROM_PROGRAM;
+        return fromProgram;
     }
 
-    public void setFromProgram(String FROM_PROGRAM) {
-        this.FROM_PROGRAM = FROM_PROGRAM;
+    public void setFromProgram(String fromProgram) {
+        this.fromProgram = fromProgram;
     }
 
     public String getMessageType() {
-        return MESSAGE_TYPE;
+        return messageType;
     }
 
-    public void setMessageType(String MESSAGE_TYPE) {
-        this.MESSAGE_TYPE = MESSAGE_TYPE;
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public String getMessageText() {
-        return MESSAGE_TEXT;
+        return messageText;
     }
 
-    public void setMessageText(String MESSAGE_TEXT) {
-        this.MESSAGE_TEXT = MESSAGE_TEXT;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 
     public String getMessageSecondLevelText() {
-        return MESSAGE_SECOND_LEVEL_TEXT;
+        return messageSecondLevelText;
     }
 
-    public void setMessageSecondLevelText(String MESSAGE_SECOND_LEVEL_TEXT) {
-        this.MESSAGE_SECOND_LEVEL_TEXT = MESSAGE_SECOND_LEVEL_TEXT;
+    public void setMessageSecondLevelText(String messageSecondLevelText) {
+        this.messageSecondLevelText = messageSecondLevelText;
     }
 }

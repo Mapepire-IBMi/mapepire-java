@@ -1,16 +1,21 @@
 package io.github.mapapire.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SetConfigResult extends ServerResponse {
+    @JsonProperty("tracedest")
     private ServerTraceDest tracedest;
+
+    @JsonProperty("tracelevel")
     private ServerTraceLevel tracelevel;
 
     public SetConfigResult() {
         super();
     }
 
-    public SetConfigResult(String id, boolean success, String error, int sql_rc, String sql_state,
+    public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState,
             ServerTraceDest tracedest, ServerTraceLevel tracelevel) {
-        super(id, success, error, sql_rc, sql_state);
+        super(id, success, error, sqlRc, sqlState);
         this.tracedest = tracedest;
         this.tracelevel = tracelevel;
     }

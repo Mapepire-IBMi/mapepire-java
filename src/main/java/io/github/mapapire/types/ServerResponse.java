@@ -1,22 +1,33 @@
 package io.github.mapapire.types;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ServerResponse {
+    @JsonProperty("id")
     private String id;
+
+    @JsonProperty("success")
     private boolean success;
+
+    @JsonProperty("error")
     private String error;
-    private int sql_rc;
-    private String sql_state;
+
+    @JsonProperty("sql_rc")
+    private int sqlRc;
+
+    @JsonProperty("sql_state")
+    private String sqlState;
 
     public ServerResponse() {
 
     }
 
-    public ServerResponse(String id, boolean success, String error, int sql_rc, String sql_state) {
+    public ServerResponse(String id, boolean success, String error, int sqlRc, String sqlState) {
         this.id = id;
         this.success = success;
         this.error = error;
-        this.sql_rc = sql_rc;
-        this.sql_state = sql_state;
+        this.sqlRc = sqlRc;
+        this.sqlState = sqlState;
     }
 
     public String getId() {
@@ -27,7 +38,7 @@ public class ServerResponse {
         this.id = id;
     }
 
-    public boolean isSuccess() {
+    public boolean getSuccess() {
         return success;
     }
 
@@ -44,18 +55,18 @@ public class ServerResponse {
     }
 
     public int getSqlRc() {
-        return sql_rc;
+        return sqlRc;
     }
 
-    public void setSqlRc(int sql_rc) {
-        this.sql_rc = sql_rc;
+    public void setSqlRc(int sqlRc) {
+        this.sqlRc = sqlRc;
     }
 
     public String getSqlState() {
-        return sql_state;
+        return sqlState;
     }
 
-    public void setSqlState(String sql_state) {
-        this.sql_state = sql_state;
+    public void setSqlState(String sqlState) {
+        this.sqlState = sqlState;
     }
 }

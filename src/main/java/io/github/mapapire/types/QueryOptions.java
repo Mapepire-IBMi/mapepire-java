@@ -1,12 +1,17 @@
 package io.github.mapapire.types;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class QueryOptions {
+    @JsonProperty("isTerseResults")
     private boolean isTerseResults;
+
+    @JsonProperty("isClCommand")
     private boolean isClCommand;
+
+    @JsonProperty("parameters")
     private List<Object> parameters;
 
     public QueryOptions() {
@@ -19,19 +24,19 @@ public class QueryOptions {
         this.parameters = parameters;
     }
 
-    public boolean isTerseResults() {
+    public boolean getIsTerseResults() {
         return isTerseResults;
     }
 
-    public void setTerseResults(boolean isTerseResults) {
+    public void setIsTerseResults(boolean isTerseResults) {
         this.isTerseResults = isTerseResults;
     }
 
-    public boolean isClCommand() {
+    public boolean getIsClCommand() {
         return isClCommand;
     }
 
-    public void setClCommand(boolean isClCommand) {
+    public void setIsClCommand(boolean isClCommand) {
         this.isClCommand = isClCommand;
     }
 

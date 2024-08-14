@@ -3,10 +3,8 @@ package io.github.mapapire;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,8 +33,8 @@ public class Query<T> {
         // TODO: Fix constructor
         this.isPrepared = opts.getParameters() != null;
         this.parameters = opts.getParameters();
-        this.isCLCommand = opts.isClCommand();
-        this.isTerseResults = opts.isTerseResults();
+        this.isCLCommand = opts.getIsClCommand();
+        this.isTerseResults = opts.getIsTerseResults();
 
         Query.globalQueryList.add(this);
     }
@@ -78,9 +76,7 @@ public class Query<T> {
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
         try {
             allOf.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -113,8 +109,10 @@ public class Query<T> {
             queryObject.put("sql", this.sql);
             queryObject.put("terse", this.isTerseResults);
             queryObject.put("rows", rowsToFetch);
-            JsonNode parameters = objectMapper.valueToTree(this.parameters);
-            queryObject.set("parameters", parameters);
+            if (this.parameters != null) {
+                JsonNode parameters = objectMapper.valueToTree(this.parameters);
+                queryObject.set("parameters", parameters);
+            }
         }
 
         this.rowsToFetch = rowsToFetch;
@@ -132,15 +130,15 @@ public class Query<T> {
         QueryResult<T> queryResult;
         try {
             queryResult = objectMapper.readValue(result, QueryResult.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
 
-        this.state = queryResult.isDone() ? QueryState.RUN_DONE
+        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
                 : QueryState.RUN_MORE_DATA_AVAILABLE;
 
-        if (!queryResult.isSuccess() && !this.isCLCommand) {
+        if (!queryResult.getSuccess() && !this.isCLCommand) {
             this.state = QueryState.ERROR;
 
             List<String> errorList = new ArrayList<>();
@@ -196,10 +194,10 @@ public class Query<T> {
                             // conversion to conform to QueryResult<T>
                             QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
 
-                            this.state = queryResult.isDone() ? QueryState.RUN_DONE
+                            this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
                                     : QueryState.RUN_MORE_DATA_AVAILABLE;
 
-                            if (!queryResult.isSuccess()) {
+                            if (!queryResult.getSuccess()) {
                                 this.state = QueryState.ERROR;
 
                                 String error = queryResult.getError();
@@ -211,12 +209,12 @@ public class Query<T> {
                             }
 
                             return CompletableFuture.completedFuture(queryResult);
-                        } catch (JsonProcessingException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                             return CompletableFuture.completedFuture(null);
                         }
                     });
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return CompletableFuture.completedFuture(null);
         }
@@ -232,7 +230,7 @@ public class Query<T> {
 
             try {
                 return job.send(objectMapper.writeValueAsString(queryObject));
-            } catch (JsonProcessingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return CompletableFuture.completedFuture(null);
             }

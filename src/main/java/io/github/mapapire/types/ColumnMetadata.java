@@ -1,28 +1,37 @@
 package io.github.mapapire.types;
 
-public class ColumnMetaData {
-    private int display_size;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ColumnMetadata {
+    @JsonProperty("display_size")
+    private int displaySize;
+
+    @JsonProperty("label")
     private String label;
+
+    @JsonProperty("name")
     private String name;
+
+    @JsonProperty("type")
     private String type;
 
-    public ColumnMetaData() {
+    public ColumnMetadata() {
 
     }
 
-    public ColumnMetaData(int display_size, String label, String name, String type) {
-        this.display_size = display_size;
+    public ColumnMetadata(int displaySize, String label, String name, String type) {
+        this.displaySize = displaySize;
         this.label = label;
         this.name = name;
         this.type = type;
     }
 
     public int getDisplaySize() {
-        return display_size;
+        return displaySize;
     }
 
-    public void setDisplaySize(int display_size) {
-        this.display_size = display_size;
+    public void setDisplaySize(int displaySize) {
+        this.displaySize = displaySize;
     }
 
     public String getLabel() {
