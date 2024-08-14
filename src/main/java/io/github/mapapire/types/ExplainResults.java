@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExplainResults<T> extends QueryResult<T> {
     @JsonProperty("vemetadata")
-    private QueryMetaData vemetadata;
+    private QueryMetadata vemetadata;
 
     @JsonProperty("vedata")
     private Object vedata;
@@ -16,18 +16,18 @@ public class ExplainResults<T> extends QueryResult<T> {
     }
 
     public ExplainResults(String id, boolean success, String error, int sqlRc, String sqlState,
-            QueryMetaData metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data,
-            QueryMetaData vemetadata, Object vedata) {
+            QueryMetadata metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data,
+            QueryMetadata vemetadata, Object vedata) {
         super(id, success, error, sqlRc, sqlState, metadata, isDone, hasResults, updateCount, data);
         this.vemetadata = vemetadata;
         this.vedata = vedata;
     }
 
-    public QueryMetaData getVemetadata() {
+    public QueryMetadata getVemetadata() {
         return vemetadata;
     }
 
-    public void setVemetadata(QueryMetaData vemetadata) {
+    public void setVemetadata(QueryMetadata vemetadata) {
         this.vemetadata = vemetadata;
     }
 
