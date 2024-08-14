@@ -5,6 +5,10 @@ import io.github.mapapire.types.QueryResult;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -25,10 +29,20 @@ class SimpleTest {
             properties.load(input);
         }
 
-        String host = properties.getProperty("IBMI_HOST");
-        String user = properties.getProperty("IBMI_USER");
-        String password = properties.getProperty("IBMI_PASSWORD");
-        int port = Integer.parseInt(properties.getProperty("IBMI_PORT"));
+        List<String> keys = Arrays.asList("IBMI_HOST", "IBMI_USER", "IBMI_PASSWORD", "IBMI_PORT");
+        Map<String, String> secrets = new HashMap<>();
+        for (String key : keys) {
+            String value = properties.getProperty(key);
+            if (value.equals("")) {
+                throw new Error(key + " not set in config.properties");
+            }
+            secrets.put(key, value);
+        }
+
+        String host = secrets.get(keys.get(0));
+        String user = secrets.get(keys.get(1));
+        String password = secrets.get(keys.get(2));
+        int port = Integer.parseInt(secrets.get(keys.get(3)));
 
         creds = new DaemonServer(host, port, user, password, true, "");
 
