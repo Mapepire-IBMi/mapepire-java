@@ -2,7 +2,7 @@ package io.github.mapapire.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ColumnMetaData {
+public class ColumnMetadata {
     @JsonProperty("display_size")
     private int displaySize;
 
@@ -15,11 +15,11 @@ public class ColumnMetaData {
     @JsonProperty("type")
     private String type;
 
-    public ColumnMetaData() {
+    public ColumnMetadata() {
 
     }
 
-    public ColumnMetaData(int displaySize, String label, String name, String type) {
+    public ColumnMetadata(int displaySize, String label, String name, String type) {
         this.displaySize = displaySize;
         this.label = label;
         this.name = name;
