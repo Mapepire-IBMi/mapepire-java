@@ -29,6 +29,7 @@ class PoolOptions {
 
     PoolOptions(DaemonServer creds, int maxSize, int startingSize) {
         this.creds = creds;
+        this.opts = new JDBCOptions();
         this.maxSize = maxSize;
         this.startingSize = startingSize;
     }
