@@ -29,6 +29,7 @@ class PoolOptions {
 
     PoolOptions(DaemonServer creds, int maxSize, int startingSize) {
         this.creds = creds;
+        this.opts = new JDBCOptions();
         this.maxSize = maxSize;
         this.startingSize = startingSize;
     }
@@ -235,24 +236,22 @@ public class Pool {
         }
     }
 
-    // TODO: Fix optional parm
     public <T> Query<T> query(String sql) {
-        return this.query(sql, null);
+        QueryOptions options = new QueryOptions();
+        return this.query(sql, options);
     }
 
-    // TODO: Fix optional parm
     public <T> Query<T> query(String sql, QueryOptions opts) {
         SqlJob job = this.getJob();
         return job.query(sql, opts);
     }
 
-    // TODO: Fix optional parm
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql) {
-        return this.execute(sql, null);
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws Exception {
+        QueryOptions options = new QueryOptions();
+        return this.execute(sql, options);
     }
 
-    // TODO: Fix optional parm
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws Exception {
         SqlJob job = this.getJob();
         return job.execute(sql, opts);
     }

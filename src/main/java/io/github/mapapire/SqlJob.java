@@ -212,7 +212,7 @@ public class SqlJob {
     }
 
     // TODO:
-    public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) {
+    public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) throws Exception {
         this.status = JobStatus.Connecting;
         try {
             this.socket = this.getChannel(db2Server).get();
@@ -267,9 +267,9 @@ public class SqlJob {
             this.dispose();
             this.status = JobStatus.NotStarted;
             if (connectResult.getError() != null) {
-                throw new Error(connectResult.getError());
+                throw new Exception(connectResult.getError());
             } else {
-                throw new Error("Failed to connect to server.");
+                throw new Exception("Failed to connect to server.");
             }
         }
 
@@ -288,12 +288,12 @@ public class SqlJob {
         return new Query(this, sql, opts);
     }
 
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql) {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws Exception {
         QueryOptions options = new QueryOptions();
         return this.execute(sql, options);
     }
 
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws Exception {
         Query<T> query = query(sql, opts);
         CompletableFuture<QueryResult<T>> future = query.execute();
         try {
@@ -301,7 +301,7 @@ public class SqlJob {
             query.close().get();
 
             if (result.getError() != null) {
-                throw new Error(result.getError());
+                throw new Exception(result.getError());
             }
 
             return CompletableFuture.completedFuture(result);
@@ -311,7 +311,7 @@ public class SqlJob {
         }
     }
 
-    public CompletableFuture<VersionCheckResult> getVersion() {
+    public CompletableFuture<VersionCheckResult> getVersion() throws Exception {
         ObjectNode verObj = objectMapper.createObjectNode();
         verObj.put("id", SqlJob.getNewUniqueId());
         verObj.put("type", "getversion");
@@ -334,20 +334,20 @@ public class SqlJob {
 
         if (!version.getSuccess()) {
             if (version.getError() != null) {
-                throw new Error(version.getError());
+                throw new Exception(version.getError());
             } else {
-                throw new Error("Failed to get version from backend");
+                throw new Exception("Failed to get version from backend");
             }
         }
 
         return CompletableFuture.completedFuture(version);
     }
 
-    public CompletableFuture<ExplainResults<?>> explain(String statement) {
+    public CompletableFuture<ExplainResults<?>> explain(String statement) throws Exception {
         return this.explain(statement, ExplainType.Run);
     }
 
-    public CompletableFuture<ExplainResults<?>> explain(String statement, ExplainType type) {
+    public CompletableFuture<ExplainResults<?>> explain(String statement, ExplainType type) throws Exception {
         ObjectNode explainRequest = objectMapper.createObjectNode();
         explainRequest.put("id", SqlJob.getNewUniqueId());
         explainRequest.put("type", "dove");
@@ -372,9 +372,9 @@ public class SqlJob {
 
         if (!explainResult.getSuccess()) {
             if (explainResult.getError() != null) {
-                throw new Error(explainResult.getError());
+                throw new Exception(explainResult.getError());
             } else {
-                throw new Error("Failed to explain.");
+                throw new Exception("Failed to explain.");
             }
         }
 
@@ -385,7 +385,7 @@ public class SqlJob {
         return this.traceFile;
     }
 
-    public CompletableFuture<GetTraceDataResult> getTraceData() {
+    public CompletableFuture<GetTraceDataResult> getTraceData() throws Exception {
         ObjectNode tracedataReqObj = objectMapper.createObjectNode();
         tracedataReqObj.put("id", SqlJob.getNewUniqueId());
         tracedataReqObj.put("type", "gettracedata");
@@ -408,16 +408,16 @@ public class SqlJob {
 
         if (!rpy.getSuccess()) {
             if (rpy.getError() != null) {
-                throw new Error(rpy.getError());
+                throw new Exception(rpy.getError());
             } else {
-                throw new Error("Failed to get trace data from backend");
+                throw new Exception("Failed to get trace data from backend");
             }
         }
 
         return CompletableFuture.completedFuture(rpy);
     }
 
-    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level) {
+    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level) throws Exception {
         ObjectNode reqObj = objectMapper.createObjectNode();
         reqObj.put("id", SqlJob.getNewUniqueId());
         reqObj.put("type", "setconfig");
@@ -444,9 +444,9 @@ public class SqlJob {
 
         if (!rpy.getSuccess()) {
             if (rpy.getError() != null) {
-                throw new Error(rpy.getError());
+                throw new Exception(rpy.getError());
             } else {
-                throw new Error("Failed to set trace options on backend");
+                throw new Exception("Failed to set trace options on backend");
             }
         }
 
@@ -487,7 +487,7 @@ public class SqlJob {
     // });
     // }
 
-    public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type) {
+    public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type) throws Exception {
         String query;
 
         switch (type) {

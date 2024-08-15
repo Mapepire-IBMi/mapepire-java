@@ -85,16 +85,16 @@ public class Query<T> {
                 .collect(Collectors.toList());
     }
 
-    public <T> CompletableFuture<QueryResult<T>> execute() {
+    public <T> CompletableFuture<QueryResult<T>> execute() throws Exception {
         return this.execute(100);
     }
 
-    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) {
+    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws Exception {
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
-                throw new Error("Statement has already been run");
+                throw new Exception("Statement has already been run");
             case RUN_DONE:
-                throw new Error("Statement has already been fully run");
+                throw new Exception("Statement has already been fully run");
         }
 
         ObjectNode queryObject = objectMapper.createObjectNode();
@@ -158,23 +158,23 @@ public class Query<T> {
                 errorList.add("Failed to run query (unknown error)");
             }
 
-            throw new Error(String.join(", ", errorList));
+            throw new Exception(String.join(", ", errorList));
         }
 
         this.correlationId = queryResult.getId();
         return CompletableFuture.completedFuture(queryResult);
     }
 
-    public CompletableFuture<QueryResult<T>> fetchMore() {
+    public CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
         return this.fetchMore(this.rowsToFetch);
     }
 
-    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) {
+    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws Exception {
         switch (this.state) {
             case NOT_YET_RUN:
-                throw new Error("Statement has not yet been run");
+                throw new Exception("Statement has not yet been run");
             case RUN_DONE:
-                throw new Error("Statement has already been fully run");
+                throw new Exception("Statement has already been fully run");
         }
 
         ObjectNode queryObject = objectMapper.createObjectNode();
@@ -202,9 +202,9 @@ public class Query<T> {
 
                                 String error = queryResult.getError();
                                 if (error != null) {
-                                    throw new Error(error.toString());
+                                    throw new Exception(error.toString());
                                 } else {
-                                    throw new Error("Failed to run query (unknown error)");
+                                    throw new Exception("Failed to run query (unknown error)");
                                 }
                             }
 
