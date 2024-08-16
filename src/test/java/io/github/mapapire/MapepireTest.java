@@ -11,9 +11,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Timeout;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Timeout(5)
 class MapepireTest {
     private static final String CONFIG_FILE = "config.properties";
     public static DaemonServer creds;
