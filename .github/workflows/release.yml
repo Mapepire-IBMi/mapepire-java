@@ -60,14 +60,11 @@ jobs:
           sed -i 's/^IBMI_PASSWORD=/IBMI_PASSWORD=${{ secrets.IBMI_PASSWORD }}/' ${{ env.CONFIG_PROPERTIES }}
           sed -i 's/^IBMI_PORT=/IBMI_PORT=${{ secrets.IBMI_PORT }}/' ${{ env.CONFIG_PROPERTIES }}
 
-      - name: remove test dir
-        run: rm -fr src/test
-
       - name: eyeball settings.xml
         run: cat $HOME/.m2/settings.xml
 
       - name: Publish Maven Package
-        run: mvn --batch-mode -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} clean deploy --file pom.xml
+        run: mvn --batch-mode -Dmaven.test.skip=true clean deploy --file pom.xml
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
