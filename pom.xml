@@ -3,9 +3,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.github.mapapire-ibmi</groupId>
-  <artifactId>mapapire-sdk</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>io.github.mapepire-ibmi</groupId>
+  <artifactId>mapepire-sdk</artifactId>
+  <version>0.0.2</version>
   <packaging>jar</packaging>
 
   <name>Mapepire Java</name>
@@ -40,17 +40,6 @@
     <developerConnection>scm:git:ssh://github.com:Mapepire-IBMi/mapepire-java.git</developerConnection>
     <url>https://github.com/Mapepire-IBMi/mapepire-java</url>
   </scm>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -261,17 +250,16 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.7.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>0.5.0</version>
+          <extensions>true</extensions>
+          <configuration>
+             <publishingServerId>central</publishingServerId>
+             <autoPublish>true</autoPublish>
+          </configuration>
+        </plugin>
     </plugins>
   </build>
 
