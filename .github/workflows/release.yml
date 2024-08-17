@@ -62,6 +62,7 @@ jobs:
 
       - name: remove test dir
         run: rm -fr src/test
+
       - name: eyeball settings.xml
         run: cat $HOME/.m2/settings.xml
 
@@ -78,8 +79,8 @@ jobs:
       - name: Copy Artifacts to Staging Directory
         run: mkdir staging && cp target/*.jar staging
 
-      - name: Create Bundle .zip
-        run: cd staging && zip ../mapepire-java-${{ env.PROJECT_VERSION }}.zip *.jar && cd ..
+      - name: Create Bundle .zip and move main jar file
+        run: cd staging && zip ../mapepire-sdk-${{ env.PROJECT_VERSION }}.zip *.jar && mv ./mapepire-sdk-${{ env.PROJECT_VERSION }}.jar .. && cd ..
 
       # - name: Get Release
       #   id: get_release
@@ -93,8 +94,8 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   with:
       #     upload_url: ${{ steps.get_release.outputs.upload_url }}
-      #     asset_path: ./mapepire-java-${{ env.PROJECT_VERSION }}.jar
-      #     asset_name: mapepire-java-${{ env.PROJECT_VERSION }}.jar
+      #     asset_path: ./mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
+      #     asset_name: mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
       #     asset_content_type: application/zip
 
       # - name: Upload ZIP to Release
@@ -103,8 +104,8 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   with:
       #     upload_url: ${{ steps.get_release.outputs.upload_url }}
-      #     asset_path: ./mapepire-java-${{ env.PROJECT_VERSION }}.zip
-      #     asset_name: mapepire-java-${{ env.PROJECT_VERSION }}.zip
+      #     asset_path: ./mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
+      #     asset_name: mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
       #     asset_content_type: application/zip
 
       - name: Create the tag and release
@@ -113,4 +114,5 @@ jobs:
           tag_name: v${{ env.PROJECT_VERSION }}
           name: v${{ env.PROJECT_VERSION }}
           files: |
-           mapepire-java-${{ env.PROJECT_VERSION }}.zip
+           mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
+           mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
