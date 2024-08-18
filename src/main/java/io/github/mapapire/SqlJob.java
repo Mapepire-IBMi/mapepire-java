@@ -192,7 +192,9 @@ public class SqlJob {
 
             CompletableFuture<String> future = new CompletableFuture<>();
             responseMap.put(id, future);
-            this.socket.send(content);
+            synchronized(this.socket) {
+                this.socket.send(content+"\n");
+            }
             String message = future.get();
             responseMap.remove(id);
             return CompletableFuture.completedFuture(message);
