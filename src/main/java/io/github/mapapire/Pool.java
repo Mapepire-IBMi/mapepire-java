@@ -1,7 +1,9 @@
 package io.github.mapapire;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -85,7 +87,7 @@ class PoolAddOptions {
 }
 
 public class Pool {
-    private List<SqlJob> jobs = new ArrayList<>();
+    private List<SqlJob> jobs = Collections.synchronizedList(new LinkedList<SqlJob>());
     private PoolOptions options;
     private List<JobStatus> INVALID_STATES = new ArrayList<JobStatus>(
             Arrays.asList(JobStatus.Ended, JobStatus.NotStarted));
@@ -159,19 +161,12 @@ public class Pool {
                 .orElse(null);
     }
 
-    public int getReadyJobIndex() {
-        return IntStream.range(0, this.jobs.size())
-                .filter(j -> jobs.get(j).getStatus() == JobStatus.Ready)
-                .findFirst()
-                .orElse(-1);
-    }
-
     /**
      * Returns a job as fast as possible. It will either be a ready job
      * or the job with the least requests on the queue. Will spawn new jobs
      * if the pool is not full but all jobs are busy.
      */
-    public SqlJob getJob() {
+    public synchronized SqlJob getJob() {
         SqlJob job = this.getReadyJob();
         if (job == null) {
             // This code finds a job that is busy, but has the least requests on the queue
@@ -224,10 +219,11 @@ public class Pool {
      * Returns a job that is ready to be used. If no jobs are ready, it will
      * create a new job and return that. Use `addJob` to add back to the pool.
      */
-    public CompletableFuture<SqlJob> popJob() {
-        int index = getReadyJobIndex();
-        if (index > -1) {
-            return CompletableFuture.completedFuture(jobs.remove(index));
+    public CompletableFuture<SqlJob> popJob() { //TODO: dead code: what to do with it?
+        SqlJob readyJob = getReadyJob();
+        if (null != readyJob) {
+            jobs.remove(readyJob);
+            return CompletableFuture.completedFuture(readyJob);
         } else {
             // Add a new job asynchronously
             PoolAddOptions options = new PoolAddOptions();
