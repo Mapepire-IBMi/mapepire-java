@@ -135,7 +135,7 @@ public class SqlJob {
                 @Override
                 public void onMessage(String message) {
                     if (isTracingChannelData) {
-                        System.out.println(message);
+                        System.out.println("\n<< "+message);
                     }
 
                     try {
@@ -183,7 +183,7 @@ public class SqlJob {
 
     public CompletableFuture<String> send(String content) {
         if (this.isTracingChannelData) {
-            System.out.println(content);
+            System.out.println("\n>> "+content);
         }
 
         try {
