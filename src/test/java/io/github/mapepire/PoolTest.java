@@ -10,8 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mapepire.Pool;
-import io.github.mapepire.PoolOptions;
 import io.github.mapepire.types.QueryResult;
 
 class PoolTest extends MapepireTest {

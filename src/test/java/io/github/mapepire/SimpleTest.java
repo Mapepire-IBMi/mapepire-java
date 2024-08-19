@@ -4,8 +4,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mapepire.Query;
-import io.github.mapepire.SqlJob;
 import io.github.mapepire.types.QueryResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
