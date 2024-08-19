@@ -1,4 +1,4 @@
-# mapepire-java
+# Mapepire Java Client SDK
 
 [![Maven Build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml) [![License](https://img.shields.io/github/license/allenai/tango.svg?color=blue&cachedrop)](https://github.com/Mapepire-IBMi/mapepire-java/blob/main/LICENSE)
 
