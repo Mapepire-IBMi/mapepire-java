@@ -10,6 +10,7 @@ Thank you for considering contributing to the Mapepire Java Client SDK! We appre
   - [Suggesting Enhancements](#suggesting-enhancements)
   - [Submitting Changes](#submitting-changes)
 - [Development Workflow](#development-workflow)
+  - [Development Environment](#development-environment)
   - [Getting Started](#getting-started)
   - [Creating a Branch](#creating-a-branch)
   - [Making Changes](#making-changes)
@@ -27,19 +28,30 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Reporting Bugs
 
-If you find a bug, please report it by opening an issue on our [GitHub Issues page](https://github.com/your-username/mapepire-java/issues). Provide as much detail as possible, including steps to reproduce the issue, your environment, and any relevant logs.
+If you find a bug, please report it by opening an issue on our [GitHub Issues](https://github.com/Mapepire-IBMi/mapepire-java/issues) page. Provide as much detail as possible, including steps to reproduce the issue, your environment, and any relevant logs.
 
 Before you start working on a bug, please comment on the issue to let us know that you are working on it. This helps prevent duplicate efforts.
 
 ### Suggesting Enhancements
 
-We welcome new ideas! If you have a feature request or enhancement suggestion, please open an issue on our [GitHub Issues page](https://github.com/your-username/mapepire-java/issues) and describe the enhancement you'd like to see. 
+We welcome new ideas! If you have a feature request or enhancement suggestion, please open an issue on our [GitHub Issues](https://github.com/Mapepire-IBMi/mapepire-java/issues) page and describe the enhancement you'd like to see. 
 
 ### Submitting Changes
 
 If you would like to contribute code to the project, follow the steps below to get started.
 
 ## Development Workflow
+
+### Development Environment
+
+[Visual Studio Code](https://code.visualstudio.com/) is the recommended code editor to be used as it is lightweight and has several extensions which can be installed to enhacene the developer experience.
+
+For this project, the following extensions should be installed:
+
+- [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+- [GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions)
+- [TODO Highlight](https://marketplace.visualstudio.com/items?itemName=wayou.vscode-todo-highlight)
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
 
 ### Getting Started
 
@@ -51,26 +63,31 @@ If you would like to contribute code to the project, follow the steps below to g
     cd mapepire-java
     ```
 
+    > [!NOTE]  
+    > Make sure to replace `your-username` in the `git clone` command with your GitHub username.
+
 3. Install the necessary dependencies:
 
     ```sh
-    ./gradlew build
+    mvn clean install
     ```
 
 ### Creating a Branch
 
 Create a new branch for your changes. Use a descriptive name for the branch to reflect the work being done.
 
-## Making Changes
+### Making Changes
 Make your changes to the codebase. Ensure that your changes adhere to our [style guide](#style-guide).
 
-## Committing Changes
+### Committing Changes
 Commit your changes with a descriptive commit message. Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for your commit messages.
 
-
+```sh
 git add .
-git commit -m "feat: add new feature description"
-# Submitting a Pull Request
+git commit -s -m "added a cool feature"
+```
+
+### Submitting a Pull Request
 
 1. Push your changes to your forked repository:
 
@@ -88,13 +105,13 @@ git commit -m "feat: add new feature description"
 
 ## Style Guide
 
-- Follow the Google Java Style Guide for code formatting.
+- Follow the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) for code formatting.
 - Ensure your code is well-documented with Javadoc comments.
 - Write unit tests for new features and bug fixes.
 
 ## LICENSE
 
-By contributing to this project, you agree that your contributions will be licensed under the following license. [LICENSE](LICENSE)
+By contributing to this project, you agree that your contributions will be licensed under the [Apache-2.0 license](LICENSE)
 
 ## Acknowledgements
 
