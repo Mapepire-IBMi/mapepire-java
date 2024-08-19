@@ -8,7 +8,7 @@
   <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Mapepire Java</name>
+  <name>Mapepire SDK</name>
   <description>The Mapepire Java client SDK provides a new and convenient way to access Db2 on IBM i</description>
   <url>https://github.com/Mapepire-IBMi/mapepire-java</url>
 
