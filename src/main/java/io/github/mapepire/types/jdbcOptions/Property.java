@@ -101,6 +101,7 @@ public enum Property {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

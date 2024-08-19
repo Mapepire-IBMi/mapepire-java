@@ -20,6 +20,7 @@ public enum PackageCriteria {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

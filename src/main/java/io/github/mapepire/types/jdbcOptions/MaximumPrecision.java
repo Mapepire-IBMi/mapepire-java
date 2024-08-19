@@ -20,6 +20,7 @@ public enum MaximumPrecision {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

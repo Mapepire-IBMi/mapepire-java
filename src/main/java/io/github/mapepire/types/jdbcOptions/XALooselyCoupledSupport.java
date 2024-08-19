@@ -20,6 +20,7 @@ public enum XALooselyCoupledSupport {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

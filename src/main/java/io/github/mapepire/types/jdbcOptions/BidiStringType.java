@@ -26,6 +26,7 @@ public enum BidiStringType {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

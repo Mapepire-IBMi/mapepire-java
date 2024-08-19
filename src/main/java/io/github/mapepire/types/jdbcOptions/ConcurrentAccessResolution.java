@@ -21,6 +21,7 @@ public enum ConcurrentAccessResolution {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

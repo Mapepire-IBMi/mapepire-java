@@ -21,6 +21,7 @@ public enum QueryOptimizeGoal {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

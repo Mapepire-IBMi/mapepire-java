@@ -26,6 +26,7 @@ public enum DateFormat {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

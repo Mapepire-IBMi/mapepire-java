@@ -8,81 +8,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import io.github.mapepire.types.DaemonServer;
-import io.github.mapepire.types.JDBCOptions;
 import io.github.mapepire.types.JobStatus;
+import io.github.mapepire.types.PoolAddOptions;
+import io.github.mapepire.types.PoolOptions;
 import io.github.mapepire.types.QueryOptions;
 import io.github.mapepire.types.QueryResult;
-
-class PoolOptions {
-    private DaemonServer creds;
-    private JDBCOptions opts;
-    private int maxSize;
-    private int startingSize;
-
-    PoolOptions(DaemonServer creds, JDBCOptions opts, int maxSize, int startingSize) {
-        this.creds = creds;
-        this.opts = opts;
-        this.maxSize = maxSize;
-        this.startingSize = startingSize;
-    }
-
-    PoolOptions(DaemonServer creds, int maxSize, int startingSize) {
-        this.creds = creds;
-        this.opts = new JDBCOptions();
-        this.maxSize = maxSize;
-        this.startingSize = startingSize;
-    }
-
-    public DaemonServer getCreds() {
-        return creds;
-    }
-
-    public JDBCOptions getOpts() {
-        return opts;
-    }
-
-    public int getMaxSize() {
-        return maxSize;
-    }
-
-    public int getStartingSize() {
-        return startingSize;
-    }
-}
-
-class PoolAddOptions {
-    /** An existing job to add to the pool */
-    private SqlJob existingJob;
-
-    /** Don't add to the pool */
-    private boolean poolIgnore;
-
-    public PoolAddOptions() {
-
-    }
-
-    public PoolAddOptions(SqlJob existingJob, boolean poolIgnore) {
-        this.existingJob = existingJob;
-        this.poolIgnore = poolIgnore;
-    }
-
-    public SqlJob getExistingJob() {
-        return existingJob;
-    }
-
-    public void setExistingJob(SqlJob existingJob) {
-        this.existingJob = existingJob;
-    }
-
-    public boolean isPoolIgnore() {
-        return poolIgnore;
-    }
-
-    public void setPoolIgnore(boolean poolIgnore) {
-        this.poolIgnore = poolIgnore;
-    }
-}
 
 public class Pool {
     private List<SqlJob> jobs = new ArrayList<>();
@@ -136,7 +66,7 @@ public class Pool {
         SqlJob newSqlJob = options.getExistingJob() != null ? options.getExistingJob()
                 : new SqlJob(this.options.getOpts());
 
-        if (options.isPoolIgnore() != true) {
+        if (options.getPoolIgnore() != true) {
             this.jobs.add(newSqlJob);
         }
 

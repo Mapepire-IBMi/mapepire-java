@@ -25,6 +25,7 @@ public enum DecfloatRoundingMode {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

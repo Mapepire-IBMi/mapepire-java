@@ -20,6 +20,7 @@ public enum MetadataSource {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

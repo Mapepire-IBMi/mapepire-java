@@ -21,6 +21,7 @@ public enum PackageCcsid {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

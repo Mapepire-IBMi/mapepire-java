@@ -20,6 +20,7 @@ public enum Naming {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

@@ -20,6 +20,7 @@ public enum DecimalSeparator {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

@@ -23,6 +23,7 @@ public enum TransactionIsolation {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

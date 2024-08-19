@@ -21,6 +21,7 @@ public enum BlockCriteria {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }
