@@ -13,14 +13,14 @@ public class GetTraceDataResult extends ServerResponse {
     private String tracedata;
 
     /**
-     * Constructs a new GetTraceDataResult instance.
+     * Construct a new GetTraceDataResult instance.
      */
     public GetTraceDataResult() {
         super();
     }
 
     /**
-     * Constructs a new GetTraceDataResult instance.
+     * Construct a new GetTraceDataResult instance.
      * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.

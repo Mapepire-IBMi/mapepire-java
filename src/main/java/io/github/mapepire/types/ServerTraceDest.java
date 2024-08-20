@@ -20,7 +20,7 @@ public enum ServerTraceDest {
     private String value;
 
     /**
-     * Constructs a new ServerTraceDest instance.
+     * Construct a new ServerTraceDest instance.
      * 
      * @param value The server trace destination.
      */

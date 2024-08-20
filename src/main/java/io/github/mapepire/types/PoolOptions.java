@@ -28,7 +28,7 @@ public class PoolOptions {
     private int startingSize;
 
     /**
-     * Constructs a new PoolOptions instance.
+     * Construct a new PoolOptions instance.
      * 
      * @param creds        The credentials required to connect to the daemon server.
      * @param opts         The JDBC options for configuring the connection.
@@ -44,7 +44,7 @@ public class PoolOptions {
     }
 
     /**
-     * Constructs a new PoolOptions instance.
+     * Construct a new PoolOptions instance.
      * 
      * @param creds        The credentials required to connect to the daemon server.
      * @param maxSize      The maximum number of connections allowed in the pool.

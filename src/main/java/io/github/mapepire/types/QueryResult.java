@@ -39,14 +39,14 @@ public class QueryResult<T> extends ServerResponse {
     private List<T> data;
 
     /**
-     * Constructs a new QueryResult instance.
+     * Construct a new QueryResult instance.
      */
     public QueryResult() {
         super();
     }
 
     /**
-     * Constructs a new QueryResult instance.
+     * Construct a new QueryResult instance.
      * 
      * @param id          The unique identifier for the request.
      * @param success     Whether the request was successful.

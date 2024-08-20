@@ -27,14 +27,14 @@ public class QueryMetadata {
     private String job;
 
     /**
-     * Constructs a new QueryMetadata instance.
+     * Construct a new QueryMetadata instance.
      */
     public QueryMetadata() {
 
     }
 
     /**
-     * Constructs a new QueryMetadata instance.
+     * Construct a new QueryMetadata instance.
      * 
      * @param columnCount The number of columns returned by the query.
      * @param columns     The metadata for each column.

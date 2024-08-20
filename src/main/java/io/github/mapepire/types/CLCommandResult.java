@@ -16,14 +16,14 @@ public class CLCommandResult extends ServerResponse {
     private List<JobLogEntry> joblog = new ArrayList<JobLogEntry>();
 
     /**
-     * Constructs a new CLCommandResult instance.
+     * Construct a new CLCommandResult instance.
      */
     public CLCommandResult() {
         super();
     }
 
     /**
-     * Constructs a new CLCommandResult instance.
+     * Construct a new CLCommandResult instance.
      * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.

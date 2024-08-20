@@ -37,14 +37,14 @@ public class ServerResponse {
     private String sqlState;
 
     /**
-     * Constructs a new ServerResponse instance.
+     * Construct a new ServerResponse instance.
      */
     public ServerResponse() {
 
     }
 
     /**
-     * Constructs a new ServerResponse instance.
+     * Construct a new ServerResponse instance.
      * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.

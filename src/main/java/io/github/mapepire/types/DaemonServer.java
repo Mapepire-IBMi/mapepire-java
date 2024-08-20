@@ -43,14 +43,14 @@ public class DaemonServer {
     private String ca;
 
     /**
-     * Constructs a new DaemonServer instance.
+     * Construct a new DaemonServer instance.
      */
     public DaemonServer() {
 
     }
 
     /**
-     * Constructs a new DaemonServer instance.
+     * Construct a new DaemonServer instance.
      * 
      * @param host               The hostname or IP address of the server.
      * @param port               The port number to connect to.

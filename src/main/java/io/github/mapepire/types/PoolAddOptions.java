@@ -17,14 +17,14 @@ public class PoolAddOptions {
     private boolean poolIgnore;
 
     /**
-     * Constructs a new PoolAddOptions instance.
+     * Construct a new PoolAddOptions instance.
      */
     public PoolAddOptions() {
 
     }
 
     /**
-     * Constructs a new PoolAddOptions instance.
+     * Construct a new PoolAddOptions instance.
      * 
      * @param existingJob An existing job to add to the pool.
      * @param poolIgnore  Whether to not add to the pool.

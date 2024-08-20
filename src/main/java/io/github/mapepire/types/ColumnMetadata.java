@@ -31,14 +31,14 @@ public class ColumnMetadata {
     private String type;
 
     /**
-     * Constructs a new ColumnMetadata instance.
+     * Construct a new ColumnMetadata instance.
      */
     public ColumnMetadata() {
 
     }
 
     /**
-     * Constructs a new ColumnMetadata instance.
+     * Construct a new ColumnMetadata instance.
      * 
      * @param displaySize The display size of the column.
      * @param label       The label of the column.

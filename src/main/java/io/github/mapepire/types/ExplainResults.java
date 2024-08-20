@@ -21,14 +21,14 @@ public class ExplainResults<T> extends QueryResult<T> {
     private Object vedata;
 
     /**
-     * Constructs a new ExplainResults instance.
+     * Construct a new ExplainResults instance.
      */
     public ExplainResults() {
         super();
     }
 
     /**
-     * Constructs a new ExplainResults instance.
+     * Construct a new ExplainResults instance.
      * 
      * @param id          The unique identifier for the request.
      * @param success     Whether the request was successful.

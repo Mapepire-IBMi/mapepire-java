@@ -55,14 +55,14 @@ public class JobLogEntry {
     private String messageSecondLevelText;
 
     /**
-     * Constructs a new JobLogEntry instance.
+     * Construct a new JobLogEntry instance.
      */
     public JobLogEntry() {
 
     }
 
     /**
-     * Constructs a new JobLogEntry instance.
+     * Construct a new JobLogEntry instance.
      * 
      * @param messageId              The unique message identifier.
      * @param severity               The severity level of the message.

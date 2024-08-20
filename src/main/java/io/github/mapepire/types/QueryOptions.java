@@ -27,14 +27,14 @@ public class QueryOptions {
     private List<Object> parameters;
 
     /**
-     * Constructs a new QueryOptions instance.
+     * Construct a new QueryOptions instance.
      */
     public QueryOptions() {
 
     }
 
     /**
-     * Constructs a new QueryOptions instance.
+     * Construct a new QueryOptions instance.
      * 
      * @param isTerseResults Whether to return terse results.
      * @param isClCommand    Whether the command is a CL command.

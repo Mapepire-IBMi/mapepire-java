@@ -32,7 +32,7 @@ public enum QueryState {
     private int value;
 
     /**
-     * Constructs a new QueryState instance.
+     * Construct a new QueryState instance.
      * 
      * @param value The query state.
      */

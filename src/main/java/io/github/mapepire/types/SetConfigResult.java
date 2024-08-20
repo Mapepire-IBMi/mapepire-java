@@ -19,14 +19,14 @@ public class SetConfigResult extends ServerResponse {
     private ServerTraceLevel tracelevel;
 
     /**
-     * Constructs a new SetConfigResult instance.
+     * Construct a new SetConfigResult instance.
      */
     public SetConfigResult() {
         super();
     }
 
     /**
-     * Constructs a new SetConfigResult instance.
+     * Construct a new SetConfigResult instance.
      * 
      * @param id         The unique identifier for the request.
      * @param success    Whether the request was successful.

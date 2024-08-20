@@ -35,7 +35,7 @@ public enum JobStatus {
     private String value;
 
     /**
-     * Constructs a new JobStatus instance.
+     * Construct a new JobStatus instance.
      * 
      * @param value The job status.
      */

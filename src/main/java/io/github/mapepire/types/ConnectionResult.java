@@ -13,14 +13,14 @@ public class ConnectionResult extends ServerResponse {
     private String job;
 
     /**
-     * Constructs a new ConnectionResult instance.
+     * Construct a new ConnectionResult instance.
      */
     public ConnectionResult() {
         super();
     }
 
     /**
-     * Constructs a new ConnectionResult instance.
+     * Construct a new ConnectionResult instance.
      * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.

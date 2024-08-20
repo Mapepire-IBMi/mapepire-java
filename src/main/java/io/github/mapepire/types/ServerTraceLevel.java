@@ -30,7 +30,7 @@ public enum ServerTraceLevel {
     private String value;
 
     /**
-     * Constructs a new ServerTraceLevel instance.
+     * Construct a new ServerTraceLevel instance.
      * 
      * @param value The server trace level.
      */

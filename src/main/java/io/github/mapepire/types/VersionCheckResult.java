@@ -19,14 +19,14 @@ public class VersionCheckResult extends ServerResponse {
     private String version;
 
     /**
-     * Constructs a new VersionCheckResult instance.
+     * Construct a new VersionCheckResult instance.
      */
     public VersionCheckResult() {
 
     }
 
     /**
-     * Constructs a new VersionCheckResult instance.
+     * Construct a new VersionCheckResult instance.
      * 
      * @param id        The unique identifier for the request.
      * @param success   Whether the request was successful.
