@@ -133,3 +133,7 @@ Output:
   } ]
 }
 ```
+
+## Sample Projects
+
+Check out all the [Java Sample Projects](https://github.com/Mapepire-IBMi/samples/tree/main/java) that showcase how this client SDK can be used in various applications.
