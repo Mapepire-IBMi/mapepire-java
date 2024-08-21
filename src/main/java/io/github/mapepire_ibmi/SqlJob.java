@@ -119,6 +119,7 @@ public class SqlJob {
 
     /**
      * Construct a new SqlJob instance.
+     * 
      * @param options The JDBC options.
      */
     public SqlJob(JDBCOptions options) {
@@ -127,6 +128,7 @@ public class SqlJob {
 
     /**
      * Get a new unique ID with "id" as the prefix.
+     * 
      * @return The unique ID.
      */
     public static String getNewUniqueId() {
@@ -135,6 +137,7 @@ public class SqlJob {
 
     /**
      * Get a new unique ID with a custom prefix.
+     * 
      * @param prefix The custom prefix.
      * @return The unique ID.
      */
@@ -145,6 +148,7 @@ public class SqlJob {
     /**
      * Get a WebSocketClient instance which can be used to connect to the specified
      * DB2 server.
+     * 
      * @param db2Server The server details for the connection.
      * @return A CompletableFuture that resolves to the WebSocketClient instance.
      */
@@ -172,7 +176,7 @@ public class SqlJob {
                 @Override
                 public void onMessage(String message) {
                     if (isTracingChannelData) {
-                        System.out.println(message);
+                        System.out.println("\n<< " + message);
                     }
 
                     try {
@@ -219,12 +223,13 @@ public class SqlJob {
 
     /**
      * Send a message to the connected database server.
+     * 
      * @param content The message content to send.
      * @return A CompletableFuture that resolves to the server's response.
      */
     public CompletableFuture<String> send(String content) {
         if (this.isTracingChannelData) {
-            System.out.println(content);
+            System.out.println("\n>> " + content);
         }
 
         try {
@@ -233,7 +238,9 @@ public class SqlJob {
 
             CompletableFuture<String> future = new CompletableFuture<>();
             responseMap.put(id, future);
-            this.socket.send(content);
+            synchronized (this.socket) {
+                this.socket.send(content + "\n");
+            }
             String message = future.get();
             responseMap.remove(id);
             return CompletableFuture.completedFuture(message);
@@ -245,6 +252,7 @@ public class SqlJob {
 
     /**
      * Get the current status of the job.
+     * 
      * @return The current status of the job.
      */
     public JobStatus getStatus() {
@@ -253,6 +261,7 @@ public class SqlJob {
 
     /**
      * Get the count of ongoing requests for the job.
+     * 
      * @return The number of ongoing requests.
      */
     public int getRunningCount() {
@@ -262,6 +271,7 @@ public class SqlJob {
 
     /**
      * Connect to the specified DB2 server and initializes the SQL job.
+     * 
      * @param db2Server The server details for the connection.
      * @return A CompletableFuture that resolves to the connection result.
      */
@@ -334,6 +344,7 @@ public class SqlJob {
 
     /**
      * Create a Query object for the specified SQL statement.
+     * 
      * @param <T> The type of data to be returned.
      * @param sql The SQL query.
      * @return A new Query instance.
@@ -344,6 +355,7 @@ public class SqlJob {
 
     /**
      * Create a Query object for the specified SQL statement.
+     * 
      * @param <T>  The type of data to be returned.
      * @param sql  The SQL query.
      * @param opts The options for configuring the query.
@@ -355,6 +367,7 @@ public class SqlJob {
 
     /**
      * Execute an SQL command and returns the result.
+     * 
      * @param <T> The type of data to be returned.
      * @param sql The SQL command to execute.
      * @return A CompletableFuture that resolves to the query result.
@@ -365,7 +378,8 @@ public class SqlJob {
 
     /**
      * Execute an SQL command and returns the result.
-     * @param <T> The type of data to be returned.
+     * 
+     * @param <T>  The type of data to be returned.
      * @param sql  The SQL command to execute.
      * @param opts The options for configuring the query.
      * @return A CompletableFuture that resolves to the query result.
@@ -390,6 +404,7 @@ public class SqlJob {
 
     /**
      * Get the version information from the database server.
+     * 
      * @return A CompletableFuture that resolves to the version check result.
      */
     public CompletableFuture<VersionCheckResult> getVersion() throws Exception {
@@ -426,6 +441,7 @@ public class SqlJob {
 
     /**
      * Explains a SQL statement and returns the results.
+     * 
      * @param statement The SQL statement to explain.
      * @return A CompletableFuture that resolves to the explain results.
      */
@@ -435,6 +451,7 @@ public class SqlJob {
 
     /**
      * Explains a SQL statement and returns the results.
+     * 
      * @param statement The SQL statement to explain.
      * @param type      The type of explain to perform (default is ExplainType.Run).
      * @return A CompletableFuture that resolves to the explain results.
@@ -482,6 +499,7 @@ public class SqlJob {
 
     /**
      * Get trace data from the backend.
+     * 
      * @return A CompletableFuture that resolves to the trace data result.
      */
     public CompletableFuture<GetTraceDataResult> getTraceData() throws Exception {
@@ -518,6 +536,7 @@ public class SqlJob {
 
     /**
      * Set the trace config on the backend.
+     * 
      * @param dest  The server trace destination.
      * @param level The server trace level.
      * @return A CompletableFuture that resolves to the set config result.
@@ -564,6 +583,7 @@ public class SqlJob {
 
     /**
      * Create a CL command query.
+     * 
      * @param cmd The CL command.
      * @return A new Query instance for the command.
      */
@@ -576,6 +596,7 @@ public class SqlJob {
     /**
      * Check if the job is under commitment control based on the transaction
      * isolation level.
+     * 
      * @return Whether the job is under commitment control.
      */
     public boolean underCommitControl() {
@@ -585,6 +606,7 @@ public class SqlJob {
 
     /**
      * Get the count of pending transactions.
+     * 
      * @return A CompletableFuture that resolves to the count of pending
      *         transactions.
      */
@@ -611,6 +633,7 @@ public class SqlJob {
 
     /**
      * Ends the current transaction by committing or rolling back.
+     * 
      * @param type The type of transaction ending (commit or rollback).
      * @return A CompletableFuture that resolves to the result of the transaction
      *         operation.
@@ -636,6 +659,7 @@ public class SqlJob {
      * Get the unique ID assigned to this SqlJob instance.
      * TODO: Currently unused but we will inevitably need a unique ID assigned to
      * each instance since server job names can be reused in some circumstances
+     * 
      * @return The unique ID assigned to this SqlJob instance
      */
     public String getUniqueId() {

@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
-import io.github.mapepire_ibmi.Pool;
 import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 
 class PoolTest extends MapepireTest {
     @Test
+    @Timeout(22)
     @SuppressWarnings("unchecked")
     void simplePoolUsingPoolExecute() throws Exception {
         PoolOptions options = new PoolOptions(MapepireTest.creds, 5, 3);

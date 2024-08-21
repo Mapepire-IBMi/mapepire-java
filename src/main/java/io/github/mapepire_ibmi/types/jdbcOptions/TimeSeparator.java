@@ -32,6 +32,7 @@ public enum TimeSeparator {
 
     /**
      * Construct a new TimeSeparator instance.
+     * 
      * @param value The "time separator" value.
      */
     TimeSeparator(String value) {
@@ -40,6 +41,7 @@ public enum TimeSeparator {
 
     /**
      * Get the "time separator" value.
+     * 
      * @return The "time separator" value.
      */
     public String getValue() {
@@ -48,6 +50,7 @@ public enum TimeSeparator {
 
     /**
      * Get the enum "time separator" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -57,7 +60,6 @@ public enum TimeSeparator {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

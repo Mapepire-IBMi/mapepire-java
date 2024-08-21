@@ -22,6 +22,7 @@ public enum PackageCriteria {
 
     /**
      * Construct a new PackageCriteria instance.
+     * 
      * @param value The "package criteria" value.
      */
     PackageCriteria(String value) {
@@ -30,6 +31,7 @@ public enum PackageCriteria {
 
     /**
      * Get the "package criteria" value.
+     * 
      * @return The "package criteria" value.
      */
     public String getValue() {
@@ -38,6 +40,7 @@ public enum PackageCriteria {
 
     /**
      * Get the enum "package criteria" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -47,7 +50,6 @@ public enum PackageCriteria {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

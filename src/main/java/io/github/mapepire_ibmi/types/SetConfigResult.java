@@ -27,6 +27,7 @@ public class SetConfigResult extends ServerResponse {
 
     /**
      * Construct a new SetConfigResult instance.
+     * 
      * @param id         The unique identifier for the request.
      * @param success    Whether the request was successful.
      * @param error      The error message, if any.
@@ -44,6 +45,7 @@ public class SetConfigResult extends ServerResponse {
 
     /**
      * Get the destination for trace data.
+     * 
      * @return The destination for trace data.
      */
     public ServerTraceDest getTracedest() {
@@ -52,6 +54,7 @@ public class SetConfigResult extends ServerResponse {
 
     /**
      * Set the destination for trace data.
+     * 
      * @param tracedestThe destination for trace data.
      */
     public void setTracedest(ServerTraceDest tracedest) {
@@ -60,6 +63,7 @@ public class SetConfigResult extends ServerResponse {
 
     /**
      * Get the level of tracing set on the server.
+     * 
      * @return The level of tracing set on the server.
      */
     public ServerTraceLevel getTracelevel() {
@@ -68,6 +72,7 @@ public class SetConfigResult extends ServerResponse {
 
     /**
      * Set the level of tracing set on the server.
+     * 
      * @param tracelevel The level of tracing set on the server.
      */
     public void setTracelevel(ServerTraceLevel tracelevel) {

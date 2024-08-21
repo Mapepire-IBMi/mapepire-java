@@ -22,6 +22,7 @@ public enum Driver {
 
     /**
      * Construct a new Driver instance.
+     * 
      * @param value The "driver" value.
      */
     Driver(String value) {
@@ -30,6 +31,7 @@ public enum Driver {
 
     /**
      * Get the "driver" value.
+     * 
      * @return The "driver" value.
      */
     public String getValue() {
@@ -38,6 +40,7 @@ public enum Driver {
 
     /**
      * Get the enum "driver" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -47,7 +50,6 @@ public enum Driver {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

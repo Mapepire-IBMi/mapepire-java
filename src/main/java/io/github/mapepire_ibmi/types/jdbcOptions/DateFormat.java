@@ -52,6 +52,7 @@ public enum DateFormat {
 
     /**
      * Construct a new DateFormat instance.
+     * 
      * @param value The "date format" value.
      */
     DateFormat(String value) {
@@ -60,6 +61,7 @@ public enum DateFormat {
 
     /**
      * Get the "date format" value.
+     * 
      * @return The "date format" value.
      */
     public String getValue() {
@@ -68,6 +70,7 @@ public enum DateFormat {
 
     /**
      * Get the enum "date format" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -77,7 +80,6 @@ public enum DateFormat {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

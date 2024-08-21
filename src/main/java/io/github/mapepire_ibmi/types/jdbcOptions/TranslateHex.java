@@ -47,7 +47,6 @@ public enum TranslateHex {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

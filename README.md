@@ -1,4 +1,4 @@
-# mapepire-java
+# Mapepire Java Client SDK
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.mapepire-ibmi/mapepire-sdk.svg?label=Maven%20Central&logo=apachemaven)](https://central.sonatype.com/artifact/io.github.mapepire-ibmi/mapepire-sdk/)
 [![Maven Build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml)
@@ -22,7 +22,7 @@ Full Documentation: https://mapepire-ibmi.github.io
 <dependency>
     <groupId>io.github.mapepire-ibmi</groupId>
     <artifactId>mapepire-sdk</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 </dependency>
 ```
 

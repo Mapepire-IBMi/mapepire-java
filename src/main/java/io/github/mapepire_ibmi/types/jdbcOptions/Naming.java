@@ -21,6 +21,7 @@ public enum Naming {
 
     /**
      * Construct a new Naming instance.
+     * 
      * @param value The "naming" value.
      */
     Naming(String value) {
@@ -29,6 +30,7 @@ public enum Naming {
 
     /**
      * Get the "naming" value.
+     * 
      * @return The "naming" value.
      */
     public String getValue() {
@@ -37,6 +39,7 @@ public enum Naming {
 
     /**
      * Get the enum "naming" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -46,7 +49,6 @@ public enum Naming {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

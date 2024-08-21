@@ -62,6 +62,7 @@ public enum MinimumDivideScale {
 
     /**
      * Construct a new MinimumDivideScale instance.
+     * 
      * @param value The "minimum divide scale" value.
      */
     MinimumDivideScale(String value) {
@@ -70,6 +71,7 @@ public enum MinimumDivideScale {
 
     /**
      * Get the "minimum divide scale" value.
+     * 
      * @return The "minimum divide scale" value.
      */
     public String getValue() {
@@ -78,6 +80,7 @@ public enum MinimumDivideScale {
 
     /**
      * Get the enum "minimum divide scale" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -87,7 +90,6 @@ public enum MinimumDivideScale {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

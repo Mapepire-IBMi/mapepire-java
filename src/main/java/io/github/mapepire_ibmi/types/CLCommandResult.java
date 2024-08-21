@@ -24,6 +24,7 @@ public class CLCommandResult extends ServerResponse {
 
     /**
      * Construct a new CLCommandResult instance.
+     * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.
      * @param error    The error message, if any.
@@ -39,6 +40,7 @@ public class CLCommandResult extends ServerResponse {
 
     /**
      * Get the log entries generated during the execution of the job.
+     * 
      * @return The log entries generated during the execution of the job.
      */
     public List<JobLogEntry> getJoblog() {
@@ -47,6 +49,7 @@ public class CLCommandResult extends ServerResponse {
 
     /**
      * Set the log entries generated during the execution of the job.
+     * 
      * @param joblog The log entries generated during the execution of the job.
      */
     public void setJoblog(List<JobLogEntry> joblog) {

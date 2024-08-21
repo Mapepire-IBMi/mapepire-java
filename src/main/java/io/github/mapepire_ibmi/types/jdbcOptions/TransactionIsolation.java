@@ -37,6 +37,7 @@ public enum TransactionIsolation {
 
     /**
      * Construct a new TransactionIsolation instance.
+     * 
      * @param value The "transaction isolation" value.
      */
     TransactionIsolation(String value) {
@@ -45,6 +46,7 @@ public enum TransactionIsolation {
 
     /**
      * Get the "transaction isolation" value.
+     * 
      * @return The "transaction isolation" value.
      */
     public String getValue() {
@@ -53,6 +55,7 @@ public enum TransactionIsolation {
 
     /**
      * Get the enum "transaction isolation" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -62,7 +65,6 @@ public enum TransactionIsolation {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

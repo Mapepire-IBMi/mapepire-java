@@ -27,6 +27,7 @@ public enum CursorSensitivity {
 
     /**
      * Construct a new CursorSensitivity instance.
+     * 
      * @param value The "cursor sensitivity" value.
      */
     CursorSensitivity(String value) {
@@ -35,6 +36,7 @@ public enum CursorSensitivity {
 
     /**
      * Get the "cursor sensitivity" value.
+     * 
      * @return The "cursor sensitivity" value.
      */
     public String getValue() {
@@ -43,6 +45,7 @@ public enum CursorSensitivity {
 
     /**
      * Get the enum "cursor sensitivity" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -52,7 +55,6 @@ public enum CursorSensitivity {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

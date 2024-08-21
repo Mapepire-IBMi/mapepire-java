@@ -33,6 +33,7 @@ public enum QueryState {
 
     /**
      * Construct a new QueryState instance.
+     * 
      * @param value The query state.
      */
     QueryState(int value) {
@@ -41,6 +42,7 @@ public enum QueryState {
 
     /**
      * Get the query state.
+     * 
      * @return The query state.
      */
     public int getValue() {
@@ -49,6 +51,7 @@ public enum QueryState {
 
     /**
      * Get the enum query state representation of a string.
+     * 
      * @param value The string representation of the query state.
      * @return The enum representation of the query state.
      */
@@ -58,7 +61,6 @@ public enum QueryState {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

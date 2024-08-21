@@ -47,6 +47,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Construct a new QueryResult instance.
+     * 
      * @param id          The unique identifier for the request.
      * @param success     Whether the request was successful.
      * @param error       The error message, if any.
@@ -70,6 +71,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Get the metadata about the query results.
+     * 
      * @return The metadata about the query results.
      */
     public QueryMetadata getMetadata() {
@@ -78,6 +80,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Set the metadata about the query results.
+     * 
      * @param metadata The metadata about the query results.
      */
     public void setMetadata(QueryMetadata metadata) {
@@ -86,6 +89,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Get whether the query execution is complete.
+     * 
      * @return Whether the query execution is complete.
      */
     public boolean getIsDone() {
@@ -94,6 +98,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Set whether the query execution is complete.
+     * 
      * @param isDone Whether the query execution is complete.
      */
     public void setIsDone(boolean isDone) {
@@ -102,6 +107,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Get whether the results were returned.
+     * 
      * @return Whether the results were returned.
      */
     public boolean getHasResults() {
@@ -110,6 +116,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Set whether the results were returned.
+     * 
      * @param hasResults Whether the results were returned.
      */
     public void setHasResults(boolean hasResults) {
@@ -118,6 +125,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Get the number of rows affected by the query.
+     * 
      * @return The number of rows affected by the query.
      */
     public int getUpdateCount() {
@@ -126,6 +134,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Set the number of rows affected by the query.
+     * 
      * @param updateCount The number of rows affected by the query.
      */
     public void setUpdateCount(int updateCount) {
@@ -134,6 +143,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Get the data returned from the query.
+     * 
      * @return The data returned from the query.
      */
     public List<T> getData() {
@@ -142,6 +152,7 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * Set the data returned from the query.
+     * 
      * @param data The data returned from the query.
      */
     public void setData(List<T> data) {

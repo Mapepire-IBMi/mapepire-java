@@ -35,6 +35,7 @@ public class QueryOptions {
 
     /**
      * Construct a new QueryOptions instance.
+     * 
      * @param isTerseResults Whether to return terse results.
      * @param isClCommand    Whether the command is a CL command.
      * @param parameters     The parameters for the query.
@@ -47,6 +48,7 @@ public class QueryOptions {
 
     /**
      * Get whether to return terse results.
+     * 
      * @return Whether to return terse results.
      */
     public boolean getIsTerseResults() {
@@ -55,6 +57,7 @@ public class QueryOptions {
 
     /**
      * Set whether to return terse results.
+     * 
      * @param isTerseResults Whether to return terse results.
      */
     public void setIsTerseResults(boolean isTerseResults) {
@@ -63,6 +66,7 @@ public class QueryOptions {
 
     /**
      * Get whether the command is a CL command.
+     * 
      * @return Whether the command is a CL command.
      */
     public boolean getIsClCommand() {
@@ -71,6 +75,7 @@ public class QueryOptions {
 
     /**
      * Set whether the command is a CL command.
+     * 
      * @param isClCommand Whether the command is a CL command.
      */
     public void setIsClCommand(boolean isClCommand) {
@@ -79,6 +84,7 @@ public class QueryOptions {
 
     /**
      * Get the parameters for the query.
+     * 
      * @return The parameters for the query.
      */
     public List<Object> getParameters() {
@@ -87,6 +93,7 @@ public class QueryOptions {
 
     /**
      * Set the parameters for the query.
+     * 
      * @param parameters The parameters for the query.
      */
     public void setParameters(List<Object> parameters) {

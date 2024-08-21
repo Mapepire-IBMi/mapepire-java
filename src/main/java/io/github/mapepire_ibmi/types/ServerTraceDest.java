@@ -21,6 +21,7 @@ public enum ServerTraceDest {
 
     /**
      * Construct a new ServerTraceDest instance.
+     * 
      * @param value The server trace destination.
      */
     ServerTraceDest(String value) {
@@ -29,6 +30,7 @@ public enum ServerTraceDest {
 
     /**
      * Get the server trace destination.
+     * 
      * @return The server trace destination.
      */
     public String getValue() {
@@ -37,6 +39,7 @@ public enum ServerTraceDest {
 
     /**
      * Get the enum server trace destination representation of a string.
+     * 
      * @param value The string representation of the server trace destination.
      * @return The enum representation of the server trace destination.
      */
@@ -46,7 +49,6 @@ public enum ServerTraceDest {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

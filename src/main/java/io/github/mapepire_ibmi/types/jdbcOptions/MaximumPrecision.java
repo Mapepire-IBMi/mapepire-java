@@ -22,6 +22,7 @@ public enum MaximumPrecision {
 
     /**
      * Construct a new MaximumPrecision instance.
+     * 
      * @param value The "maximum precision" value.
      */
     MaximumPrecision(String value) {
@@ -30,6 +31,7 @@ public enum MaximumPrecision {
 
     /**
      * Get the "maximum precision" value.
+     * 
      * @return The "maximum precision" value.
      */
     public String getValue() {
@@ -38,6 +40,7 @@ public enum MaximumPrecision {
 
     /**
      * Get the enum "maximum precision" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -47,7 +50,6 @@ public enum MaximumPrecision {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

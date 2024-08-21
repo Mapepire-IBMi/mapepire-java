@@ -47,6 +47,7 @@ public enum DecfloatRoundingMode {
 
     /**
      * Construct a new DecfloatRoundingMode instance.
+     * 
      * @param value The "decfloat rounding mode" value.
      */
     DecfloatRoundingMode(String value) {
@@ -55,6 +56,7 @@ public enum DecfloatRoundingMode {
 
     /**
      * Get the "decfloat rounding mode" value.
+     * 
      * @return The "decfloat rounding mode" value.
      */
     public String getValue() {
@@ -63,6 +65,7 @@ public enum DecfloatRoundingMode {
 
     /**
      * Get the enum "decfloat rounding mode" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -72,7 +75,6 @@ public enum DecfloatRoundingMode {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

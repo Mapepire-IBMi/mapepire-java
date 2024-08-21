@@ -27,6 +27,7 @@ public class VersionCheckResult extends ServerResponse {
 
     /**
      * Construct a new VersionCheckResult instance.
+     * 
      * @param id        The unique identifier for the request.
      * @param success   Whether the request was successful.
      * @param error     The error message, if any.
@@ -44,6 +45,7 @@ public class VersionCheckResult extends ServerResponse {
 
     /**
      * Get the build date of the version.
+     * 
      * @return The build date of the version.
      */
     public String getBuildDate() {
@@ -52,6 +54,7 @@ public class VersionCheckResult extends ServerResponse {
 
     /**
      * Set the build date of the version.
+     * 
      * @param buildDate The build date of the version.
      */
     public void setBuildDate(String buildDate) {
@@ -60,6 +63,7 @@ public class VersionCheckResult extends ServerResponse {
 
     /**
      * Get the version string.
+     * 
      * @return The version string.
      */
     public String getVersion() {
@@ -68,6 +72,7 @@ public class VersionCheckResult extends ServerResponse {
 
     /**
      * Set the version string.
+     * 
      * @param version The version string.
      */
     public void setVersion(String version) {

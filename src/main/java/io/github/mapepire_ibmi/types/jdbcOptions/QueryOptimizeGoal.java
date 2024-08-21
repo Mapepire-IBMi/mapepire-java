@@ -29,6 +29,7 @@ public enum QueryOptimizeGoal {
 
     /**
      * Construct a new QueryOptimizeGoal instance.
+     * 
      * @param value The "query optimize goal" value.
      */
     QueryOptimizeGoal(String value) {
@@ -37,6 +38,7 @@ public enum QueryOptimizeGoal {
 
     /**
      * Get the "query optimize goal" value.
+     * 
      * @return The "query optimize goal" value.
      */
     public String getValue() {
@@ -45,6 +47,7 @@ public enum QueryOptimizeGoal {
 
     /**
      * Get the enum "query optimize goal" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -54,7 +57,6 @@ public enum QueryOptimizeGoal {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

@@ -26,6 +26,7 @@ public enum Sort {
 
     /**
      * Construct a new Sort instance.
+     * 
      * @param value The "sort" value.
      */
     Sort(String value) {
@@ -34,6 +35,7 @@ public enum Sort {
 
     /**
      * Get the "sort" value.
+     * 
      * @return The "sort" value.
      */
     public String getValue() {
@@ -42,6 +44,7 @@ public enum Sort {
 
     /**
      * Get the enum "sort" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
@@ -51,7 +54,6 @@ public enum Sort {
                 return type;
             }
         }
-
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }
