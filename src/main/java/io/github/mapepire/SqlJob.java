@@ -38,7 +38,7 @@ import io.github.mapepire.types.ServerTraceLevel;
 import io.github.mapepire.types.SetConfigResult;
 import io.github.mapepire.types.TransactionEndType;
 import io.github.mapepire.types.VersionCheckResult;
-import io.github.mapepire.types.jdbcOptions.Property;
+import io.github.mapepire.types.jdbcOptions.Option;
 import io.github.mapepire.types.jdbcOptions.TransactionIsolation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -598,8 +598,8 @@ public class SqlJob {
      * @return Whether the job is under commitment control.
      */
     public boolean underCommitControl() {
-        return this.options.getOption(Property.TRANSACTION_ISOLATION) != null
-                && this.options.getOption(Property.TRANSACTION_ISOLATION) != TransactionIsolation.NONE.getValue();
+        return this.options.getOption(Option.TRANSACTION_ISOLATION) != null
+                && this.options.getOption(Option.TRANSACTION_ISOLATION) != TransactionIsolation.NONE.getValue();
     }
 
     /**
