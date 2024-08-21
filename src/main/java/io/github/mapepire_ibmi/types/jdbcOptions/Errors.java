@@ -1,54 +1,52 @@
 package io.github.mapepire_ibmi.types.jdbcOptions;
 
 /**
- * Enum representing the possible types of values for the "naming" JDBC option.
+ * Enum representing the possible types of values for the "errors" JDBC option.
  */
-public enum Naming {
+public enum Errors {
     /**
-     * As in schema.table.
+     * Full error detail.
      */
-    SQL("sql"),
+    FULL("full"),
 
     /**
-     * As in schema/table.
+     * Basic error detail.
      */
-    SYSTEM("system");
+    BASIC("basic");
 
     /**
-     * The "naming" value.
+     * The "errors" value.
      */
     private final String value;
 
     /**
-     * Construct a new Naming instance.
-     * 
-     * @param value The "naming" value.
+     * Construct a new Errors instance.
+     * @param value The "errors" value.
      */
-    Naming(String value) {
+    Errors(String value) {
         this.value = value;
     }
 
     /**
-     * Get the "naming" value.
-     * 
-     * @return The "naming" value.
+     * Get the "errors" value.
+     * @return The "errors" value.
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * Get the enum "naming" value representation of a string.
-     * 
+     * Get the enum "errors" value representation of a string.
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
-    public static Naming fromValue(String value) {
-        for (Naming type : values()) {
+    public static Errors fromValue(String value) {
+        for (Errors type : values()) {
             if (type.value.equals(value)) {
                 return type;
             }
         }
+
         throw new IllegalArgumentException("Unknown value: " + value);
     }
 }

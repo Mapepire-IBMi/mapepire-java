@@ -13,19 +13,71 @@ import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.QueryState;
 
+/**
+ * Represents a SQL query that can be executed and managed within a SQL job.
+ */
 public class Query<T> {
+    /**
+     * The SQL job that this query will be executed in.
+     */
     private SqlJob job;
+
+    /**
+     * A list of all global queries that are currently open.
+     */
     private static List<Query<?>> globalQueryList = new ArrayList<>();
+
+    /**
+     * The correlation ID associated with the query.
+     */
     private String correlationId;
+
+    /**
+     * The SQL statement to be executed.
+     */
     private String sql;
+
+    /**
+     * Whether the query has been prepared.
+     */
     private boolean isPrepared = false;
+
+    /**
+     * The parameters to be used with the SQL query.
+     */
     private List<?> parameters;
+
+    /**
+     * The number of rows to fetch in each execution.
+     */
     private int rowsToFetch = 100;
+
+    /**
+     * Whether the query is a CL command.
+     */
     private boolean isCLCommand;
+
+    /**
+     * The current state of the query execution.
+     */
     private QueryState state = QueryState.NOT_YET_RUN;
+
+    /**
+     * Whether the results should be terse.
+     */
     private boolean isTerseResults;
+
+    /**
+     * TODO: Remove
+     */
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Construct a new Query instance.
+     * @param job   The SQL job that this query will be executed in.
+     * @param query The SQL statement to be executed.
+     * @param opts  The options for configuring a query.
+     */
     public Query(SqlJob job, String query, QueryOptions opts) {
         this.job = job;
         this.sql = query;
@@ -39,6 +91,11 @@ public class Query<T> {
         Query.globalQueryList.add(this);
     }
 
+    /**
+     * Get a Query instance by its correlation ID.
+     * @param id The correlation ID of the query.
+     * @return The corresponding Query instance or null if not found.
+     */
     public static Query<?> byId(String id) {
         if (id == null || id == "") {
             return null;
@@ -51,6 +108,19 @@ public class Query<T> {
         }
     }
 
+    /**
+     * Get a list of open correlation IDs.
+     * @return A list of correlation IDs for open queries.
+     */
+    public static List<String> getOpenIds() {
+        return Query.getOpenIds(null);
+    }
+
+    /**
+     * Get a list of open correlation IDs for the specified job.
+     * @param forJob The job to filter the queries by.
+     * @return A list of correlation IDs for open queries.
+     */
     public static List<String> getOpenIds(SqlJob forJob) {
         return Query.globalQueryList.stream()
                 .filter(q -> q.job.equals(forJob) || forJob == null)
@@ -60,6 +130,10 @@ public class Query<T> {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Clean up queries that are done or are in error state from the global query
+     * list.
+     */
     public void cleanup() {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
@@ -85,10 +159,21 @@ public class Query<T> {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Execute an SQL command and returns the result.
+     * @param <T> The type of data to be returned.
+     * @return A CompletableFuture that resolves to the query result.
+     */
     public <T> CompletableFuture<QueryResult<T>> execute() throws Exception {
         return this.execute(100);
     }
 
+    /**
+     * Execute an SQL command and returns the result.
+     * @param <T>         The type of data to be returned.
+     * @param rowsToFetch The number of rows to fetch.
+     * @return A CompletableFuture that resolves to the query result.
+     */
     public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws Exception {
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
@@ -165,10 +250,19 @@ public class Query<T> {
         return CompletableFuture.completedFuture(queryResult);
     }
 
+    /**
+     * Fetch more rows from the currently running query.
+     * @return A CompletableFuture that resolves to the query result.
+     */
     public CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
         return this.fetchMore(this.rowsToFetch);
     }
 
+    /**
+     * Fetch more rows from the currently running query.
+     * @param rowsToFetch The number of additional rows to fetch.
+     * @return A CompletableFuture that resolves to the query result.
+     */
     public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws Exception {
         switch (this.state) {
             case NOT_YET_RUN:
@@ -220,6 +314,10 @@ public class Query<T> {
         }
     }
 
+    /**
+     * Close the query.
+     * @return A CompletableFuture that resolves when the query is closed.
+     */
     public CompletableFuture<String> close() {
         if (correlationId != null && state != QueryState.RUN_DONE) {
             state = QueryState.RUN_DONE;
@@ -242,10 +340,18 @@ public class Query<T> {
         }
     }
 
+    /**
+     * Get the correlation ID of the query.
+     * @return The correlation ID of the query.
+     */
     public String getId() {
         return this.correlationId;
     }
 
+    /**
+     * Get the current state of the query execution.
+     * @return The current state of the query execution.
+     */
     public QueryState getState() {
         return this.state;
     }

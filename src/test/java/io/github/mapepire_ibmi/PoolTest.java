@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
+import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 
 class PoolTest extends MapepireTest {

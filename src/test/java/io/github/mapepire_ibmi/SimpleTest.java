@@ -1,10 +1,12 @@
 package io.github.mapepire_ibmi;
 
-import io.github.mapepire_ibmi.types.QueryResult;
-
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
+
+import io.github.mapepire_ibmi.Query;
+import io.github.mapepire_ibmi.SqlJob;
+import io.github.mapepire_ibmi.types.QueryResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

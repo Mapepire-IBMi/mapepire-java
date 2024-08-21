@@ -1,7 +1,5 @@
 package io.github.mapepire_ibmi;
 
-import io.github.mapepire_ibmi.types.DaemonServer;
-
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,6 +12,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Timeout;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.mapepire_ibmi.types.DaemonServer;
 
 @Timeout(5)
 class MapepireTest {
