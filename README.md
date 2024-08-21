@@ -18,9 +18,9 @@ Full Documentation: https://mapepire-ibmi.github.io
 
 ```xml
 <dependency>
-    <groupId>io.github.mapapire</groupId>
-    <artifactId>mapapire-java</artifactId>
-    <version>x.x.x</version>
+    <groupId>io.github.mapepire-ibmi</groupId>
+    <artifactId>mapepire-sdk</artifactId>
+    <version>0.0.4</version>
 </dependency>
 ```
 
