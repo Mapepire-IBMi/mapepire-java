@@ -35,7 +35,6 @@ public class QueryMetadata {
 
     /**
      * Construct a new QueryMetadata instance.
-     * 
      * @param columnCount The number of columns returned by the query.
      * @param columns     The metadata for each column.
      * @param job         The unique job identifier for the query.
@@ -48,7 +47,6 @@ public class QueryMetadata {
 
     /**
      * Get the number of columns returned by the query.
-     * 
      * @return The number of columns returned by the query.
      */
     public int getColumnCount() {
@@ -57,7 +55,6 @@ public class QueryMetadata {
 
     /**
      * Set the number of columns returned by the query.
-     * 
      * @param columnCount The number of columns returned by the query.
      */
     public void setColumnCount(int columnCount) {
@@ -66,7 +63,6 @@ public class QueryMetadata {
 
     /**
      * Get the metadata for each column.
-     * 
      * @return The metadata for each column.
      */
     public List<ColumnMetadata> getColumns() {
@@ -75,7 +71,6 @@ public class QueryMetadata {
 
     /**
      * Set the metadata for each column.
-     * 
      * @param columns The metadata for each column.
      */
     public void setColumns(List<ColumnMetadata> columns) {
@@ -84,7 +79,6 @@ public class QueryMetadata {
 
     /**
      * Get the unique job identifier for the query.
-     * 
      * @return The unique job identifier for the query.
      */
     public String getJob() {
@@ -93,7 +87,6 @@ public class QueryMetadata {
 
     /**
      * Set the unique job identifier for the query.
-     * 
      * @param job The unique job identifier for the query.
      */
     public void setJob(String job) {

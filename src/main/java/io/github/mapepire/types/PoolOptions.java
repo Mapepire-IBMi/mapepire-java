@@ -29,7 +29,6 @@ public class PoolOptions {
 
     /**
      * Construct a new PoolOptions instance.
-     * 
      * @param creds        The credentials required to connect to the daemon server.
      * @param opts         The JDBC options for configuring the connection.
      * @param maxSize      The maximum number of connections allowed in the pool.
@@ -45,7 +44,6 @@ public class PoolOptions {
 
     /**
      * Construct a new PoolOptions instance.
-     * 
      * @param creds        The credentials required to connect to the daemon server.
      * @param maxSize      The maximum number of connections allowed in the pool.
      * @param startingSize The number of connections to create when the pool
@@ -60,7 +58,6 @@ public class PoolOptions {
 
     /**
      * Get the credentials required to connect to the daemon server.
-     * 
      * @return The credentials required to connect to the daemon server.
      */
     public DaemonServer getCreds() {
@@ -69,7 +66,6 @@ public class PoolOptions {
 
     /**
      * Set the credentials required to connect to the daemon server.
-     * 
      * @param creds The credentials required to connect to the daemon server.
      */
     public void setCreds(DaemonServer creds) {
@@ -78,7 +74,6 @@ public class PoolOptions {
 
     /**
      * Get the JDBC options for configuring the connection.
-     * 
      * @return The JDBC options for configuring the connection.
      */
     public JDBCOptions getOpts() {
@@ -87,7 +82,6 @@ public class PoolOptions {
 
     /**
      * Set the JDBC options for configuring the connection.
-     * 
      * @param opts The JDBC options for configuring the connection.
      */
     public void setOpts(JDBCOptions opts) {
@@ -96,7 +90,6 @@ public class PoolOptions {
 
     /**
      * Get the maximum number of connections allowed in the pool.
-     * 
      * @return The maximum number of connections allowed in the pool.
      */
     public int getMaxSize() {
@@ -105,7 +98,6 @@ public class PoolOptions {
 
     /**
      * Set the maximum number of connections allowed in the pool.
-     * 
      * @param maxSize The maximum number of connections allowed in the pool.
      */
     public void setMaxSize(int maxSize) {
@@ -114,7 +106,6 @@ public class PoolOptions {
 
     /**
      * Get the number of connections to create when the pool is initialized.
-     * 
      * @return The number of connections to create when the pool is initialized.
      */
     public int getStartingSize() {
@@ -123,7 +114,6 @@ public class PoolOptions {
 
     /**
      * Set the number of connections to create when the pool is initialized.
-     * 
      * @param startingSize The number of connections to create when the pool is
      *                     initialized.
      */

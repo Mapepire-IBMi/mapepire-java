@@ -22,7 +22,6 @@ public enum DecimalSeparator {
 
     /**
      * Construct a new DecimalSeparator instance.
-     * 
      * @param value The "decimal separator" value.
      */
     DecimalSeparator(String value) {
@@ -31,7 +30,6 @@ public enum DecimalSeparator {
 
     /**
      * Get the "decimal separator" value.
-     * 
      * @return The "decimal separator" value.
      */
     public String getValue() {
@@ -40,7 +38,6 @@ public enum DecimalSeparator {
 
     /**
      * Get the enum "decimal separator" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

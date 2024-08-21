@@ -47,7 +47,6 @@ public enum ServerTrace {
 
     /**
      * Construct a new ServerTrace instance.
-     * 
      * @param value The "server trace" value.
      */
     ServerTrace(String value) {
@@ -56,7 +55,6 @@ public enum ServerTrace {
 
     /**
      * Get the "server trace" value.
-     * 
      * @return The "server trace" value.
      */
     public String getValue() {
@@ -65,7 +63,6 @@ public enum ServerTrace {
 
     /**
      * Get the enum "server trace" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

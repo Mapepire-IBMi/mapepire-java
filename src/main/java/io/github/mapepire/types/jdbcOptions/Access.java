@@ -26,7 +26,6 @@ public enum Access {
 
     /**
      * Construct a new Access instance.
-     * 
      * @param value The "access" value.
      */
     Access(String value) {
@@ -35,7 +34,6 @@ public enum Access {
 
     /**
      * Get the "access" value.
-     * 
      * @return The "access" value.
      */
     public String getValue() {
@@ -44,7 +42,6 @@ public enum Access {
 
     /**
      * Get the enum "access" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

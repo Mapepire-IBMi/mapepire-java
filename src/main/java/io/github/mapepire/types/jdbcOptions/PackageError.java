@@ -27,7 +27,6 @@ public enum PackageError {
 
     /**
      * Construct a new PackageError instance.
-     * 
      * @param value The "package error" value.
      */
     PackageError(String value) {
@@ -36,7 +35,6 @@ public enum PackageError {
 
     /**
      * Get the "package error" value.
-     * 
      * @return The "package error" value.
      */
     public String getValue() {
@@ -45,7 +43,6 @@ public enum PackageError {
 
     /**
      * Get the enum "package error" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

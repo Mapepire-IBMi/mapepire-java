@@ -27,7 +27,6 @@ public enum PackageCcsid {
 
     /**
      * Construct a new PackageCcsid instance.
-     * 
      * @param value The "package ccsid" value.
      */
     PackageCcsid(String value) {
@@ -36,7 +35,6 @@ public enum PackageCcsid {
 
     /**
      * Get the "package ccsid" value.
-     * 
      * @return The "package ccsid" value.
      */
     public String getValue() {
@@ -45,7 +43,6 @@ public enum PackageCcsid {
 
     /**
      * Get the enum "package ccsid" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

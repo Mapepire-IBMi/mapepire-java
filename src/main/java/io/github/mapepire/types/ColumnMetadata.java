@@ -39,7 +39,6 @@ public class ColumnMetadata {
 
     /**
      * Construct a new ColumnMetadata instance.
-     * 
      * @param displaySize The display size of the column.
      * @param label       The label of the column.
      * @param name        The name of the column.
@@ -54,7 +53,6 @@ public class ColumnMetadata {
 
     /**
      * Get the display size of the column.
-     * 
      * @return The display size of the column.
      */
     public int getDisplaySize() {
@@ -63,7 +61,6 @@ public class ColumnMetadata {
 
     /**
      * Set the display size of the column.
-     * 
      * @param displaySize The display size of the column.
      */
     public void setDisplaySize(int displaySize) {
@@ -72,7 +69,6 @@ public class ColumnMetadata {
 
     /**
      * Get the label of the column.
-     * 
      * @return The label of the column.
      */
     public String getLabel() {
@@ -81,7 +77,6 @@ public class ColumnMetadata {
 
     /**
      * Set the label of the column.
-     * 
      * @param label The label of the column.
      */
     public void setLabel(String label) {
@@ -90,7 +85,6 @@ public class ColumnMetadata {
 
     /**
      * Get the name of the column.
-     * 
      * @return The name of the column.
      */
     public String getName() {
@@ -99,7 +93,6 @@ public class ColumnMetadata {
 
     /**
      * Set the name of the column.
-     * 
      * @param name The name of the column.
      */
     public void setName(String name) {
@@ -108,7 +101,6 @@ public class ColumnMetadata {
 
     /**
      * Get the type of the column.
-     * 
      * @return The type of the column.
      */
     public String getType() {
@@ -117,7 +109,6 @@ public class ColumnMetadata {
 
     /**
      * Set the type of the column.
-     * 
      * @param type The type of the column.
      */
     public void setType(String type) {

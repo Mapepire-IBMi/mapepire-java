@@ -74,7 +74,6 @@ public class Query<T> {
 
     /**
      * Construct a new Query instance.
-     * 
      * @param job   The SQL job that this query will be executed in.
      * @param query The SQL statement to be executed.
      * @param opts  The options for configuring a query.
@@ -94,7 +93,6 @@ public class Query<T> {
 
     /**
      * Get a Query instance by its correlation ID.
-     * 
      * @param id The correlation ID of the query.
      * @return The corresponding Query instance or null if not found.
      */
@@ -112,7 +110,6 @@ public class Query<T> {
 
     /**
      * Get a list of open correlation IDs.
-     * 
      * @return A list of correlation IDs for open queries.
      */
     public static List<String> getOpenIds() {
@@ -121,7 +118,6 @@ public class Query<T> {
 
     /**
      * Get a list of open correlation IDs for the specified job.
-     * 
      * @param forJob The job to filter the queries by.
      * @return A list of correlation IDs for open queries.
      */
@@ -165,7 +161,6 @@ public class Query<T> {
 
     /**
      * Execute an SQL command and returns the result.
-     * 
      * @param <T> The type of data to be returned.
      * @return A CompletableFuture that resolves to the query result.
      */
@@ -175,7 +170,6 @@ public class Query<T> {
 
     /**
      * Execute an SQL command and returns the result.
-     * 
      * @param <T>         The type of data to be returned.
      * @param rowsToFetch The number of rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
@@ -258,7 +252,6 @@ public class Query<T> {
 
     /**
      * Fetch more rows from the currently running query.
-     * 
      * @return A CompletableFuture that resolves to the query result.
      */
     public CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
@@ -267,7 +260,6 @@ public class Query<T> {
 
     /**
      * Fetch more rows from the currently running query.
-     * 
      * @param rowsToFetch The number of additional rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
      */
@@ -324,7 +316,6 @@ public class Query<T> {
 
     /**
      * Close the query.
-     * 
      * @return A CompletableFuture that resolves when the query is closed.
      */
     public CompletableFuture<String> close() {
@@ -351,7 +342,6 @@ public class Query<T> {
 
     /**
      * Get the correlation ID of the query.
-     * 
      * @return The correlation ID of the query.
      */
     public String getId() {
@@ -360,7 +350,6 @@ public class Query<T> {
 
     /**
      * Get the current state of the query execution.
-     * 
      * @return The current state of the query execution.
      */
     public QueryState getState() {

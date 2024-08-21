@@ -63,7 +63,6 @@ public class JobLogEntry {
 
     /**
      * Construct a new JobLogEntry instance.
-     * 
      * @param messageId              The unique message identifier.
      * @param severity               The severity level of the message.
      * @param messageTimestamp       The timestamp when the message was generated.
@@ -89,7 +88,6 @@ public class JobLogEntry {
 
     /**
      * Get the unique message identifier.
-     * 
      * @return The unique message identifier.
      */
     public String getMessageId() {
@@ -98,7 +96,6 @@ public class JobLogEntry {
 
     /**
      * Set the unique message identifier.
-     * 
      * @param messageId The unique message identifier.
      */
     public void setMessageId(String messageId) {
@@ -107,7 +104,6 @@ public class JobLogEntry {
 
     /**
      * Get the severity level of the message.
-     * 
      * @return The severity level of the message.
      */
     public String getSeverity() {
@@ -116,7 +112,6 @@ public class JobLogEntry {
 
     /**
      * Set the severity level of the message.
-     * 
      * @param severity The severity level of the message.
      */
     public void setSeverity(String severity) {
@@ -125,7 +120,6 @@ public class JobLogEntry {
 
     /**
      * Get the timestamp when the message was generated.
-     * 
      * @return The timestamp when the message was generated.
      */
     public String getMessageTimestamp() {
@@ -134,7 +128,6 @@ public class JobLogEntry {
 
     /**
      * Set the timestamp when the message was generated.
-     * 
      * @param messageTimestamp The timestamp when the message was generated.
      */
     public void setMessageTimestamp(String messageTimestamp) {
@@ -143,7 +136,6 @@ public class JobLogEntry {
 
     /**
      * Get the library from which the message originated.
-     * 
      * @return The library from which the message originated.
      */
     public String getFromLibrary() {
@@ -152,7 +144,6 @@ public class JobLogEntry {
 
     /**
      * Set the library from which the message originated.
-     * 
      * @param fromLibrary The library from which the message originated.
      */
     public void setFromLibrary(String fromLibrary) {
@@ -161,7 +152,6 @@ public class JobLogEntry {
 
     /**
      * Get the program from which the message originated.
-     * 
      * @return The program from which the message originated.
      */
     public String getFromProgram() {
@@ -170,7 +160,6 @@ public class JobLogEntry {
 
     /**
      * Set the program from which the message originated.
-     * 
      * @param fromProgram The program from which the message originated.
      */
     public void setFromProgram(String fromProgram) {
@@ -179,7 +168,6 @@ public class JobLogEntry {
 
     /**
      * Get the type of message.
-     * 
      * @return The type of message.
      */
     public String getMessageType() {
@@ -188,7 +176,6 @@ public class JobLogEntry {
 
     /**
      * Set the type of message.
-     * 
      * @param messageType The type of message.
      */
     public void setMessageType(String messageType) {
@@ -197,7 +184,6 @@ public class JobLogEntry {
 
     /**
      * Get the message text.
-     * 
      * @return The message text.
      */
     public String getMessageText() {
@@ -206,7 +192,6 @@ public class JobLogEntry {
 
     /**
      * Set the message text.
-     * 
      * @param messageText The message text.
      */
     public void setMessageText(String messageText) {
@@ -215,7 +200,6 @@ public class JobLogEntry {
 
     /**
      * Get the second level text of the message, if available.
-     * 
      * @return The second level text of the message, if available.
      */
     public String getMessageSecondLevelText() {
@@ -224,7 +208,6 @@ public class JobLogEntry {
 
     /**
      * Set the second level text of the message, if available.
-     * 
      * @param messageSecondLevelText The second level text of the message, if
      *                               available.
      */

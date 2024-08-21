@@ -25,7 +25,6 @@ public class PoolAddOptions {
 
     /**
      * Construct a new PoolAddOptions instance.
-     * 
      * @param existingJob An existing job to add to the pool.
      * @param poolIgnore  Whether to not add to the pool.
      */
@@ -36,7 +35,6 @@ public class PoolAddOptions {
 
     /**
      * Get the existing job to add to the pool.
-     * 
      * @return An existing job to add to the pool.
      */
     public SqlJob getExistingJob() {
@@ -45,7 +43,6 @@ public class PoolAddOptions {
 
     /**
      * Set the existing job to add to the pool.
-     * 
      * @param existingJob An existing job to add to the pool.
      */
     public void setExistingJob(SqlJob existingJob) {
@@ -54,7 +51,6 @@ public class PoolAddOptions {
 
     /**
      * Get whether to not add to the pool.
-     * 
      * @return Whether to not add to the pool
      */
     public boolean getPoolIgnore() {
@@ -63,7 +59,6 @@ public class PoolAddOptions {
 
     /**
      * Set whether to not add to the pool.
-     * 
      * @param poolIgnore Whether to not add to the pool
      */
     public void setPoolIgnore(boolean poolIgnore) {

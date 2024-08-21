@@ -24,7 +24,6 @@ public enum QueryTimeoutMechanism {
 
     /**
      * Construct a new QueryTimeoutMechanism instance.
-     * 
      * @param value The "query timeout mechanism" value.
      */
     QueryTimeoutMechanism(String value) {
@@ -33,7 +32,6 @@ public enum QueryTimeoutMechanism {
 
     /**
      * Get the "query timeout mechanism" value.
-     * 
      * @return The "query timeout mechanism" value.
      */
     public String getValue() {
@@ -42,7 +40,6 @@ public enum QueryTimeoutMechanism {
 
     /**
      * Get the enum "query timeout mechanism" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

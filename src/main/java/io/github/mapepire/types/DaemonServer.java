@@ -51,7 +51,6 @@ public class DaemonServer {
 
     /**
      * Construct a new DaemonServer instance.
-     * 
      * @param host               The hostname or IP address of the server.
      * @param port               The port number to connect to.
      * @param user               The username for authentication.
@@ -72,7 +71,6 @@ public class DaemonServer {
 
     /**
      * Get the hostname or IP address of the server.
-     * 
      * @return The hostname or IP address of the server.
      */
     public String getHost() {
@@ -81,7 +79,6 @@ public class DaemonServer {
 
     /**
      * Set the hostname or IP address of the server.
-     * 
      * @param host The hostname or IP address of the server.
      */
     public void setHost(String host) {
@@ -90,7 +87,6 @@ public class DaemonServer {
 
     /**
      * Get port number to connect to.
-     * 
      * @return The port number to connect to.
      */
     public int getPort() {
@@ -99,7 +95,6 @@ public class DaemonServer {
 
     /**
      * Set port number to connect to.
-     * 
      * @param port The port number to connect to.
      */
     public void setPort(int port) {
@@ -108,7 +103,6 @@ public class DaemonServer {
 
     /**
      * Get username for authentication.
-     * 
      * @return The username for authentication.
      */
     public String getUser() {
@@ -117,7 +111,6 @@ public class DaemonServer {
 
     /**
      * Set username for authentication.
-     * 
      * @param user The username for authentication.
      */
     public void setUser(String user) {
@@ -126,7 +119,6 @@ public class DaemonServer {
 
     /**
      * Get password for authentication.
-     * 
      * @return The password for authentication.
      */
     public String getPassword() {
@@ -135,7 +127,6 @@ public class DaemonServer {
 
     /**
      * Set password for authentication.
-     * 
      * @param password The password for authentication.
      */
     public void setPassword(String password) {
@@ -144,7 +135,6 @@ public class DaemonServer {
 
     /**
      * Get whether to ignore unauthorized certificates.
-     * 
      * @return Whether to ignore unauthorized certificates.
      */
     public boolean getIgnoreUnauthorized() {
@@ -153,7 +143,6 @@ public class DaemonServer {
 
     /**
      * Set whether to ignore unauthorized certificates.
-     * 
      * @param ignoreUnauthorized Whether to ignore unauthorized certificates.
      */
     public void setIgnoreUnauthorized(boolean ignoreUnauthorized) {
@@ -162,7 +151,6 @@ public class DaemonServer {
 
     /**
      * Get the certificate authority (CA) for validating the server's certificate.
-     * 
      * @return The certificate authority (CA) for validating the server's
      *         certificate.
      */
@@ -172,7 +160,6 @@ public class DaemonServer {
 
     /**
      * Set the certificate authority (CA) for validating the server's certificate.
-     * 
      * @param ca The certificate authority (CA) for validating the server's
      *           certificate.
      */

@@ -31,7 +31,6 @@ public enum ServerTraceLevel {
 
     /**
      * Construct a new ServerTraceLevel instance.
-     * 
      * @param value The server trace level.
      */
     ServerTraceLevel(String value) {
@@ -40,7 +39,6 @@ public enum ServerTraceLevel {
 
     /**
      * Get the server trace level.
-     * 
      * @return The server trace level.
      */
     public String getValue() {
@@ -49,7 +47,6 @@ public enum ServerTraceLevel {
 
     /**
      * Get the enum server trace level representation of a string.
-     * 
      * @param value The string representation of the server trace level.
      * @return The enum representation of the server trace level.
      */

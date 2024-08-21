@@ -22,7 +22,6 @@ public enum MetadataSource {
 
     /**
      * Construct a new MetadataSource instance.
-     * 
      * @param value The "metadata source" value.
      */
     MetadataSource(String value) {
@@ -31,7 +30,6 @@ public enum MetadataSource {
 
     /**
      * Get the "metadata source" value.
-     * 
      * @return The "metadata source" value.
      */
     public String getValue() {
@@ -40,7 +38,6 @@ public enum MetadataSource {
 
     /**
      * Get the enum "metadata source" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

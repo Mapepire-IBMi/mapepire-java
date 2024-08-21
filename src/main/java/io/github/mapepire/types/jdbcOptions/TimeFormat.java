@@ -37,7 +37,6 @@ public enum TimeFormat {
 
     /**
      * Construct a new TimeFormat instance.
-     * 
      * @param value The "time format" value.
      */
     TimeFormat(String value) {
@@ -46,7 +45,6 @@ public enum TimeFormat {
 
     /**
      * Get the "time format" value.
-     * 
      * @return The "time format" value.
      */
     public String getValue() {
@@ -55,7 +53,6 @@ public enum TimeFormat {
 
     /**
      * Get the enum "time format" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

@@ -21,7 +21,6 @@ public enum Remarks {
 
     /**
      * Construct a new Remarks instance.
-     * 
      * @param value The "remarks" value.
      */
     Remarks(String value) {
@@ -30,7 +29,6 @@ public enum Remarks {
 
     /**
      * Get the "remarks" value.
-     * 
      * @return The "remarks" value.
      */
     public String getValue() {
@@ -39,7 +37,6 @@ public enum Remarks {
 
     /**
      * Get the enum "remarks" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

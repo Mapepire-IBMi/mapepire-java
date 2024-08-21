@@ -52,7 +52,6 @@ public enum BlockSize {
 
     /**
      * Construct a new BlockSize instance.
-     * 
      * @param value The "block size" value.
      */
     BlockSize(String value) {
@@ -61,7 +60,6 @@ public enum BlockSize {
 
     /**
      * Get the "block size" value.
-     * 
      * @return The "block size" value.
      */
     public String getValue() {
@@ -70,7 +68,6 @@ public enum BlockSize {
 
     /**
      * Get the enum "block size" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

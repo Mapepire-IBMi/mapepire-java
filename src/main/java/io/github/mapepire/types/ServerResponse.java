@@ -45,7 +45,6 @@ public class ServerResponse {
 
     /**
      * Construct a new ServerResponse instance.
-     * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.
      * @param error    The error message, if any.
@@ -62,7 +61,6 @@ public class ServerResponse {
 
     /**
      * Get the unique identifier for the request.
-     * 
      * @return The unique identifier for the request.
      */
     public String getId() {
@@ -71,7 +69,6 @@ public class ServerResponse {
 
     /**
      * Set the unique identifier for the request.
-     * 
      * @param id The unique identifier for the request.
      */
     public void setId(String id) {
@@ -80,7 +77,6 @@ public class ServerResponse {
 
     /**
      * Get whether the request was successful.
-     * 
      * @return Whether the request was successful.
      */
     public boolean getSuccess() {
@@ -89,7 +85,6 @@ public class ServerResponse {
 
     /**
      * Set whether the request was successful.
-     * 
      * @param success Whether the request was successful.
      */
     public void setSuccess(boolean success) {
@@ -98,7 +93,6 @@ public class ServerResponse {
 
     /**
      * Get the error message, if any.
-     * 
      * @return The error message, if any.
      */
     public String getError() {
@@ -107,7 +101,6 @@ public class ServerResponse {
 
     /**
      * Set the error message, if any.
-     * 
      * @param error The error message, if any.
      */
     public void setError(String error) {
@@ -116,7 +109,6 @@ public class ServerResponse {
 
     /**
      * Get the SQL return code.
-     * 
      * @return The SQL return code.
      */
     public int getSqlRc() {
@@ -125,7 +117,6 @@ public class ServerResponse {
 
     /**
      * Set the SQL return code.
-     * 
      * @param sqlRc The SQL return code.
      */
     public void setSqlRc(int sqlRc) {
@@ -134,7 +125,6 @@ public class ServerResponse {
 
     /**
      * Get the SQL state code.
-     * 
      * @return The SQL state code.
      */
     public String getSqlState() {
@@ -143,7 +133,6 @@ public class ServerResponse {
 
     /**
      * Set the SQL state code.
-     * 
      * @param sqlState The SQL state code.
      */
     public void setSqlState(String sqlState) {

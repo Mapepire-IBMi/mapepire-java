@@ -36,7 +36,6 @@ public class Pool {
 
     /**
      * Construct a new Pool instance.
-     * 
      * @param options The options for configuring the connection pool.
      */
     Pool(PoolOptions options) {
@@ -46,7 +45,6 @@ public class Pool {
     /**
      * Initializes the pool by creating a number of SQL jobs defined by the starting
      * size.
-     * 
      * @return A CompletableFuture that resolves when all jobs have been created.
      */
     public CompletableFuture<Void> init() {
@@ -60,7 +58,6 @@ public class Pool {
 
     /**
      * Check if there is space available in the pool for more jobs.
-     * 
      * @return Whether there is space available.
      */
     public boolean hasSpace() {
@@ -73,7 +70,6 @@ public class Pool {
 
     /**
      * Get the count of active jobs that are either busy or ready.
-     * 
      * @return The number of active jobs.
      */
     public int getActiveJobCount() {
@@ -92,7 +88,6 @@ public class Pool {
 
     /**
      * Add a new job to the pool.
-     * 
      * @return A CompletableFuture that resolves to the new job.
      */
     public CompletableFuture<SqlJob> addJob() {
@@ -102,9 +97,7 @@ public class Pool {
 
     /**
      * Add a new job to the pool.
-     * 
      * @param options Options for configuring an addition to the connection pool.
-     * 
      * @return A CompletableFuture that resolves to the new job.
      */
     public CompletableFuture<SqlJob> addJob(PoolAddOptions options) {
@@ -132,7 +125,6 @@ public class Pool {
 
     /**
      * Get a ready job from the pool.
-     * 
      * @return The first ready job found, or null if none are ready.
      */
     public SqlJob getReadyJob() {
@@ -145,7 +137,6 @@ public class Pool {
 
     /**
      * Get the index of a ready job in the pool.
-     * 
      * @return The index of the first ready job, or -1 if none are ready.
      */
     public int getReadyJobIndex() {
@@ -159,7 +150,6 @@ public class Pool {
      * Get a job as fast as possible. It will either be a ready job or the job with
      * the least requests on the queue. It will spawn new jobs if the pool is not
      * full but all jobs are busy.
-     * 
      * @return The retrieved job.
      */
     public SqlJob getJob() {
@@ -188,7 +178,6 @@ public class Pool {
     /**
      * Wait for a job to become available. It will return a ready job if one exists,
      * otherwise, it may create a new job if the pool is not full.
-     * 
      * @return A CompletableFuture that resolves to a ready job.
      */
     public CompletableFuture<SqlJob> waitForJob() {
@@ -198,7 +187,6 @@ public class Pool {
     /**
      * Wait for a job to become available. It will return a ready job if one exists,
      * otherwise, it may create a new job if the pool is not full.
-     * 
      * @param useNewJob Whether a new job should be created even if the pool is
      *                  full.
      * @return A CompletableFuture that resolves to a ready job.
@@ -223,7 +211,6 @@ public class Pool {
      * Pops a job from the pool if one is ready. If no jobs are ready, it will
      * create a new job and return that. The returned job should be added back to
      * the pool.
-     * 
      * @return A CompletableFuture that resolves to a ready job or a new job.
      */
     public CompletableFuture<SqlJob> popJob() {
@@ -240,7 +227,6 @@ public class Pool {
 
     /**
      * Create a Query object using a job from the pool.
-     * 
      * @param <T> The type of data to be returned.
      * @param sql The SQL query.
      * @return A new Query instance.
@@ -252,7 +238,6 @@ public class Pool {
 
     /**
      * Create a Query object using a job from the pool.
-     * 
      * @param <T>  The type of data to be returned.
      * @param sql  The SQL query.
      * @param opts The options for configuring the query.
@@ -265,7 +250,6 @@ public class Pool {
 
     /**
      * Execute a SQL command using a job from the pool.
-     * 
      * @param <T> The type of data to be returned.
      * @param sql The SQL command to execute.
      * @return A CompletableFuture that resolves to the query result.
@@ -277,7 +261,6 @@ public class Pool {
 
     /**
      * Execute a SQL command using a job from the pool.
-     * 
      * @param <T>  The type of data to be returned.
      * @param sql  The SQL command to execute.
      * @param opts The options for configuring the query.

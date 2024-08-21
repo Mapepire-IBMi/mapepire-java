@@ -21,7 +21,6 @@ public class GetTraceDataResult extends ServerResponse {
 
     /**
      * Construct a new GetTraceDataResult instance.
-     * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.
      * @param error    The error message, if any.
@@ -37,7 +36,6 @@ public class GetTraceDataResult extends ServerResponse {
 
     /**
      * Get the retrieved trace data.
-     * 
      * @return The retrieved trace data.
      */
     public String getTracedata() {

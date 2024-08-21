@@ -36,7 +36,6 @@ public enum JobStatus {
 
     /**
      * Construct a new JobStatus instance.
-     * 
      * @param value The job status.
      */
     JobStatus(String value) {
@@ -45,7 +44,6 @@ public enum JobStatus {
 
     /**
      * Get the job status.
-     * 
      * @return The job status.
      */
     public String getValue() {
@@ -54,7 +52,6 @@ public enum JobStatus {
 
     /**
      * Get the enum job status representation of a string.
-     * 
      * @param value The string representation of the job status.
      * @return The enum representation of the job status.
      */

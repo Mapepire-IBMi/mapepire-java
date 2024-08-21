@@ -37,7 +37,6 @@ public enum DateSeparator {
 
     /**
      * Construct a new DateSeparator instance.
-     * 
      * @param value The "date separator" value.
      */
     DateSeparator(String value) {
@@ -46,7 +45,6 @@ public enum DateSeparator {
 
     /**
      * Get the "date separator" value.
-     * 
      * @return The "date separator" value.
      */
     public String getValue() {
@@ -55,7 +53,6 @@ public enum DateSeparator {
 
     /**
      * Get the enum "date separator" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

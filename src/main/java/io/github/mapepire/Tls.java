@@ -14,7 +14,6 @@ public class Tls {
      * This function establishes a secure connection to the server and retrieves the
      * peer certificate information, which includes details about the server's
      * SSL/TLS certificate.
-     * 
      * @param creds The server details for the connection.
      * @return A CompletableFuture that resolves to the detailed peer certificate
      *         information.

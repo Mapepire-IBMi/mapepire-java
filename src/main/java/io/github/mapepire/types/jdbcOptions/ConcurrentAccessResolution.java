@@ -27,7 +27,6 @@ public enum ConcurrentAccessResolution {
 
     /**
      * Construct a new ConcurrentAccessResolution instance.
-     * 
      * @param value The "concurrent access resolution" value.
      */
     ConcurrentAccessResolution(String value) {
@@ -36,7 +35,6 @@ public enum ConcurrentAccessResolution {
 
     /**
      * Get the "concurrent access resolution" value.
-     * 
      * @return The "concurrent access resolution" value.
      */
     public String getValue() {
@@ -45,7 +43,6 @@ public enum ConcurrentAccessResolution {
 
     /**
      * Get the enum "concurrent access resolution" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

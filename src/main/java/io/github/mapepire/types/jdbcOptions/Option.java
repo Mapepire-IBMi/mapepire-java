@@ -564,7 +564,6 @@ public enum Option {
 
     /**
      * Construct a new Option instance.
-     * 
      * @param value The JDBC option.
      */
     Option(String value) {
@@ -573,7 +572,6 @@ public enum Option {
 
     /**
      * Get the JDBC option.
-     * 
      * @return The JDBC option.
      */
     public String getValue() {
@@ -582,7 +580,6 @@ public enum Option {
 
     /**
      * Get the enum JDBC option representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

@@ -78,7 +78,6 @@ public enum ToolboxTrace {
 
     /**
      * Construct a new ToolboxTrace instance.
-     * 
      * @param value The "toolbox trace" value.
      */
     ToolboxTrace(String value) {
@@ -87,7 +86,6 @@ public enum ToolboxTrace {
 
     /**
      * Get the "toolbox trace" value.
-     * 
      * @return The "toolbox trace" value.
      */
     public String getValue() {
@@ -96,7 +94,6 @@ public enum ToolboxTrace {
 
     /**
      * Get the enum "toolbox trace" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

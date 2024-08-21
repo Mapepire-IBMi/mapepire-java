@@ -22,7 +22,6 @@ public enum SortWeight {
 
     /**
      * Construct a new SortWeight instance.
-     * 
      * @param value The "sort weight" value.
      */
     SortWeight(String value) {
@@ -31,7 +30,6 @@ public enum SortWeight {
 
     /**
      * Get the "sort weight" value.
-     * 
      * @return The "sort weight" value.
      */
     public String getValue() {
@@ -40,7 +38,6 @@ public enum SortWeight {
 
     /**
      * Get the enum "sort weight" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

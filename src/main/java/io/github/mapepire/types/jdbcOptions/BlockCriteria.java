@@ -27,7 +27,6 @@ public enum BlockCriteria {
 
     /**
      * Construct a new BlockCriteria instance.
-     * 
      * @param value The "block criteria" value.
      */
     BlockCriteria(String value) {
@@ -36,7 +35,6 @@ public enum BlockCriteria {
 
     /**
      * Get the "block criteria" value.
-     * 
      * @return The "block criteria" value.
      */
     public String getValue() {
@@ -45,7 +43,6 @@ public enum BlockCriteria {
 
     /**
      * Get the enum "block criteria" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

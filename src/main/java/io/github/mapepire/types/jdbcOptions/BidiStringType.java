@@ -52,7 +52,6 @@ public enum BidiStringType {
 
     /**
      * Construct a new BidiStringType instance.
-     * 
      * @param value The "bidi string type" value.
      */
     BidiStringType(String value) {
@@ -61,7 +60,6 @@ public enum BidiStringType {
 
     /**
      * Get the "bidi string type" value.
-     * 
      * @return The "bidi string type" value.
      */
     public String getValue() {
@@ -70,7 +68,6 @@ public enum BidiStringType {
 
     /**
      * Get the enum "bidi string type" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

@@ -22,7 +22,6 @@ public enum TranslateHex {
 
     /**
      * Construct a new TranslateHex instance.
-     * 
      * @param value The "translate hex" value.
      */
     TranslateHex(String value) {
@@ -31,7 +30,6 @@ public enum TranslateHex {
 
     /**
      * Get the "translate hex" value.
-     * 
      * @return The "translate hex" value.
      */
     public String getValue() {
@@ -40,7 +38,6 @@ public enum TranslateHex {
 
     /**
      * Get the enum "translate hex" value representation of a string.
-     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */
