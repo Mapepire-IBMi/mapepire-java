@@ -5,10 +5,10 @@
 
   <groupId>io.github.mapepire-ibmi</groupId>
   <artifactId>mapepire-sdk</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3</version>
   <packaging>jar</packaging>
 
-  <name>Mapepire Java</name>
+  <name>Mapepire SDK</name>
   <description>The Mapepire Java client SDK provides a new and convenient way to access Db2 on IBM i</description>
   <url>https://github.com/Mapepire-IBMi/mapepire-java</url>
 

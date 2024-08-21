@@ -1,6 +1,8 @@
-# mapepire-java
+# Mapepire Java Client SDK
 
-[![Maven Build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml) [![License](https://img.shields.io/github/license/allenai/tango.svg?color=blue&cachedrop)](https://github.com/Mapepire-IBMi/mapepire-java/blob/main/LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mapepire-ibmi/mapepire-sdk.svg?label=Maven%20Central&logo=apachemaven)](https://central.sonatype.com/artifact/io.github.mapepire-ibmi/mapepire-sdk/)
+[![Maven Build](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml/badge.svg)](https://github.com/Mapepire-IBMi/mapepire-java/actions/workflows/build.yml)
+[![License](https://img.shields.io/github/license/allenai/tango.svg?color=blue&cachedrop)](https://github.com/Mapepire-IBMi/mapepire-java/blob/main/LICENSE)
 
 ## Overview
 
@@ -14,13 +16,13 @@ Full Documentation: https://mapepire-ibmi.github.io
 
 * Java 8 or later
 
-### Install with `maven` (Forthcoming)
+### Install with `maven`
 
 ```xml
 <dependency>
-    <groupId>io.github.mapapire</groupId>
-    <artifactId>mapapire-java</artifactId>
-    <version>x.x.x</version>
+    <groupId>io.github.mapepire-ibmi</groupId>
+    <artifactId>mapepire-sdk</artifactId>
+    <version>0.0.3</version>
 </dependency>
 ```
 
@@ -30,128 +32,104 @@ In order for applications to use Db2 for i through this Java client SDK, the `ma
 
 ## Example Usage
 
-The following Java program creates a `DaemonServer` object that will be used to connect with the Server Component. Then a single `SqlJob` is created to facilitate the connection from the client side.
+The following Java program initializes a `DaemonServer` object that will be used to connect with the Server Component. A single `SqlJob` object is created to facilitate this connection from the client side. A `query` object is then initialized with a simple `SELECT` query which is finally executed with 3 rows being fetched and the results being printed.
+
+> [!NOTE]
+> To run this Java program, replace the credentials which are passed into the `DaemonServer` object.
 
 ```java
+package io.github.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import io.github.mapepire_ibmi.Query;
+import io.github.mapepire_ibmi.SqlJob;
+import io.github.mapepire_ibmi.types.DaemonServer;
+import io.github.mapepire_ibmi.types.QueryResult;
+
+public final class App {
+    public static void main(String[] args) throws Exception {
+        // Initialize credentials
+        DaemonServer creds = new DaemonServer("HOST", 8085, "USER", "PASSWORD", true, "CA");
+
+        // Establish connection
+        SqlJob job = new SqlJob();
+        job.connect(creds).get();
+
+        // Initialize and execute query
+        Query<Object> query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
+        QueryResult<Object> result = query.execute(3).get();
+
+        // Convert to JSON string and output
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        String jsonString = mapper.writeValueAsString(result);
+        System.out.println(jsonString);
+    }
+}
 ```
 
 Output:
 
 ```json
 {
-  "id":"query3",
-  "has_results":true,
-  "update_count":-1,
-  "metadata":{
-    "column_count":14,
-    "job":"330955/QUSER/QZDASOINIT",
-    "columns":[
-      {
-        "name":"EMPNO",
-        "type":"CHAR",
-        "display_size":6,
-        "label":"EMPNO"
-      },
-      {
-        "name":"FIRSTNME",
-        "type":"VARCHAR",
-        "display_size":12,
-        "label":"FIRSTNME"
-      },
-      {
-        "name":"MIDINIT",
-        "type":"CHAR",
-        "display_size":1,
-        "label":"MIDINIT"
-      },
-      {
-        "name":"LASTNAME",
-        "type":"VARCHAR",
-        "display_size":15,
-        "label":"LASTNAME"
-      },
-      {
-        "name":"WORKDEPT",
-        "type":"CHAR",
-        "display_size":3,
-        "label":"WORKDEPT"
-      },
-      {
-        "name":"PHONENO",
-        "type":"CHAR",
-        "display_size":4,
-        "label":"PHONENO"
-      },
-      {
-        "name":"HIREDATE",
-        "type":"DATE",
-        "display_size":10,
-        "label":"HIREDATE"
-      },
-      {
-        "name":"JOB",
-        "type":"CHAR",
-        "display_size":8,
-        "label":"JOB"
-      },
-      {
-        "name":"EDLEVEL",
-        "type":"SMALLINT",
-        "display_size":6,
-        "label":"EDLEVEL"
-      },
-      {
-        "name":"SEX",
-        "type":"CHAR",
-        "display_size":1,
-        "label":"SEX"
-      },
-      {
-        "name":"BIRTHDATE",
-        "type":"DATE",
-        "display_size":10,
-        "label":"BIRTHDATE"
-      },
-      {
-        "name":"SALARY",
-        "type":"DECIMAL",
-        "display_size":11,
-        "label":"SALARY"
-      },
-      {
-        "name":"BONUS",
-        "type":"DECIMAL",
-        "display_size":11,
-        "label":"BONUS"
-      },
-      {
-        "name":"COMM",
-        "type":"DECIMAL",
-        "display_size":11,
-        "label":"COMM"
-      }
-    ]
+  "id" : "query3",
+  "success" : true,
+  "error" : null,
+  "sql_rc" : 0,
+  "sql_state" : null,
+  "metadata" : {
+    "column_count" : 5,
+    "columns" : [ {
+      "display_size" : 3,
+      "label" : "DEPTNO",
+      "name" : "DEPTNO",
+      "type" : "CHAR"
+    }, {
+      "display_size" : 36,
+      "label" : "DEPTNAME",
+      "name" : "DEPTNAME",
+      "type" : "VARCHAR"
+    }, {
+      "display_size" : 6,
+      "label" : "MGRNO",
+      "name" : "MGRNO",
+      "type" : "CHAR"
+    }, {
+      "display_size" : 3,
+      "label" : "ADMRDEPT",
+      "name" : "ADMRDEPT",
+      "type" : "CHAR"
+    }, {
+      "display_size" : 16,
+      "label" : "LOCATION",
+      "name" : "LOCATION",
+      "type" : "CHAR"
+    } ],
+    "job" : "930740/QUSER/QZDASOINIT"
   },
-  "data":[
-    {
-      "EMPNO":"000010",
-      "FIRSTNME":"CHRISTINE",
-      "MIDINIT":"I",
-      "LASTNAME":"HAAS",
-      "WORKDEPT":"A00",
-      "PHONENO":"3978",
-      "HIREDATE":"01/01/65",
-      "JOB":"PRES",
-      "EDLEVEL":18,
-      "SEX":"F",
-      "BIRTHDATE":"None",
-      "SALARY":52750.0,
-      "BONUS":1000.0,
-      "COMM":4220.0
-    }
-  ],
-  "is_done":false,
-  "success":true
+  "is_done" : false,
+  "has_results" : true,
+  "update_count" : -1,
+  "data" : [ {
+    "DEPTNO" : "A00",
+    "DEPTNAME" : "SPIFFY COMPUTER SERVICE DIV.",
+    "MGRNO" : "000010",
+    "ADMRDEPT" : "A00",
+    "LOCATION" : null
+  }, {
+    "DEPTNO" : "B01",
+    "DEPTNAME" : "PLANNING",
+    "MGRNO" : "000020",
+    "ADMRDEPT" : "A00",
+    "LOCATION" : null
+  }, {
+    "DEPTNO" : "C01",
+    "DEPTNAME" : "INFORMATION CENTER",
+    "MGRNO" : "000030",
+    "ADMRDEPT" : "A00",
+    "LOCATION" : null
+  } ]
 }
 ```
