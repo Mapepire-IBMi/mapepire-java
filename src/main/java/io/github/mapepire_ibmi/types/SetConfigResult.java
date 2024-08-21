@@ -55,7 +55,7 @@ public class SetConfigResult extends ServerResponse {
     /**
      * Set the destination for trace data.
      * 
-     * @param tracedestThe destination for trace data.
+     * @param tracedest The destination for trace data.
      */
     public void setTracedest(ServerTraceDest tracedest) {
         this.tracedest = tracedest;
