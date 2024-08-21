@@ -1,4 +1,4 @@
-name: build
+name: Maven Build
 
 on:
   workflow_dispatch:
@@ -7,10 +7,16 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  CONFIG_PROPERTIES: ./src/test/resources/config.properties
+  CONFIG_PROPERTIES_SAMPLE: ./src/test/resources/config.properties.sample
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    environment: OSSBUILD
 
     steps:
     - name: Checkout Repository
@@ -22,6 +28,14 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
+
+    - name: Set Test Secrets
+      run: |
+        cp ${{ env.CONFIG_PROPERTIES_SAMPLE }} ${{ env.CONFIG_PROPERTIES }}
+        sed -i 's/^IBMI_HOST=/IBMI_HOST=${{ secrets.IBMI_HOST }}/' ${{ env.CONFIG_PROPERTIES }}
+        sed -i 's/^IBMI_USER=/IBMI_USER=${{ secrets.IBMI_USER }}/' ${{ env.CONFIG_PROPERTIES }}
+        sed -i 's/^IBMI_PASSWORD=/IBMI_PASSWORD=${{ secrets.IBMI_PASSWORD }}/' ${{ env.CONFIG_PROPERTIES }}
+        sed -i 's/^IBMI_PORT=/IBMI_PORT=${{ secrets.IBMI_PORT }}/' ${{ env.CONFIG_PROPERTIES }}
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
