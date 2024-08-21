@@ -1,0 +1,115 @@
+name: Maven Release
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+env:
+  CONFIG_PROPERTIES: ./src/test/resources/config.properties
+  CONFIG_PROPERTIES_SAMPLE: ./src/test/resources/config.properties.sample
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    environment: OSSBUILD
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Maven Project Version
+        run: |
+          echo "PROJECT_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec  --file pom.xml)" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+
+      - name: Install GPG Secret Key
+        id: install-secret-key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+  
+      - name: Install GPG Public Key
+        id: install-pulic-key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_PUBLIC_KEY }}") | gpg --batch --import
+          gpg --list-public-keys --keyid-format LONG
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+          server-id: central
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-passphrase: GPG_PASSPHRASE
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Set Test Secrets
+        run: |
+          cp ${{ env.CONFIG_PROPERTIES_SAMPLE }} ${{ env.CONFIG_PROPERTIES }}
+          sed -i 's/^IBMI_HOST=/IBMI_HOST=${{ secrets.IBMI_HOST }}/' ${{ env.CONFIG_PROPERTIES }}
+          sed -i 's/^IBMI_USER=/IBMI_USER=${{ secrets.IBMI_USER }}/' ${{ env.CONFIG_PROPERTIES }}
+          sed -i 's/^IBMI_PASSWORD=/IBMI_PASSWORD=${{ secrets.IBMI_PASSWORD }}/' ${{ env.CONFIG_PROPERTIES }}
+          sed -i 's/^IBMI_PORT=/IBMI_PORT=${{ secrets.IBMI_PORT }}/' ${{ env.CONFIG_PROPERTIES }}
+
+      - name: eyeball settings.xml
+        run: cat $HOME/.m2/settings.xml
+
+      - name: Publish Maven Package
+        run: mvn --batch-mode -Dmaven.test.skip=true clean deploy --file pom.xml
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: List Target Directory
+        run: ls -l target
+
+      - name: Copy Artifacts to Staging Directory
+        run: mkdir staging && cp target/*.jar staging
+
+      - name: Create Bundle .zip and move main jar file
+        run: cd staging && zip ../mapepire-sdk-${{ env.PROJECT_VERSION }}.zip *.jar && mv ./mapepire-sdk-${{ env.PROJECT_VERSION }}.jar .. && cd ..
+
+      # - name: Get Release
+      #   id: get_release
+      #   uses: bruceadams/get-release@v1.3.2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Upload JAR to Release
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.get_release.outputs.upload_url }}
+      #     asset_path: ./mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
+      #     asset_name: mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
+      #     asset_content_type: application/zip
+
+      # - name: Upload ZIP to Release
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.get_release.outputs.upload_url }}
+      #     asset_path: ./mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
+      #     asset_name: mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
+      #     asset_content_type: application/zip
+
+      - name: Create the tag and release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.PROJECT_VERSION }}
+          name: v${{ env.PROJECT_VERSION }}
+          files: |
+           mapepire-sdk-${{ env.PROJECT_VERSION }}.zip
+           mapepire-sdk-${{ env.PROJECT_VERSION }}.jar
