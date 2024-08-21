@@ -15,7 +15,7 @@ import io.github.mapapire.types.QueryResult;
 
 class PoolTest extends MapepireTest {
     @Test
-    @Timeout(222)
+    @Timeout(22)
     @SuppressWarnings("unchecked")
     void simplePoolUsingPoolExecute() throws Exception {
         PoolOptions options = new PoolOptions(MapepireTest.creds, 5, 3);
