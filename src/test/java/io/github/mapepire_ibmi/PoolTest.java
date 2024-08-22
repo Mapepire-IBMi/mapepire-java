@@ -19,7 +19,7 @@ class PoolTest extends MapepireTest {
     @Timeout(22)
     @SuppressWarnings("unchecked")
     void simplePoolUsingPoolExecute() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.creds, 5, 3);
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 5, 3);
         Pool pool = new Pool(options);
         pool.init().get();
 

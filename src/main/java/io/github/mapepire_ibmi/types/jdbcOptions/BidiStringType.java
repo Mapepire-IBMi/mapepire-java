@@ -6,42 +6,42 @@ package io.github.mapepire_ibmi.types.jdbcOptions;
  */
 public enum BidiStringType {
     /**
-     * Bidi String Type 4
+     * Bidi String Type 4.
      */
     TYPE_4("4"),
 
     /**
-     * Bidi String Type 5
+     * Bidi String Type 5.
      */
     TYPE_5("5"),
 
     /**
-     * Bidi String Type 6
+     * Bidi String Type 6.
      */
     TYPE_6("6"),
 
     /**
-     * Bidi String Type 7
+     * Bidi String Type 7.
      */
     TYPE_7("7"),
 
     /**
-     * Bidi String Type 8
+     * Bidi String Type 8.
      */
     TYPE_8("8"),
 
     /**
-     * Bidi String Type 9
+     * Bidi String Type 9.
      */
     TYPE_9("9"),
 
     /**
-     * Bidi String Type 10
+     * Bidi String Type 10.
      */
     TYPE_10("10"),
 
     /**
-     * Bidi String Type 11
+     * Bidi String Type 11.
      */
     TYPE_11("11");
 
