@@ -1,7 +1,9 @@
 package io.github.mapepire_ibmi;
 
-import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,22 +13,19 @@ import java.util.Properties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Timeout;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.github.mapepire_ibmi.types.DaemonServer;
 
 @Timeout(5)
 class MapepireTest {
+    private static DaemonServer creds;
     private static final String CONFIG_FILE = "config.properties";
-    public static DaemonServer creds;
-    public static final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeAll
-    public static void setup() throws Exception {
+    public static void setup() throws IOException, ParseException {
         Properties properties = new Properties();
         try (InputStream input = MapepireTest.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (input == null) {
-                throw new IOException("Unable to find " + CONFIG_FILE);
+                throw new FileNotFoundException("Unable to find " + CONFIG_FILE);
             }
             properties.load(input);
         }
@@ -36,7 +35,7 @@ class MapepireTest {
         for (String key : keys) {
             String value = properties.getProperty(key);
             if (value.equals("")) {
-                throw new Exception(key + " not set in config.properties");
+                throw new ParseException(key + " not set in config.properties", 0);
             }
             secrets.put(key, value);
         }
@@ -49,5 +48,9 @@ class MapepireTest {
         creds = new DaemonServer(host, port, user, password, true, "");
 
         // TODO: Get certificate
+    }
+
+    public static DaemonServer getCreds() {
+        return creds;
     }
 }

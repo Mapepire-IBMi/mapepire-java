@@ -1,21 +1,19 @@
 package io.github.mapepire_ibmi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mapepire_ibmi.Query;
-import io.github.mapepire_ibmi.SqlJob;
 import io.github.mapepire_ibmi.types.QueryResult;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimpleTest extends MapepireTest {
     @Test
     void simpleTest() throws Exception {
         SqlJob job = new SqlJob();
-        job.connect(MapepireTest.creds).get();
+        job.connect(MapepireTest.getCreds()).get();
 
         Query<Object> query = job.query("select * from sample.department");
         QueryResult<Object> result = query.execute().get();
@@ -23,13 +21,13 @@ class SimpleTest extends MapepireTest {
         assertTrue(result.getIsDone());
         assertTrue(result.getData().size() > 0);
 
-        job.close();
+        job.dispose();
     }
 
     @Test
     void pagingTest() throws Exception {
         SqlJob job = new SqlJob();
-        job.connect(MapepireTest.creds).get();
+        job.connect(MapepireTest.getCreds()).get();
 
         Query<Object> query = job.query("select * from sample.department");
         QueryResult<Object> result = query.execute(5).get();
@@ -43,13 +41,13 @@ class SimpleTest extends MapepireTest {
         }
 
         query.close().get();
-        job.close();
+        job.dispose();
     }
 
     @Test
     void errorTest() throws Exception {
         SqlJob job = new SqlJob();
-        job.connect(MapepireTest.creds).get();
+        job.connect(MapepireTest.getCreds()).get();
 
         Query<Object> query = job.query("select * from scooby");
 
@@ -57,18 +55,19 @@ class SimpleTest extends MapepireTest {
             query.execute(5).get();
             throw new Exception("Exception not hit");
         } catch (Exception e) {
-            assertEquals("[SQL0204] SCOOBY in " + creds.getUser().toUpperCase() + " type *FILE not found., 42704, -204",
+            assertEquals(
+                    "[SQL0204] SCOOBY in " + getCreds().getUser().toUpperCase() + " type *FILE not found., 42704, -204",
                     e.getMessage());
         }
 
         query.close().get();
-        job.close();
+        job.dispose();
     }
 
     @Test
     void multipleStatementsOneJobTest() throws Exception {
         SqlJob job = new SqlJob();
-        job.connect(MapepireTest.creds).get();
+        job.connect(MapepireTest.getCreds()).get();
 
         QueryResult<Object> resultA = job.query("select * from sample.department").execute().get();
         assertTrue(resultA.getIsDone());
@@ -76,13 +75,13 @@ class SimpleTest extends MapepireTest {
         QueryResult<Object> resultB = job.query("select * from sample.employee").execute().get();
         assertTrue(resultB.getIsDone());
 
-        job.close();
+        job.dispose();
     }
 
     @Test
     void multipleStatementsParallelOneJobTest() throws Exception {
         SqlJob job = new SqlJob();
-        job.connect(MapepireTest.creds).get();
+        job.connect(MapepireTest.getCreds()).get();
 
         CompletableFuture<QueryResult<Object>> resultAFuture = job.query("select * from sample.department").execute();
         CompletableFuture<QueryResult<Object>> resultBFuture = job.query("select * from sample.employee").execute();
@@ -93,6 +92,6 @@ class SimpleTest extends MapepireTest {
         assertTrue(resultA.getIsDone());
         assertTrue(resultB.getIsDone());
 
-        job.close();
+        job.dispose();
     }
 }

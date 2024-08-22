@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://checkstyle.sourceforge.net/dtds/suppressions_1_0.dtd">
+<suppressions>
+    <suppress files=".*" checks="PackageName" />
+    <suppress files=".*" checks="MagicNumber" />
+    <suppress files=".*" checks="RegexpSingleline" />
+    <suppress files=".*" checks="ParameterNumber" />
+    <suppress files=".*" checks="HiddenField" />
+    <suppress files=".*" checks="EqualsAvoidNull" />
+    <suppress files=".*" checks="NoWhitespaceAfter" />
+    <suppress files=".*" checks="ImportOrder" />
+    <suppress files=".*" checks="HideUtilityClassConstructor" />
+    <suppress files="Test.java$" checks="IllegalCatch" />
+</suppressions>

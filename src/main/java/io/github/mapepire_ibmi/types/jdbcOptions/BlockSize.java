@@ -6,7 +6,7 @@ package io.github.mapepire_ibmi.types.jdbcOptions;
  */
 public enum BlockSize {
     /**
-     * 0 kilobytes
+     * 0 kilobytes.
      */
     SIZE_0("0"),
 

@@ -21,8 +21,6 @@ public class Tls {
      */
     public CompletableFuture<String> getCertificate(DaemonServer creds) {
         // TODO: Add implementation
-        // TODO: Add @throws - ts docs -> An error if the connection fails or if there
-        // is an issue retrieving the certificate.
         return CompletableFuture.completedFuture(null);
     }
 }

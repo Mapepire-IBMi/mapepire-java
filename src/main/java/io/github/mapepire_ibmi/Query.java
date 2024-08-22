@@ -1,10 +1,14 @@
 package io.github.mapepire_ibmi;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,14 +22,14 @@ import io.github.mapepire_ibmi.types.QueryState;
  */
 public class Query<T> {
     /**
-     * The SQL job that this query will be executed in.
-     */
-    private SqlJob job;
-
-    /**
      * A list of all global queries that are currently open.
      */
     private static List<Query<?>> globalQueryList = new ArrayList<>();
+
+    /**
+     * The SQL job that this query will be executed in.
+     */
+    private SqlJob job;
 
     /**
      * The correlation ID associated with the query.
@@ -40,7 +44,7 @@ public class Query<T> {
     /**
      * Whether the query has been prepared.
      */
-    private boolean isPrepared = false;
+    private boolean isPrepared;
 
     /**
      * The parameters to be used with the SQL query.
@@ -68,12 +72,8 @@ public class Query<T> {
     private boolean isTerseResults;
 
     /**
-     * TODO: Remove
-     */
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    /**
      * Construct a new Query instance.
+     * 
      * @param job   The SQL job that this query will be executed in.
      * @param query The SQL statement to be executed.
      * @param opts  The options for configuring a query.
@@ -93,11 +93,12 @@ public class Query<T> {
 
     /**
      * Get a Query instance by its correlation ID.
+     * 
      * @param id The correlation ID of the query.
      * @return The corresponding Query instance or null if not found.
      */
     public static Query<?> byId(String id) {
-        if (id == null || id == "") {
+        if (id == null || id.equals("")) {
             return null;
         } else {
             return Query.globalQueryList
@@ -110,6 +111,7 @@ public class Query<T> {
 
     /**
      * Get a list of open correlation IDs.
+     * 
      * @return A list of correlation IDs for open queries.
      */
     public static List<String> getOpenIds() {
@@ -118,6 +120,7 @@ public class Query<T> {
 
     /**
      * Get a list of open correlation IDs for the specified job.
+     * 
      * @param forJob The job to filter the queries by.
      * @return A list of correlation IDs for open queries.
      */
@@ -133,26 +136,23 @@ public class Query<T> {
     /**
      * Clean up queries that are done or are in error state from the global query
      * list.
+     * 
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public void cleanup() {
+    public void cleanup() throws InterruptedException, ExecutionException {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
                 .map(query -> CompletableFuture.runAsync(() -> {
                     try {
                         query.close();
-                    } catch (Exception e) {
+                    } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
                 }))
                 .collect(Collectors.toList());
 
-        // TODO: Fix this logic
-        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-        try {
-            allOf.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
 
         globalQueryList = globalQueryList.stream()
                 .filter(q -> q.getState() != QueryState.RUN_DONE)
@@ -161,27 +161,45 @@ public class Query<T> {
 
     /**
      * Execute an SQL command and returns the result.
+     * 
      * @param <T> The type of data to be returned.
      * @return A CompletableFuture that resolves to the query result.
+     * @throws SQLException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws UnknownClientException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute() throws Exception {
+    public <T> CompletableFuture<QueryResult<T>> execute() throws JsonMappingException, JsonProcessingException,
+            UnknownClientException, InterruptedException, ExecutionException, SQLException {
         return this.execute(100);
     }
 
     /**
      * Execute an SQL command and returns the result.
+     * 
      * @param <T>         The type of data to be returned.
      * @param rowsToFetch The number of rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
+     * @throws UnknownClientException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws SQLException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws Exception {
+    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws UnknownClientException,
+            JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException, SQLException {
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
-                throw new Exception("Statement has already been run");
+                throw new UnknownClientException("Statement has already been run");
             case RUN_DONE:
-                throw new Exception("Statement has already been fully run");
+                throw new UnknownClientException("Statement has already been fully run");
+            default:
         }
 
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode queryObject = objectMapper.createObjectNode();
         if (this.isCLCommand) {
             queryObject.put("id", SqlJob.getNewUniqueId("clcommand"));
@@ -202,23 +220,8 @@ public class Query<T> {
 
         this.rowsToFetch = rowsToFetch;
 
-        String result;
-        try {
-            result = job.send(objectMapper.writeValueAsString(queryObject)).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CompletableFuture.completedFuture(null);
-        }
-
-        // TODO: Type safety: The expression of type QueryResult needs unchecked
-        // conversion to conform to QueryResult<T>
-        QueryResult<T> queryResult;
-        try {
-            queryResult = objectMapper.readValue(result, QueryResult.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CompletableFuture.completedFuture(null);
-        }
+        String result = job.send(objectMapper.writeValueAsString(queryObject)).get();
+        QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
 
         this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
                 : QueryState.RUN_MORE_DATA_AVAILABLE;
@@ -243,7 +246,7 @@ public class Query<T> {
                 errorList.add("Failed to run query (unknown error)");
             }
 
-            throw new Exception(String.join(", ", errorList));
+            throw new SQLException(String.join(", ", errorList), queryResult.getSqlState());
         }
 
         this.correlationId = queryResult.getId();
@@ -252,25 +255,43 @@ public class Query<T> {
 
     /**
      * Fetch more rows from the currently running query.
+     * 
      * @return A CompletableFuture that resolves to the query result.
+     * @throws SQLException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws UnknownClientException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
-    public CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
+    public CompletableFuture<QueryResult<T>> fetchMore() throws JsonMappingException, JsonProcessingException,
+            UnknownClientException, InterruptedException, ExecutionException, SQLException {
         return this.fetchMore(this.rowsToFetch);
     }
 
     /**
      * Fetch more rows from the currently running query.
+     * 
      * @param rowsToFetch The number of additional rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
+     * @throws UnknownClientException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
+     * @throws SQLException
      */
-    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws Exception {
+    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws UnknownClientException,
+            JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException, SQLException {
         switch (this.state) {
             case NOT_YET_RUN:
-                throw new Exception("Statement has not yet been run");
+                throw new UnknownClientException("Statement has not yet been run");
             case RUN_DONE:
-                throw new Exception("Statement has already been fully run");
+                throw new UnknownClientException("Statement has already been fully run");
+            default:
         }
 
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode queryObject = objectMapper.createObjectNode();
         queryObject.put("id", SqlJob.getNewUniqueId("fetchMore"));
         queryObject.put("cont_id", this.correlationId);
@@ -280,58 +301,47 @@ public class Query<T> {
 
         this.rowsToFetch = rowsToFetch;
 
-        try {
-            return job.send(objectMapper.writeValueAsString(queryObject))
-                    .thenCompose(result -> {
-                        try {
-                            // TODO: Type safety: The expression of type QueryResult needs unchecked
-                            // conversion to conform to QueryResult<T>
-                            QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
+        String result = job.send(objectMapper.writeValueAsString(queryObject)).get();
+        QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
 
-                            this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
-                                    : QueryState.RUN_MORE_DATA_AVAILABLE;
+        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
+                : QueryState.RUN_MORE_DATA_AVAILABLE;
 
-                            if (!queryResult.getSuccess()) {
-                                this.state = QueryState.ERROR;
+        if (!queryResult.getSuccess()) {
+            this.state = QueryState.ERROR;
 
-                                String error = queryResult.getError();
-                                if (error != null) {
-                                    throw new Exception(error.toString());
-                                } else {
-                                    throw new Exception("Failed to run query (unknown error)");
-                                }
-                            }
-
-                            return CompletableFuture.completedFuture(queryResult);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return CompletableFuture.completedFuture(null);
-                        }
-                    });
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CompletableFuture.completedFuture(null);
+            String error = queryResult.getError();
+            if (error != null) {
+                throw new SQLException(error.toString(), queryResult.getSqlState());
+            } else {
+                throw new UnknownClientException("Failed to fetch more");
+            }
         }
+
+        return CompletableFuture.completedFuture(queryResult);
     }
 
     /**
      * Close the query.
+     * 
      * @return A CompletableFuture that resolves when the query is closed.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
-    public CompletableFuture<String> close() {
+    public CompletableFuture<String> close()
+            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException {
         if (correlationId != null && state != QueryState.RUN_DONE) {
             state = QueryState.RUN_DONE;
+
+            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
             ObjectNode queryObject = objectMapper.createObjectNode();
             queryObject.put("id", SqlJob.getNewUniqueId("sqlclose"));
             queryObject.put("cont_id", correlationId);
             queryObject.put("type", "sqlclose");
 
-            try {
-                return job.send(objectMapper.writeValueAsString(queryObject));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return CompletableFuture.completedFuture(null);
-            }
+            return job.send(objectMapper.writeValueAsString(queryObject));
         } else if (correlationId == null) {
             state = QueryState.RUN_DONE;
             return CompletableFuture.completedFuture(null);
@@ -342,6 +352,7 @@ public class Query<T> {
 
     /**
      * Get the correlation ID of the query.
+     * 
      * @return The correlation ID of the query.
      */
     public String getId() {
@@ -350,6 +361,7 @@ public class Query<T> {
 
     /**
      * Get the current state of the query execution.
+     * 
      * @return The current state of the query execution.
      */
     public QueryState getState() {
