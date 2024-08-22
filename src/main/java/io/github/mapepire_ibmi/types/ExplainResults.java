@@ -36,7 +36,7 @@ public class ExplainResults<T> extends QueryResult<T> {
      * @param sqlState    The SQL state code.
      * @param metadata    The metadata about the query results.
      * @param isDone      Whether the query execution is complete.
-     * @param hasResults  Whether the results were returned.
+     * @param hasResults  Whether there are still more results.
      * @param updateCount The number of rows affected by the query.
      * @param data        The data returned from the query.
      * @param vemetadata  The metadata about the query execution.
