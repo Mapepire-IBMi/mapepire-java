@@ -1,4 +1,4 @@
-package io.github.mapepire_ibmi;
+package io.github.mapepire_ibmi.types.exceptions;
 
 /**
  * Represents an exception from the Mapepire client.
