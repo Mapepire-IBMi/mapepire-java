@@ -22,6 +22,8 @@ import io.github.mapepire_ibmi.types.PoolAddOptions;
 import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 
 /**
  * Represents a connection pool for managing SQL jobs.
@@ -66,10 +68,17 @@ public class Pool {
      * @throws JsonProcessingException
      * @throws KeyManagementException
      * @throws JsonMappingException
+     * @throws ClientException 
      */
     public CompletableFuture<Void> init()
             throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException, ClientException {
+        if (this.options.getMaxSize() == 0) {
+            throw new ClientException("Max size must be greater than 0");
+        } else if (this.options.getStartingSize() > this.options.getMaxSize()) {
+            throw new ClientException("Max size must be greater than starting size");
+        }
+
         List<CompletableFuture<SqlJob>> futures = new ArrayList<>();
         for (int i = 0; i < options.getStartingSize(); i++) {
             futures.add(addJob());

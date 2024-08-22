@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.QueryState;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 
 /**
  * Represents a SQL query that can be executed and managed within a SQL job.
@@ -191,6 +193,10 @@ public class Query<T> {
      */
     public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws ClientException, JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException {
+        if (rowsToFetch <= 0) {
+            throw new ClientException("Rows to fetch must be greater than 0");
+        }
+
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
                 throw new ClientException("Statement has already been run");
@@ -285,6 +291,10 @@ public class Query<T> {
      */
     public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws ClientException, JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        if (rowsToFetch <= 0) {
+            throw new ClientException("Rows to fetch must be greater than 0");
+        }
+
         switch (this.state) {
             case NOT_YET_RUN:
                 throw new ClientException("Statement has not yet been run");

@@ -43,6 +43,8 @@ import io.github.mapepire_ibmi.types.ServerTraceLevel;
 import io.github.mapepire_ibmi.types.SetConfigResult;
 import io.github.mapepire_ibmi.types.TransactionEndType;
 import io.github.mapepire_ibmi.types.VersionCheckResult;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Option;
 import io.github.mapepire_ibmi.types.jdbcOptions.TransactionIsolation;
 
