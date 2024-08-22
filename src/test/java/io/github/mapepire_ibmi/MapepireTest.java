@@ -15,9 +15,10 @@ import org.junit.jupiter.api.Timeout;
 
 import io.github.mapepire_ibmi.types.DaemonServer;
 
-@Timeout(10)
+@Timeout(25)
 class MapepireTest {
     private static DaemonServer creds;
+    private static DaemonServer invalidCreds;
     private static final String CONFIG_FILE = "config.properties";
 
     @BeforeAll
@@ -46,11 +47,16 @@ class MapepireTest {
         int port = Integer.parseInt(secrets.get(keys.get(3)));
 
         creds = new DaemonServer(host, port, user, password, true, "");
+        invalidCreds = new DaemonServer(host, port, "FAKE_USER", "FAKE_PASSWORD", true, "");
 
         // TODO: Get certificate
     }
 
     public static DaemonServer getCreds() {
         return creds;
+    }
+
+    public static DaemonServer getInvalidCreds() {
+        return invalidCreds;
     }
 }
