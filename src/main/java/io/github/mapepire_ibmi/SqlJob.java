@@ -618,30 +618,31 @@ public class SqlJob {
      *
      * @return A CompletableFuture that resolves to the count of pending
      *         transactions.
+     * @throws SQLException
+     * @throws ClientException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
-    public CompletableFuture<Integer> getPendingTransactions() {
-        // TODO: Fix implementation
+    public CompletableFuture<Integer> getPendingTransactions() throws JsonMappingException, JsonProcessingException,
+            InterruptedException, ExecutionException, ClientException, SQLException {
         String transactionCountQuery = String.join("\n", Arrays.asList(
                 "select count(*) as thecount",
                 "  from qsys2.db_transaction_info",
                 "  where JOB_NAME = qsys2.job_name and",
                 "    (local_record_changes_pending = 'YES' or local_object_changes_pending = 'YES')"));
-        // return CompletableFuture.supplyAsync(() -> {
-        // QueryResult rows;
-        // try {
-        // rows = this.query(this.transactionCountQuery).execute(1).get();
 
-        // if (rows.isSuccess() && rows.getData() != null && rows.getData().size() == 1)
-        // {
-        // Object row = rows.getData().get(0);
-        // }
+        QueryResult<Object> queryResult = this.query(transactionCountQuery).execute(1).get();
 
-        // return 0;
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // return 0;
-        // }
-        // });
+        if (queryResult.getSuccess() && queryResult.getData() != null && queryResult.getData().size() == 1) {
+            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+            String data = objectMapper.writeValueAsString(queryResult.getData().get(0));
+            Map<String, Object> req = objectMapper.readValue(data, Map.class);
+            Integer count = (Integer) req.get("THECOUNT");
+            return CompletableFuture.completedFuture(count);
+        }
+
         return CompletableFuture.completedFuture(0);
     }
 
