@@ -419,6 +419,6 @@ public class Pool {
      * Close all jobs in the pool.
      */
     public void end() {
-        this.jobs.forEach(j -> j.dispose());
+        this.jobs.forEach(j -> j.close());
     }
 }

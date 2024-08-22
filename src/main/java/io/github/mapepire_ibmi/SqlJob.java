@@ -690,9 +690,16 @@ public class SqlJob {
     }
 
     /**
+     * Close the job.
+     */
+    public void close() {
+        this.dispose();
+    }
+
+    /**
      * Close the socket and set the status to be ended.
      */
-    public void dispose() {
+    private void dispose() {
         if (this.socket != null) {
             this.socket.close();
         }
