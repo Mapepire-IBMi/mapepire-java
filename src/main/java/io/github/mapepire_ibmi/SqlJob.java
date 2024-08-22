@@ -596,7 +596,7 @@ public class SqlJob {
      * @param cmd The CL command.
      * @return A new Query instance for the command.
      */
-    public Query<?> clcommand(String cmd) {
+    public <T> Query<T> clcommand(String cmd) {
         QueryOptions options = new QueryOptions();
         options.setIsClCommand(true);
         return new Query(this, cmd, options);
