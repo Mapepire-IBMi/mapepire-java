@@ -16,7 +16,7 @@ class CLTest extends MapepireTest {
 
         Query<Object> query = job.clcommand("WRKACTJOB");
         QueryResult<Object> result = query.execute().get();
-        job.dispose();
+        job.close();
 
         assertTrue(result.getSuccess());
         assertTrue(result.getData().size() > 0);
@@ -29,14 +29,14 @@ class CLTest extends MapepireTest {
 
         Query<Object> query = job.clcommand("INVALIDCOMMAND");
         QueryResult<Object> result = query.execute().get();
-        job.dispose();
+        job.close();
 
         assertFalse(result.getSuccess());
-        assertTrue(result.getData().size() > 0);
-        assertTrue(result.getError().contains("[CPF0006] Errors occurred in command."));
-        assertTrue(result.getId() != null);
         assertTrue(result.getIsDone());
-        assertEquals(result.getSqlRc(), -443);
-        assertEquals(result.getSqlState(), "38501");
+        assertTrue(result.getId() != null);
+        assertTrue(result.getData().size() > 0);
+        assertEquals(-443, result.getSqlRc());
+        assertEquals("38501", result.getSqlState());
+        assertEquals("[CPF0006] Errors occurred in command.", result.getError());
     }
 }
