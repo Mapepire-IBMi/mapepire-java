@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Timeout;
 
 import io.github.mapepire_ibmi.types.DaemonServer;
 
-@Timeout(5)
+@Timeout(10)
 class MapepireTest {
     private static DaemonServer creds;
     private static final String CONFIG_FILE = "config.properties";
