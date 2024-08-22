@@ -167,12 +167,12 @@ public class Query<T> {
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws JsonProcessingException
      * @throws JsonMappingException
      */
     public <T> CompletableFuture<QueryResult<T>> execute() throws JsonMappingException, JsonProcessingException,
-            UnknownClientException, InterruptedException, ExecutionException, SQLException {
+            ClientException, InterruptedException, ExecutionException, SQLException {
         return this.execute(100);
     }
 
@@ -182,20 +182,20 @@ public class Query<T> {
      * @param <T>         The type of data to be returned.
      * @param rowsToFetch The number of rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws ExecutionException
      * @throws InterruptedException
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws UnknownClientException,
-            JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException, SQLException {
+    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws ClientException, JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException {
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
-                throw new UnknownClientException("Statement has already been run");
+                throw new ClientException("Statement has already been run");
             case RUN_DONE:
-                throw new UnknownClientException("Statement has already been fully run");
+                throw new ClientException("Statement has already been fully run");
             default:
         }
 
@@ -243,7 +243,7 @@ public class Query<T> {
                 errorList.add(sqlRc);
             }
             if (errorList.isEmpty()) {
-                errorList.add("Failed to run query (unknown error)");
+                errorList.add("Failed to run query");
             }
 
             throw new SQLException(String.join(", ", errorList), queryResult.getSqlState());
@@ -260,12 +260,13 @@ public class Query<T> {
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws ClientException
      */
     public CompletableFuture<QueryResult<T>> fetchMore() throws JsonMappingException, JsonProcessingException,
-            UnknownClientException, InterruptedException, ExecutionException, SQLException {
+            UnknownServerException, InterruptedException, ExecutionException, SQLException, ClientException {
         return this.fetchMore(this.rowsToFetch);
     }
 
@@ -274,20 +275,21 @@ public class Query<T> {
      * 
      * @param rowsToFetch The number of additional rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws ExecutionException
      * @throws InterruptedException
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
+     * @throws UnknownServerException
      */
-    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws UnknownClientException,
-            JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException, SQLException {
+    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws ClientException, JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
         switch (this.state) {
             case NOT_YET_RUN:
-                throw new UnknownClientException("Statement has not yet been run");
+                throw new ClientException("Statement has not yet been run");
             case RUN_DONE:
-                throw new UnknownClientException("Statement has already been fully run");
+                throw new ClientException("Statement has already been fully run");
             default:
         }
 
@@ -314,7 +316,7 @@ public class Query<T> {
             if (error != null) {
                 throw new SQLException(error.toString(), queryResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to fetch more");
+                throw new UnknownServerException("Failed to fetch more");
             }
         }
 

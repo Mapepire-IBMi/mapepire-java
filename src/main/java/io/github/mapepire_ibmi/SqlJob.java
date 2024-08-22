@@ -163,7 +163,9 @@ public class SqlJob {
         WebSocketClient wsc = new WebSocketClient(uri, new Draft_6455(), httpHeaders, 5000) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                System.out.println("Opened connection");
+                if (isTracingChannelData) {
+                    System.out.println("Opened connection");
+                }
                 openedConnectionFuture.complete("Opened connection");
             }
 
@@ -189,7 +191,9 @@ public class SqlJob {
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                System.out.println("Closed connection");
+                if (isTracingChannelData) {
+                    System.out.println("Closed connection");
+                }
                 dispose();
             }
 
@@ -272,11 +276,11 @@ public class SqlJob {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) throws KeyManagementException,
             NoSuchAlgorithmException, InterruptedException, ExecutionException, URISyntaxException,
-            JsonMappingException, JsonProcessingException, SQLException, UnknownClientException {
+            JsonMappingException, JsonProcessingException, SQLException, UnknownServerException {
         this.status = JobStatus.Connecting;
         this.socket = this.getChannel(db2Server).get();
         this.socket.connect();
@@ -314,10 +318,12 @@ public class SqlJob {
         } else {
             this.dispose();
             this.status = JobStatus.NotStarted;
-            if (connectResult.getError() != null) {
-                throw new SQLException(connectResult.getError(), connectResult.getSqlState());
+
+            String error = connectResult.getError();
+            if (error != null) {
+                throw new SQLException(error, connectResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to connect to server");
+                throw new UnknownServerException("Failed to connect to server");
             }
         }
 
@@ -356,15 +362,17 @@ public class SqlJob {
      * @param <T> The type of data to be returned.
      * @param sql The SQL command to execute.
      * @return A CompletableFuture that resolves to the query result.
+     * @throws UnknownServerException
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws JsonProcessingException
      * @throws JsonMappingException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws JsonMappingException,
-            JsonProcessingException, UnknownClientException, InterruptedException, ExecutionException, SQLException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql)
+            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
+            ExecutionException, SQLException, UnknownServerException {
         return this.execute(sql, new QueryOptions());
     }
 
@@ -378,26 +386,29 @@ public class SqlJob {
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws JsonProcessingException
      * @throws JsonMappingException
+     * @throws UnknownServerException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws JsonMappingException,
-            JsonProcessingException, UnknownClientException, InterruptedException, ExecutionException, SQLException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts)
+            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
+            ExecutionException, SQLException, UnknownServerException {
         Query<T> query = query(sql, opts);
         CompletableFuture<QueryResult<T>> future = query.execute();
-        QueryResult<T> result = future.get();
+        QueryResult<T> queryResult = future.get();
         query.close().get();
 
-        if (!result.getSuccess()) {
-            if (result.getError() != null) {
-                throw new SQLException(result.getError(), result.getSqlState());
+        if (!queryResult.getSuccess()) {
+            String error = queryResult.getError();
+            if (error != null) {
+                throw new SQLException(error, queryResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to execute");
+                throw new UnknownServerException("Failed to execute");
             }
         }
 
-        return CompletableFuture.completedFuture(result);
+        return CompletableFuture.completedFuture(queryResult);
     }
 
     /**
@@ -409,27 +420,28 @@ public class SqlJob {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<VersionCheckResult> getVersion() throws JsonMappingException, JsonProcessingException,
-            InterruptedException, ExecutionException, SQLException, UnknownClientException {
+            InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode verObj = objectMapper.createObjectNode();
         verObj.put("id", SqlJob.getNewUniqueId());
         verObj.put("type", "getversion");
 
         String result = this.send(objectMapper.writeValueAsString(verObj)).get();
-        VersionCheckResult version = objectMapper.readValue(result, VersionCheckResult.class);
+        VersionCheckResult versionCheckResult = objectMapper.readValue(result, VersionCheckResult.class);
 
-        if (!version.getSuccess()) {
-            if (version.getError() != null) {
-                throw new SQLException(version.getError(), version.getSqlState());
+        if (!versionCheckResult.getSuccess()) {
+            String error = versionCheckResult.getError();
+            if (error != null) {
+                throw new SQLException(error, versionCheckResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to get version");
+                throw new UnknownServerException("Failed to get version");
             }
         }
 
-        return CompletableFuture.completedFuture(version);
+        return CompletableFuture.completedFuture(versionCheckResult);
     }
 
     /**
@@ -442,10 +454,10 @@ public class SqlJob {
      * @throws InterruptedException
      * @throws JsonProcessingException
      * @throws JsonMappingException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<ExplainResults<?>> explain(String statement) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownClientException {
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
         return this.explain(statement, ExplainType.Run);
     }
 
@@ -460,10 +472,10 @@ public class SqlJob {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<ExplainResults<?>> explain(String statement, ExplainType type) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownClientException {
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode explainRequest = objectMapper.createObjectNode();
         explainRequest.put("id", SqlJob.getNewUniqueId());
@@ -472,14 +484,14 @@ public class SqlJob {
         explainRequest.put("run", type == ExplainType.Run);
 
         String result = this.send(objectMapper.writeValueAsString(explainRequest)).get();
-
         ExplainResults<?> explainResult = objectMapper.readValue(result, ExplainResults.class);
 
         if (!explainResult.getSuccess()) {
-            if (explainResult.getError() != null) {
-                throw new SQLException(explainResult.getError(), explainResult.getSqlState());
+            String error = explainResult.getError();
+            if (error != null) {
+                throw new SQLException(error, explainResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to explain");
+                throw new UnknownServerException("Failed to explain");
             }
         }
 
@@ -502,28 +514,28 @@ public class SqlJob {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<GetTraceDataResult> getTraceData() throws JsonMappingException, JsonProcessingException,
-            InterruptedException, ExecutionException, SQLException, UnknownClientException {
+            InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode tracedataReqObj = objectMapper.createObjectNode();
         tracedataReqObj.put("id", SqlJob.getNewUniqueId());
         tracedataReqObj.put("type", "gettracedata");
 
         String result = this.send(objectMapper.writeValueAsString(tracedataReqObj)).get();
+        GetTraceDataResult traceDataResult = objectMapper.readValue(result, GetTraceDataResult.class);
 
-        GetTraceDataResult rpy = objectMapper.readValue(result, GetTraceDataResult.class);
-
-        if (!rpy.getSuccess()) {
-            if (rpy.getError() != null) {
-                throw new SQLException(rpy.getError(), rpy.getSqlState());
+        if (!traceDataResult.getSuccess()) {
+            String error = traceDataResult.getError();
+            if (error != null) {
+                throw new SQLException(error, traceDataResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to get trace data");
+                throw new UnknownServerException("Failed to get trace data");
             }
         }
 
-        return CompletableFuture.completedFuture(rpy);
+        return CompletableFuture.completedFuture(traceDataResult);
     }
 
     /**
@@ -537,11 +549,11 @@ public class SqlJob {
      * @throws JsonProcessingException
      * @throws JsonMappingException
      * @throws SQLException
-     * @throws UnknownClientException
+     * @throws UnknownServerException
      */
     public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level)
             throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
-            SQLException, UnknownClientException {
+            SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode reqObj = objectMapper.createObjectNode();
         reqObj.put("id", SqlJob.getNewUniqueId());
@@ -552,20 +564,22 @@ public class SqlJob {
         this.isTracingChannelData = true;
 
         String result = this.send(objectMapper.writeValueAsString(reqObj)).get();
-        SetConfigResult rpy = objectMapper.readValue(result, SetConfigResult.class);
+        SetConfigResult setConfigResult = objectMapper.readValue(result, SetConfigResult.class);
 
-        if (!rpy.getSuccess()) {
-            if (rpy.getError() != null) {
-                throw new SQLException(rpy.getError(), rpy.getSqlState());
+        if (!setConfigResult.getSuccess()) {
+            String error = setConfigResult.getError();
+            if (error != null) {
+                throw new SQLException(error, setConfigResult.getSqlState());
             } else {
-                throw new UnknownClientException("Failed to set trace config");
+                throw new UnknownServerException("Failed to set trace config");
             }
         }
 
-        this.tracedest = rpy.getTracedest().getValue() != null && rpy.getTracedest().getValue().charAt(0) == '/'
-                ? rpy.getTracedest().getValue()
-                : null;
-        return CompletableFuture.completedFuture(rpy);
+        this.tracedest = setConfigResult.getTracedest().getValue() != null
+                && setConfigResult.getTracedest().getValue().charAt(0) == '/'
+                        ? setConfigResult.getTracedest().getValue()
+                        : null;
+        return CompletableFuture.completedFuture(setConfigResult);
     }
 
     /**
@@ -632,12 +646,12 @@ public class SqlJob {
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
-     * @throws UnknownClientException
+     * @throws ClientException
      * @throws JsonProcessingException
      * @throws JsonMappingException
      */
     public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type)
-            throws JsonMappingException, JsonProcessingException, UnknownClientException, InterruptedException,
+            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
             ExecutionException, SQLException {
         String query;
 
