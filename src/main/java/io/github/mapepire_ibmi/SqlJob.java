@@ -201,6 +201,10 @@ public class SqlJob {
             public void onError(Exception e) {
                 e.printStackTrace();
                 dispose();
+
+                if (openedConnectionFuture != null) {
+                    openedConnectionFuture.completeExceptionally(e);
+                }
             }
         };
         wsc.setSocketFactory(factory);
@@ -282,10 +286,12 @@ public class SqlJob {
             NoSuchAlgorithmException, InterruptedException, ExecutionException, URISyntaxException,
             JsonMappingException, JsonProcessingException, SQLException, UnknownServerException {
         this.status = JobStatus.Connecting;
+
         this.socket = this.getChannel(db2Server).get();
-        this.socket.connect();
         openedConnectionFuture = new CompletableFuture<>();
+        this.socket.connect();
         openedConnectionFuture.get();
+        openedConnectionFuture = null;
 
         String props = String.join(";",
                 this.options.getOptions()
