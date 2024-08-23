@@ -245,8 +245,10 @@ public class SqlJob {
         synchronized (this.socket) {
             this.socket.send(content + "\n");
         }
+        this.status = JobStatus.Busy;
         String message = future.get();
         responseMap.remove(id);
+        this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
         return CompletableFuture.completedFuture(message);
     }
 
@@ -256,7 +258,7 @@ public class SqlJob {
      * @return The current status of the job.
      */
     public JobStatus getStatus() {
-        return this.getRunningCount() > 0 ? JobStatus.Busy : this.status;
+        return this.status;
     }
 
     /**
@@ -265,8 +267,7 @@ public class SqlJob {
      * @return The number of ongoing requests.
      */
     public int getRunningCount() {
-        // TODO:
-        return 0;
+        return this.responseMap.size();
     }
 
     /**
