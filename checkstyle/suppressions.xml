@@ -10,5 +10,6 @@
     <suppress files=".*" checks="NoWhitespaceAfter" />
     <suppress files=".*" checks="ImportOrder" />
     <suppress files=".*" checks="HideUtilityClassConstructor" />
+    <suppress files="Test.java$" checks="LineLength" />
     <suppress files="Test.java$" checks="IllegalCatch" />
 </suppressions>
