@@ -73,10 +73,10 @@ class TraceTest extends MapepireTest {
         assertTrue(result.getId() != null);
 
         if (traceExists) {
-            assertTrue(result.getTracedata()
+            assertTrue(result.getTraceData()
                     .contains("com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time));
         } else {
-            assertFalse(result.getTracedata()
+            assertFalse(result.getTraceData()
                     .contains("com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time));
         }
 

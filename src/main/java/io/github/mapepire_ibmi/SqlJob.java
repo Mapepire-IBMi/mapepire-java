@@ -68,9 +68,9 @@ public class SqlJob {
     private JobStatus status = JobStatus.NotStarted;
 
     /**
-     * The destination for trace data.
+     * The server trace data destination.
      */
-    private String tracedest;
+    private String traceDest;
 
     /**
      * Whether channel data is being traced.
@@ -510,7 +510,7 @@ public class SqlJob {
      * Get the file path of the trace file, if available.
      */
     public String getTraceFilePath() {
-        return this.tracedest;
+        return this.traceDest;
     }
 
     /**
@@ -583,9 +583,9 @@ public class SqlJob {
             }
         }
 
-        this.tracedest = setConfigResult.getTracedest().getValue() != null
-                && setConfigResult.getTracedest().getValue().charAt(0) == '/'
-                        ? setConfigResult.getTracedest().getValue()
+        this.traceDest = setConfigResult.getTraceDest().getValue() != null
+                && setConfigResult.getTraceDest().getValue().charAt(0) == '/'
+                        ? setConfigResult.getTraceDest().getValue()
                         : null;
         return CompletableFuture.completedFuture(setConfigResult);
     }

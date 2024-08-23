@@ -7,16 +7,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class SetConfigResult extends ServerResponse {
     /**
-     * The destination for trace data.
+     * The server trace data destination.
      */
     @JsonProperty("tracedest")
-    private ServerTraceDest tracedest;
+    private ServerTraceDest traceDest;
 
     /**
-     * The level of tracing set on the server.
+     * The server trace level.
      */
     @JsonProperty("tracelevel")
-    private ServerTraceLevel tracelevel;
+    private ServerTraceLevel traceLevel;
+
+    /**
+     * The JTOpen trace data destination.
+     */
+    @JsonProperty("jtopentracedest")
+    private ServerTraceDest jtOpenTraceDest;
+
+    /**
+     * The JTOpen trace level.
+     */
+    @JsonProperty("jtopentracelevel")
+    private ServerTraceLevel jtOpenTraceLevel;
 
     /**
      * Construct a new SetConfigResult instance.
@@ -28,54 +40,95 @@ public class SetConfigResult extends ServerResponse {
     /**
      * Construct a new SetConfigResult instance.
      * 
-     * @param id         The unique identifier for the request.
-     * @param success    Whether the request was successful.
-     * @param error      The error message, if any.
-     * @param sqlRc      The SQL return code.
-     * @param sqlState   The SQL state code.
-     * @param tracedest  The destination for trace data.
-     * @param tracelevel The level of tracing set on the server.
+     * @param id               The unique identifier for the request.
+     * @param success          Whether the request was successful.
+     * @param error            The error message, if any.
+     * @param sqlRc            The SQL return code.
+     * @param sqlState         The SQL state code.
+     * @param traceDest        The server trace data destination.
+     * @param traceLevel       The server trace level.
+     * @param jtOpenTraceDest  The JTOpen trace data destination.
+     * @param jtOpenTraceLevel The JTOpen trace level.
      */
     public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            ServerTraceDest tracedest, ServerTraceLevel tracelevel) {
+            ServerTraceDest traceDest, ServerTraceLevel traceLevel, ServerTraceDest jtOpenTraceDest,
+            ServerTraceLevel jtOpenTraceLevel) {
         super(id, success, error, sqlRc, sqlState);
-        this.tracedest = tracedest;
-        this.tracelevel = tracelevel;
+        this.traceDest = traceDest;
+        this.traceLevel = traceLevel;
+        this.jtOpenTraceDest = jtOpenTraceDest;
+        this.jtOpenTraceLevel = jtOpenTraceLevel;
     }
 
     /**
-     * Get the destination for trace data.
+     * Get the server trace data destination.
      * 
-     * @return The destination for trace data.
+     * @return The server trace data destination.
      */
-    public ServerTraceDest getTracedest() {
-        return tracedest;
+    public ServerTraceDest getTraceDest() {
+        return traceDest;
     }
 
     /**
-     * Set the destination for trace data.
+     * Set the server trace data destination.
      * 
-     * @param tracedest The destination for trace data.
+     * @param traceDest The server trace data destination.
      */
-    public void setTracedest(ServerTraceDest tracedest) {
-        this.tracedest = tracedest;
+    public void setTraceDest(ServerTraceDest traceDest) {
+        this.traceDest = traceDest;
     }
 
     /**
-     * Get the level of tracing set on the server.
+     * Get the server trace level.
      * 
-     * @return The level of tracing set on the server.
+     * @return The server trace level.
      */
-    public ServerTraceLevel getTracelevel() {
-        return tracelevel;
+    public ServerTraceLevel getTraceLevel() {
+        return traceLevel;
     }
 
     /**
-     * Set the level of tracing set on the server.
+     * Set the server trace level.
      * 
-     * @param tracelevel The level of tracing set on the server.
+     * @param traceLevel The server trace level.
      */
-    public void setTracelevel(ServerTraceLevel tracelevel) {
-        this.tracelevel = tracelevel;
+    public void setTraceLevel(ServerTraceLevel traceLevel) {
+        this.traceLevel = traceLevel;
+    }
+
+    /**
+     * Get the JTOpen trace data destination.
+     * 
+     * @return The JTOpen trace data destination.
+     */
+    public ServerTraceDest getJtOpenTraceDest() {
+        return jtOpenTraceDest;
+    }
+
+    /**
+     * Set the JTOpen trace data destination.
+     * 
+     * @param jtOpenTraceDest The JTOpen trace data destination.
+     */
+    public void setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest) {
+        this.jtOpenTraceDest = jtOpenTraceDest;
+    }
+
+    /**
+     * Get the JTOpen trace level.
+     * 
+     * @return The JTOpen trace level.
+     */
+    public ServerTraceLevel getJtOpenTraceLevel() {
+        return jtOpenTraceLevel;
+    }
+
+    /**
+     * Set the JTOpen trace level.
+     * 
+     * @param jtOpenTraceLevel The JTOpen trace level.
+     */
+    public void setJtOpenTraceLevel(ServerTraceLevel jtOpenTraceLevel) {
+        this.jtOpenTraceLevel = jtOpenTraceLevel;
     }
 }
