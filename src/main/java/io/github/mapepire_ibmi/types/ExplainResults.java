@@ -29,6 +29,7 @@ public class ExplainResults<T> extends QueryResult<T> {
 
     /**
      * Construct a new ExplainResults instance.
+     * 
      * @param id          The unique identifier for the request.
      * @param success     Whether the request was successful.
      * @param error       The error message, if any.
@@ -36,7 +37,7 @@ public class ExplainResults<T> extends QueryResult<T> {
      * @param sqlState    The SQL state code.
      * @param metadata    The metadata about the query results.
      * @param isDone      Whether the query execution is complete.
-     * @param hasResults   Whether there are results.
+     * @param hasResults  Whether there are results.
      * @param updateCount The number of rows affected by the query.
      * @param data        The data returned from the query.
      * @param vemetadata  The metadata about the query execution.
@@ -52,6 +53,7 @@ public class ExplainResults<T> extends QueryResult<T> {
 
     /**
      * Get the metadata about the query execution.
+     * 
      * @return The metadata about the query execution.
      */
     public QueryMetadata getVemetadata() {
@@ -60,6 +62,7 @@ public class ExplainResults<T> extends QueryResult<T> {
 
     /**
      * Set the metadata about the query execution.
+     * 
      * @param vemetadata The metadata about the query execution.
      */
     public void setVemetadata(QueryMetadata vemetadata) {
@@ -68,6 +71,7 @@ public class ExplainResults<T> extends QueryResult<T> {
 
     /**
      * Get the data returned from the explain request.
+     * 
      * @return The data returned from the explain request.
      */
     public Object getVedata() {
@@ -76,6 +80,7 @@ public class ExplainResults<T> extends QueryResult<T> {
 
     /**
      * Set the data returned from the explain request.
+     * 
      * @param vedata The data returned from the explain request.
      */
     public void setVedata(Object vedata) {

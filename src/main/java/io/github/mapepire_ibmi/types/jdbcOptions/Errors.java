@@ -21,6 +21,7 @@ public enum Errors {
 
     /**
      * Construct a new Errors instance.
+     * 
      * @param value The "errors" value.
      */
     Errors(String value) {
@@ -29,6 +30,7 @@ public enum Errors {
 
     /**
      * Get the "errors" value.
+     * 
      * @return The "errors" value.
      */
     public String getValue() {
@@ -37,6 +39,7 @@ public enum Errors {
 
     /**
      * Get the enum "errors" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

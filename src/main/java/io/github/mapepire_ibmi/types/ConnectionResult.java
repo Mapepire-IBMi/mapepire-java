@@ -21,6 +21,7 @@ public class ConnectionResult extends ServerResponse {
 
     /**
      * Construct a new ConnectionResult instance.
+     * 
      * @param id       The unique identifier for the request.
      * @param success  Whether the request was successful.
      * @param error    The error message, if any.
@@ -35,6 +36,7 @@ public class ConnectionResult extends ServerResponse {
 
     /**
      * Get the unique job identifier for the connection.
+     * 
      * @return The unique job identifier for the connection.
      */
     public String getJob() {
@@ -43,6 +45,7 @@ public class ConnectionResult extends ServerResponse {
 
     /**
      * Set the unique job identifier for the connection.
+     * 
      * @param job The unique job identifier for the connection.
      */
     public void setJob(String job) {

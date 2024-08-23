@@ -55,6 +55,7 @@ public class JDBCOptions {
 
     /**
      * Get the map of JDBC options.
+     * 
      * @return The map of JDBC options.
      */
     public Map<String, Object> getOptions() {
@@ -63,6 +64,7 @@ public class JDBCOptions {
 
     /**
      * Get the value of a JDBC option.
+     * 
      * @param option The JDBC option.
      * @return The value of the JDBC option.
      */
@@ -72,6 +74,7 @@ public class JDBCOptions {
 
     /**
      * Set the value of a JDBC option.
+     * 
      * @param option The JDBC option.
      * @param value  The value of the JDBC option.
      */
@@ -81,6 +84,7 @@ public class JDBCOptions {
 
     /**
      * Set the "naming" JDBC option.
+     * 
      * @param naming The value to set.
      */
     public void setNaming(Naming naming) {
@@ -89,6 +93,7 @@ public class JDBCOptions {
 
     /**
      * Set the "date format" JDBC option.
+     * 
      * @param dateFormat The value to set.
      */
     public void setDateFormat(DateFormat dateFormat) {
@@ -97,6 +102,7 @@ public class JDBCOptions {
 
     /**
      * Set the "date separator" JDBC option.
+     * 
      * @param dateSeparator The value to set.
      */
     public void setDateSeparator(DateSeparator dateSeparator) {
@@ -105,6 +111,7 @@ public class JDBCOptions {
 
     /**
      * Set the "decimal separator" JDBC option.
+     * 
      * @param decimalSeparator The value to set.
      */
     public void setDecimalSeparator(DecimalSeparator decimalSeparator) {
@@ -113,6 +120,7 @@ public class JDBCOptions {
 
     /**
      * Set the "time format" JDBC option.
+     * 
      * @param timeFormat The value to set.
      */
     public void setTimeFormat(TimeFormat timeFormat) {
@@ -121,6 +129,7 @@ public class JDBCOptions {
 
     /**
      * Set the "time separator" JDBC option.
+     * 
      * @param timeSeparator The value to set.
      */
     public void setTimeSeparator(TimeSeparator timeSeparator) {
@@ -129,6 +138,7 @@ public class JDBCOptions {
 
     /**
      * Set the "full open" JDBC option.
+     * 
      * @param fullOpen The value to set.
      */
     public void setFullOpen(boolean fullOpen) {
@@ -137,6 +147,7 @@ public class JDBCOptions {
 
     /**
      * Set the "access" JDBC option.
+     * 
      * @param access The value to set.
      */
     public void setAccess(Access access) {
@@ -145,6 +156,7 @@ public class JDBCOptions {
 
     /**
      * Set the "autocommit exception" JDBC option.
+     * 
      * @param autocommitException The value to set.
      */
     public void setAutocommitException(String autocommitException) {
@@ -153,6 +165,7 @@ public class JDBCOptions {
 
     /**
      * Set the "bidi string type" JDBC option.
+     * 
      * @param bidiStringType The value to set.
      */
     public void setBidiStringType(BidiStringType bidiStringType) {
@@ -161,6 +174,7 @@ public class JDBCOptions {
 
     /**
      * Set the "bidi implicit reordering" JDBC option.
+     * 
      * @param bidiImplicitReordering The value to set.
      */
     public void setBidiImplicitReordering(boolean bidiImplicitReordering) {
@@ -169,6 +183,7 @@ public class JDBCOptions {
 
     /**
      * Set the "bidi numeric ordering" JDBC option.
+     * 
      * @param bidiNumericOrdering The value to set.
      */
     public void setBidiNumericOrdering(boolean bidiNumericOrdering) {
@@ -177,6 +192,7 @@ public class JDBCOptions {
 
     /**
      * Set the "data truncation" JDBC option.
+     * 
      * @param dataTruncation The value to set.
      */
     public void setDataTruncation(boolean dataTruncation) {
@@ -185,6 +201,7 @@ public class JDBCOptions {
 
     /**
      * Set the "driver" JDBC option.
+     * 
      * @param driver The value to set.
      */
     public void setDriver(Driver driver) {
@@ -193,6 +210,7 @@ public class JDBCOptions {
 
     /**
      * Set the "errors" JDBC option.
+     * 
      * @param errors The value to set.
      */
     public void setErrors(Errors errors) {
@@ -201,6 +219,7 @@ public class JDBCOptions {
 
     /**
      * Set the "extended metadata" JDBC option.
+     * 
      * @param extendedMetadata The value to set.
      */
     public void setExtendedMetadata(boolean extendedMetadata) {
@@ -209,6 +228,7 @@ public class JDBCOptions {
 
     /**
      * Set the "hold input locators" JDBC option.
+     * 
      * @param holdInputLocators The value to set.
      */
     public void setHoldInputLocators(boolean holdInputLocators) {
@@ -217,6 +237,7 @@ public class JDBCOptions {
 
     /**
      * Set the "hold statements" JDBC option.
+     * 
      * @param holdStatements The value to set.
      */
     public void setHoldStatements(boolean holdStatements) {
@@ -225,6 +246,7 @@ public class JDBCOptions {
 
     /**
      * Set the "ignore warnings" JDBC option.
+     * 
      * @param ignoreWarnings The value to set.
      */
     public void setIgnoreWarnings(String ignoreWarnings) {
@@ -233,6 +255,7 @@ public class JDBCOptions {
 
     /**
      * Set the "keep alive" JDBC option.
+     * 
      * @param keepAlive The value to set.
      */
     public void setKeepAlive(boolean keepAlive) {
@@ -241,6 +264,7 @@ public class JDBCOptions {
 
     /**
      * Set the "key ring name" JDBC option.
+     * 
      * @param keyRingName The value to set.
      */
     public void setKeyRingName(String keyRingName) {
@@ -249,6 +273,7 @@ public class JDBCOptions {
 
     /**
      * Set the "key ring password" JDBC option.
+     * 
      * @param keyRingPassword The value to set.
      */
     public void setKeyRingPassword(String keyRingPassword) {
@@ -257,6 +282,7 @@ public class JDBCOptions {
 
     /**
      * Set the "metadata source" JDBC option.
+     * 
      * @param metadataSource The value to set.
      */
     public void setMetadataSource(MetadataSource metadataSource) {
@@ -265,6 +291,7 @@ public class JDBCOptions {
 
     /**
      * Set the "proxy server" JDBC option.
+     * 
      * @param proxyServer The value to set.
      */
     public void setProxyServer(String proxyServer) {
@@ -273,6 +300,7 @@ public class JDBCOptions {
 
     /**
      * Set the "remarks" JDBC option.
+     * 
      * @param remarks The value to set.
      */
     public void setRemarks(Remarks remarks) {
@@ -281,6 +309,7 @@ public class JDBCOptions {
 
     /**
      * Set the "secondary URL" JDBC option.
+     * 
      * @param secondaryUrl The value to set.
      */
     public void setSecondaryUrl(boolean secondaryUrl) {
@@ -289,6 +318,7 @@ public class JDBCOptions {
 
     /**
      * Set the "secure" JDBC option.
+     * 
      * @param secure The value to set.
      */
     public void setSecure(boolean secure) {
@@ -297,6 +327,7 @@ public class JDBCOptions {
 
     /**
      * Set the "server trace" JDBC option.
+     * 
      * @param serverTrace The value to set.
      */
     public void setServerTrace(ServerTrace serverTrace) {
@@ -305,6 +336,7 @@ public class JDBCOptions {
 
     /**
      * Set the "thread used" JDBC option.
+     * 
      * @param threadUsed The value to set.
      */
     public void setThreadUsed(boolean threadUsed) {
@@ -313,6 +345,7 @@ public class JDBCOptions {
 
     /**
      * Set the "toolbox trace" JDBC option.
+     * 
      * @param toolboxTrace The value to set.
      */
     public void setToolboxTrace(ToolboxTrace toolboxTrace) {
@@ -321,6 +354,7 @@ public class JDBCOptions {
 
     /**
      * Set the "trace" JDBC option.
+     * 
      * @param trace The value to set.
      */
     public void setTrace(boolean trace) {
@@ -329,6 +363,7 @@ public class JDBCOptions {
 
     /**
      * Set the "translate binary" JDBC option.
+     * 
      * @param translateBinary The value to set.
      */
     public void setTranslateBinary(boolean translateBinary) {
@@ -337,6 +372,7 @@ public class JDBCOptions {
 
     /**
      * Set the "translate boolean" JDBC option.
+     * 
      * @param translateBoolean The value to set.
      */
     public void setTranslateBoolean(boolean translateBoolean) {
@@ -345,6 +381,7 @@ public class JDBCOptions {
 
     /**
      * Set the "libraries" JDBC option.
+     * 
      * @param libraries The value to set.
      */
     public void setLibraries(List<String> libraries) {
@@ -353,6 +390,7 @@ public class JDBCOptions {
 
     /**
      * Set the "auto commit" JDBC option.
+     * 
      * @param autoCommit The value to set.
      */
     public void setAutoCommit(boolean autoCommit) {
@@ -361,6 +399,7 @@ public class JDBCOptions {
 
     /**
      * Set the "concurrent access resolution" JDBC option.
+     * 
      * @param concurrentAccessResolution The value to set.
      */
     public void setConcurrentAccessResolution(ConcurrentAccessResolution concurrentAccessResolution) {
@@ -369,6 +408,7 @@ public class JDBCOptions {
 
     /**
      * Set the "cursor hold" JDBC option.
+     * 
      * @param cursorHold The value to set.
      */
     public void setCursorHold(boolean cursorHold) {
@@ -377,6 +417,7 @@ public class JDBCOptions {
 
     /**
      * Set the "cursor sensitivity" JDBC option.
+     * 
      * @param cursorSensitivity The value to set.
      */
     public void setCursorSensitivity(CursorSensitivity cursorSensitivity) {
@@ -385,6 +426,7 @@ public class JDBCOptions {
 
     /**
      * Set the "database name" JDBC option.
+     * 
      * @param databaseName The value to set.
      */
     public void setDatabaseName(String databaseName) {
@@ -393,6 +435,7 @@ public class JDBCOptions {
 
     /**
      * Set the "decfloat rounding mode" JDBC option.
+     * 
      * @param decfloatRoundingMode The value to set.
      */
     public void setDecfloatRoundingMode(DecfloatRoundingMode decfloatRoundingMode) {
@@ -401,6 +444,7 @@ public class JDBCOptions {
 
     /**
      * Set the "maximum precision" JDBC option.
+     * 
      * @param maximumPrecision The value to set.
      */
     public void setMaximumPrecision(MaximumPrecision maximumPrecision) {
@@ -409,6 +453,7 @@ public class JDBCOptions {
 
     /**
      * Set the "maximum scale" JDBC option.
+     * 
      * @param maximumScale The value to set.
      */
     public void setMaximumScale(String maximumScale) {
@@ -417,6 +462,7 @@ public class JDBCOptions {
 
     /**
      * Set the "minimum divide scale" JDBC option.
+     * 
      * @param minimumDivideScale The value to set.
      */
     public void setMinimumDivideScale(MinimumDivideScale minimumDivideScale) {
@@ -425,6 +471,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package ccsid" JDBC option.
+     * 
      * @param packageCcsid The value to set.
      */
     public void setPackageCcsid(PackageCcsid packageCcsid) {
@@ -433,6 +480,7 @@ public class JDBCOptions {
 
     /**
      * Set the "transaction isolation" JDBC option.
+     * 
      * @param transactionIsolation The value to set.
      */
     public void setTransactionIsolation(TransactionIsolation transactionIsolation) {
@@ -441,6 +489,7 @@ public class JDBCOptions {
 
     /**
      * Set the "translate hex" JDBC option.
+     * 
      * @param translateHex The value to set.
      */
     public void setTranslateHex(TranslateHex translateHex) {
@@ -449,6 +498,7 @@ public class JDBCOptions {
 
     /**
      * Set the "true autocommit" JDBC option.
+     * 
      * @param trueAutocommit The value to set.
      */
     public void setTrueAutocommit(boolean trueAutocommit) {
@@ -457,6 +507,7 @@ public class JDBCOptions {
 
     /**
      * Set the "xa loosely coupled support" JDBC option.
+     * 
      * @param xaLooselyCoupledSupport The value to set.
      */
     public void setXALooselyCoupledSupport(XALooselyCoupledSupport xaLooselyCoupledSupport) {
@@ -465,6 +516,7 @@ public class JDBCOptions {
 
     /**
      * Set the "big decimal" JDBC option.
+     * 
      * @param bigDecimal The value to set.
      */
     public void setBigDecimal(boolean bigDecimal) {
@@ -473,6 +525,7 @@ public class JDBCOptions {
 
     /**
      * Set the "block criteria" JDBC option.
+     * 
      * @param blockCriteria The value to set.
      */
     public void setBlockCriteria(BlockCriteria blockCriteria) {
@@ -481,6 +534,7 @@ public class JDBCOptions {
 
     /**
      * Set the "block size" JDBC option.
+     * 
      * @param blockSize The value to set.
      */
     public void setBlockSize(BlockSize blockSize) {
@@ -489,6 +543,7 @@ public class JDBCOptions {
 
     /**
      * Set the "data compression" JDBC option.
+     * 
      * @param dataCompression The value to set.
      */
     public void setDataCompression(boolean dataCompression) {
@@ -497,6 +552,7 @@ public class JDBCOptions {
 
     /**
      * Set the "extended dynamic" JDBC option.
+     * 
      * @param extendedDynamic The value to set.
      */
     public void setExtendedDynamic(boolean extendedDynamic) {
@@ -505,6 +561,7 @@ public class JDBCOptions {
 
     /**
      * Set the "lazy close" JDBC option.
+     * 
      * @param lazyClose The value to set.
      */
     public void setLazyClose(boolean lazyClose) {
@@ -513,6 +570,7 @@ public class JDBCOptions {
 
     /**
      * Set the "lob threshold" JDBC option.
+     * 
      * @param lobThreshold The value to set.
      */
     public void setLobThreshold(String lobThreshold) {
@@ -521,6 +579,7 @@ public class JDBCOptions {
 
     /**
      * Set the "maximum blocked input rows" JDBC option.
+     * 
      * @param maximumBlockedInputRows The value to set.
      */
     public void setMaximumBlockedInputRows(String maximumBlockedInputRows) {
@@ -529,6 +588,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package" JDBC option.
+     * 
      * @param pkg The value to set.
      */
     public void setPackage(String pkg) {
@@ -537,6 +597,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package add" JDBC option.
+     * 
      * @param packageAdd The value to set.
      */
     public void setPackageAdd(boolean packageAdd) {
@@ -545,6 +606,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package cache" JDBC option.
+     * 
      * @param packageCache The value to set.
      */
     public void setPackageCache(boolean packageCache) {
@@ -553,6 +615,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package criteria" JDBC option.
+     * 
      * @param packageCriteria The value to set.
      */
     public void setPackageCriteria(PackageCriteria packageCriteria) {
@@ -561,6 +624,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package error" JDBC option.
+     * 
      * @param packageError The value to set.
      */
     public void setPackageError(PackageError packageError) {
@@ -569,6 +633,7 @@ public class JDBCOptions {
 
     /**
      * Set the "package library" JDBC option.
+     * 
      * @param packageLibrary The value to set.
      */
     public void setPackageLibrary(String packageLibrary) {
@@ -577,6 +642,7 @@ public class JDBCOptions {
 
     /**
      * Set the "prefetch" JDBC option.
+     * 
      * @param prefetch The value to set.
      */
     public void setPrefetch(boolean prefetch) {
@@ -585,6 +651,7 @@ public class JDBCOptions {
 
     /**
      * Set the "qaqqinilib" JDBC option.
+     * 
      * @param qaqqinilib The value to set.
      */
     public void setQaqqinilib(String qaqqinilib) {
@@ -593,6 +660,7 @@ public class JDBCOptions {
 
     /**
      * Set the "query optimize goal" JDBC option.
+     * 
      * @param queryOptimizeGoal The value to set.
      */
     public void setQueryOptimizeGoal(QueryOptimizeGoal queryOptimizeGoal) {
@@ -601,6 +669,7 @@ public class JDBCOptions {
 
     /**
      * Set the "query timeout mechanism" JDBC option.
+     * 
      * @param queryTimeoutMechanism The value to set.
      */
     public void setQueryTimeoutMechanism(QueryTimeoutMechanism queryTimeoutMechanism) {
@@ -609,6 +678,7 @@ public class JDBCOptions {
 
     /**
      * Set the "query storage limit" JDBC option.
+     * 
      * @param queryStorageLimit The value to set.
      */
     public void setQueryStorageLimit(String queryStorageLimit) {
@@ -617,6 +687,7 @@ public class JDBCOptions {
 
     /**
      * Set the "receive buffer size" JDBC option.
+     * 
      * @param receiveBufferSize The value to set.
      */
     public void receiveBufferSize(String receiveBufferSize) {
@@ -625,6 +696,7 @@ public class JDBCOptions {
 
     /**
      * Set the "send buffer size" JDBC option.
+     * 
      * @param sendBufferSize The value to set.
      */
     public void sendBufferSize(String sendBufferSize) {
@@ -633,6 +705,7 @@ public class JDBCOptions {
 
     /**
      * Set the "variable field compression" JDBC option.
+     * 
      * @param variableFieldCompression The value to set.
      */
     public void variableFieldCompression(boolean variableFieldCompression) {
@@ -641,6 +714,7 @@ public class JDBCOptions {
 
     /**
      * Set the "sort" JDBC option.
+     * 
      * @param sort The value to set.
      */
     public void setSort(Sort sort) {
@@ -649,6 +723,7 @@ public class JDBCOptions {
 
     /**
      * Set the "sort language" JDBC option.
+     * 
      * @param sortLanguage The value to set.
      */
     public void sortLanguage(String sortLanguage) {
@@ -657,6 +732,7 @@ public class JDBCOptions {
 
     /**
      * Set the "sort table" JDBC option.
+     * 
      * @param sortTable The value to set.
      */
     public void sortTable(String sortTable) {
@@ -665,6 +741,7 @@ public class JDBCOptions {
 
     /**
      * Set the "sort weight" JDBC option.
+     * 
      * @param sortWeight The value to set.
      */
     public void setWeight(SortWeight sortWeight) {
