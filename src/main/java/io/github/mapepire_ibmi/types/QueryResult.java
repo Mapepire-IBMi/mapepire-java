@@ -21,7 +21,7 @@ public class QueryResult<T> extends ServerResponse {
     private boolean isDone;
 
     /**
-     *  Whether there are results.
+     * Whether there are results.
      */
     @JsonProperty("has_results")
     private boolean hasResults;
@@ -55,7 +55,7 @@ public class QueryResult<T> extends ServerResponse {
      * @param sqlState    The SQL state code.
      * @param metadata    The metadata about the query results.
      * @param isDone      Whether the query execution is complete.
-     * @param hasResults   Whether there are results.
+     * @param hasResults  Whether there are results.
      * @param updateCount The number of rows affected by the query.
      * @param data        The data returned from the query.
      */
@@ -106,18 +106,18 @@ public class QueryResult<T> extends ServerResponse {
     }
 
     /**
-     * Get  Whether there are results.
+     * Get Whether there are results.
      * 
-     * @return  Whether there are results.
+     * @return Whether there are results.
      */
     public boolean getHasResults() {
         return hasResults;
     }
 
     /**
-     * Set  Whether there are results.
+     * Set Whether there are results.
      * 
-     * @param hasResults  Whether there are results.
+     * @param hasResults Whether there are results.
      */
     public void setHasResults(boolean hasResults) {
         this.hasResults = hasResults;

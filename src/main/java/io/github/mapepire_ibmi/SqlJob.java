@@ -309,16 +309,16 @@ public class SqlJob {
                         .collect(Collectors.toList()));
 
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode connectionObject = objectMapper.createObjectNode();
-        connectionObject.put("id", SqlJob.getNewUniqueId());
-        connectionObject.put("type", "connect");
-        connectionObject.put("technique", "tcp");
-        connectionObject.put("application", "Java client");
+        ObjectNode connectRequest = objectMapper.createObjectNode();
+        connectRequest.put("id", SqlJob.getNewUniqueId());
+        connectRequest.put("type", "connect");
+        connectRequest.put("technique", "tcp");
+        connectRequest.put("application", "Java client");
         if (props.length() > 0) {
-            connectionObject.put("props", props);
+            connectRequest.put("props", props);
         }
 
-        String result = this.send(objectMapper.writeValueAsString(connectionObject)).get();
+        String result = this.send(objectMapper.writeValueAsString(connectRequest)).get();
         ConnectionResult connectResult = objectMapper.readValue(result, ConnectionResult.class);
 
         if (connectResult.getSuccess()) {
@@ -433,11 +433,11 @@ public class SqlJob {
     public CompletableFuture<VersionCheckResult> getVersion() throws JsonMappingException, JsonProcessingException,
             InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode verObj = objectMapper.createObjectNode();
-        verObj.put("id", SqlJob.getNewUniqueId());
-        verObj.put("type", "getversion");
+        ObjectNode versionRequest = objectMapper.createObjectNode();
+        versionRequest.put("id", SqlJob.getNewUniqueId());
+        versionRequest.put("type", "getversion");
 
-        String result = this.send(objectMapper.writeValueAsString(verObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(versionRequest)).get();
         VersionCheckResult versionCheckResult = objectMapper.readValue(result, VersionCheckResult.class);
 
         if (!versionCheckResult.getSuccess()) {
@@ -527,11 +527,11 @@ public class SqlJob {
     public CompletableFuture<GetTraceDataResult> getTraceData() throws JsonMappingException, JsonProcessingException,
             InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode tracedataReqObj = objectMapper.createObjectNode();
-        tracedataReqObj.put("id", SqlJob.getNewUniqueId());
-        tracedataReqObj.put("type", "gettracedata");
+        ObjectNode traceDataRequest = objectMapper.createObjectNode();
+        traceDataRequest.put("id", SqlJob.getNewUniqueId());
+        traceDataRequest.put("type", "gettracedata");
 
-        String result = this.send(objectMapper.writeValueAsString(tracedataReqObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(traceDataRequest)).get();
         GetTraceDataResult traceDataResult = objectMapper.readValue(result, GetTraceDataResult.class);
 
         if (!traceDataResult.getSuccess()) {
@@ -563,15 +563,15 @@ public class SqlJob {
             throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
             SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode reqObj = objectMapper.createObjectNode();
-        reqObj.put("id", SqlJob.getNewUniqueId());
-        reqObj.put("type", "setconfig");
-        reqObj.put("tracedest", dest.getValue());
-        reqObj.put("tracelevel", level.getValue());
+        ObjectNode setTraceConfigRequest = objectMapper.createObjectNode();
+        setTraceConfigRequest.put("id", SqlJob.getNewUniqueId());
+        setTraceConfigRequest.put("type", "setconfig");
+        setTraceConfigRequest.put("tracedest", dest.getValue());
+        setTraceConfigRequest.put("tracelevel", level.getValue());
 
         this.isTracingChannelData = true;
 
-        String result = this.send(objectMapper.writeValueAsString(reqObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(setTraceConfigRequest)).get();
         SetConfigResult setConfigResult = objectMapper.readValue(result, SetConfigResult.class);
 
         if (!setConfigResult.getSuccess()) {

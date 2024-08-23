@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 
 class TlsTest extends MapepireTest {
     @Test
-    void canGetCertCorrectlyTest() {
+    void canGetCertCorrectly() {
         // TODO:
     }
 
     @Test
-    void willFailCorrectlyTest() {
+    void willFailCorrectly() {
         // TODO:
     }
 }
