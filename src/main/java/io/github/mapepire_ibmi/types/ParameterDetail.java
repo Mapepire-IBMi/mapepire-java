@@ -38,7 +38,6 @@ public class ParameterDetail {
 
     /**
      * Construct a new ParameterDetail instance.
-     * 
      */
     public ParameterDetail() {
 
