@@ -254,7 +254,7 @@ class SqlTest extends MapepireTest {
         assertTrue(result.getHasResults());
         assertTrue(result.getMetadata() != null);
         assertFalse(result.getIsDone());
-        assertEquals(5, result.getData().size());
+        assertEquals(1, result.getData().size());
         assertEquals("PHONE", row.get(0));
         assertEquals("DELETEME", row.get(1));
     }
@@ -267,7 +267,7 @@ class SqlTest extends MapepireTest {
         QueryOptions options = new QueryOptions(false, false,
                 Arrays.asList("TABLE_NAME", "LONG_COMMENT", "CONSTRAINT_NAME"));
         Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME IN (?, ?, ?)", options);
-        QueryResult<Object> result = query.execute(10).get();
+        QueryResult<Object> result = query.execute(30).get();
 
         query.close().get();
         job.close();

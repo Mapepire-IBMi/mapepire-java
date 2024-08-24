@@ -27,6 +27,12 @@ public class QueryMetadata {
     private String job;
 
     /**
+     * The parameters for the query.
+     */
+    @JsonProperty("parameters")
+    private List<ParameterDetail> parameters;
+
+    /**
      * Construct a new QueryMetadata instance.
      */
     public QueryMetadata() {
@@ -39,11 +45,13 @@ public class QueryMetadata {
      * @param columnCount The number of columns returned by the query.
      * @param columns     The metadata for each column.
      * @param job         The unique job identifier for the query.
+     * @param parameters  The parameters for the query.
      */
-    public QueryMetadata(int columnCount, List<ColumnMetadata> columns, String job) {
+    public QueryMetadata(int columnCount, List<ColumnMetadata> columns, String job, List<ParameterDetail> parameters) {
         this.columnCount = columnCount;
         this.columns = columns;
         this.job = job;
+        this.parameters = parameters;
     }
 
     /**
@@ -98,5 +106,23 @@ public class QueryMetadata {
      */
     public void setJob(String job) {
         this.job = job;
+    }
+
+    /**
+     * Get the parameters for the query.
+     * 
+     * @return The parameters for the query.
+     */
+    public List<ParameterDetail> getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Set the parameters for the query.
+     * 
+     * @param parameters The parameters for the query.
+     */
+    public void setParameters(List<ParameterDetail> parameters) {
+        this.parameters = parameters;
     }
 }

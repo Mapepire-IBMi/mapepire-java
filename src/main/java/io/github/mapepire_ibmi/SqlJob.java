@@ -691,6 +691,13 @@ public class SqlJob {
     }
 
     /**
+     * Enable local tracing of channel data.
+     */
+    public void enableLocalTrace() {
+        this.isTracingChannelData = true;
+    }
+
+    /**
      * Close the job.
      */
     public void close() {
