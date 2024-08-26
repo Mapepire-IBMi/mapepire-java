@@ -51,7 +51,7 @@ public class SetConfigResult extends ServerResponse {
      * @param jtOpenTraceLevel The JTOpen trace level.
      */
     public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState,
-    String traceDest, ServerTraceLevel traceLevel, String jtOpenTraceDest,
+            String traceDest, ServerTraceLevel traceLevel, String jtOpenTraceDest,
             ServerTraceLevel jtOpenTraceLevel) {
         super(id, success, error, sqlRc, sqlState);
         this.traceDest = traceDest;

@@ -7,17 +7,17 @@ public enum ParameterMode {
     /**
      * The IN mode.
      */
-    In("IN"),
+    IN("IN"),
 
     /**
      * The OUT mode.
      */
-    Out("OUT"),
+    OUT("OUT"),
 
     /**
      * The INOUT mode.
      */
-    InOut("INOUT");
+    INOUT("INOUT");
 
     /**
      * The parameter mode.

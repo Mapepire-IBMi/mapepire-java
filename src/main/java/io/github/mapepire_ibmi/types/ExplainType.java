@@ -7,10 +7,10 @@ public enum ExplainType {
     /**
      * Run the SQL statement for explanation.
      */
-    Run,
+    RUN,
 
     /**
      * Do not run the SQL statement for explanation.
      */
-    DoNotRun
+    DO_NOT_RUN
 }

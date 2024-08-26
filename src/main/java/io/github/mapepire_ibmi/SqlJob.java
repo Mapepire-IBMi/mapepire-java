@@ -468,7 +468,7 @@ public class SqlJob {
      */
     public CompletableFuture<ExplainResults<?>> explain(String statement) throws JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
-        return this.explain(statement, ExplainType.Run);
+        return this.explain(statement, ExplainType.RUN);
     }
 
     /**
@@ -491,7 +491,7 @@ public class SqlJob {
         explainRequest.put("id", SqlJob.getNewUniqueId());
         explainRequest.put("type", "dove");
         explainRequest.put("sql", statement);
-        explainRequest.put("run", type == ExplainType.Run);
+        explainRequest.put("run", type == ExplainType.RUN);
 
         String result = this.send(objectMapper.writeValueAsString(explainRequest)).get();
         ExplainResults<?> explainResult = objectMapper.readValue(result, ExplainResults.class);
