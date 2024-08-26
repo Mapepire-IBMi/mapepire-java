@@ -50,7 +50,6 @@ public class ParameterResult {
 
     /**
      * Construct a new ParameterResult instance.
-     * 
      */
     public ParameterResult() {
 

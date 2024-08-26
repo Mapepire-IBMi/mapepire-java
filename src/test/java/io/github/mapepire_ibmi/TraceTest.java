@@ -11,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
 import io.github.mapepire_ibmi.types.GetTraceDataResult;
-import io.github.mapepire_ibmi.types.ServerTraceDest;
 import io.github.mapepire_ibmi.types.ServerTraceLevel;
 
 @Timeout(100)
 class TraceTest extends MapepireTest {
     private String time;
-    private String validQuery = "SELECT * FROM SAMPLE.DEPARTMENT";
     private String invalidQuery;
 
     @BeforeEach
@@ -28,31 +26,29 @@ class TraceTest extends MapepireTest {
 
     @Test
     void serverTracingOff() throws Exception {
-        assertTraceData(invalidQuery, ServerTraceDest.IN_MEM, ServerTraceLevel.OFF, false);
+        assertTraceData(invalidQuery, ServerTraceLevel.OFF, false);
     }
 
     @Test
     void serverTracingOn() throws Exception {
-        assertTraceData(invalidQuery, ServerTraceDest.IN_MEM, ServerTraceLevel.ON, true);
+        assertTraceData(invalidQuery, ServerTraceLevel.ON, true);
     }
 
     @Test
     void errorServerTracing() throws Exception {
-        assertTraceData(invalidQuery, ServerTraceDest.IN_MEM, ServerTraceLevel.ERRORS, true);
+        assertTraceData(invalidQuery, ServerTraceLevel.ERRORS, true);
     }
 
     @Test
     void dataStreamServerTracing() throws Exception {
-        assertTraceData(invalidQuery, ServerTraceDest.IN_MEM, ServerTraceLevel.DATASTREAM, true);
+        assertTraceData(invalidQuery, ServerTraceLevel.DATASTREAM, true);
     }
 
-    GetTraceDataResult assertTraceData(String sql, ServerTraceDest dest, ServerTraceLevel level,
-            boolean traceExists)
-            throws Exception {
+    GetTraceDataResult assertTraceData(String sql, ServerTraceLevel level, boolean traceExists) throws Exception {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        job.setTraceConfig(dest, level).get();
+        job.setTraceLevel(level).get();
 
         assertThrowsExactly(SQLException.class, () -> {
             Query<Object> query = job.query(sql);

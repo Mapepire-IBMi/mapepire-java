@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -301,8 +302,8 @@ public class SqlJob {
                         .entrySet()
                         .stream()
                         .map(entry -> {
-                            if (entry.getValue() instanceof String[]) {
-                                return entry.getKey() + "=" + String.join(",", (String[]) entry.getValue());
+                            if (entry.getValue() instanceof List) {
+                                return entry.getKey() + "=" + String.join(",", (List) entry.getValue());
                             } else {
                                 return entry.getKey() + "=" + entry.getValue();
                             }
@@ -548,10 +549,82 @@ public class SqlJob {
     }
 
     /**
+     * Set the server trace destination.
+     * 
+     * @param dest The server trace destination.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setTraceDest(ServerTraceDest dest) throws JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        return setTraceConfig(dest, null, null, null);
+    }
+
+    /**
+     * Set the server trace level.
+     * 
+     * @param level The server trace level.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setTraceLevel(ServerTraceLevel level) throws JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        return setTraceConfig(null, level, null, null);
+    }
+
+    /**
+     * Set the JTOpen trace data destination.
+     * 
+     * @param jtOpenTraceDest The JTOpen trace data destination.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest)
+            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
+            SQLException, UnknownServerException {
+        return setTraceConfig(null, null, jtOpenTraceDest, null);
+    }
+
+    /**
+     * Set the JTOpen trace level.
+     * 
+     * @param jtOpenTraceLevel The JTOpen trace level.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setJtOpenTraceLevel(ServerTraceLevel jtOpenTraceLevel)
+            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
+            SQLException, UnknownServerException {
+        return setTraceConfig(null, null, null, jtOpenTraceLevel);
+    }
+
+    /**
      * Set the trace config on the backend.
      *
-     * @param dest  The server trace destination.
-     * @param level The server trace level.
+     * @param dest             The server trace destination.
+     * @param level            The server trace level.
+     * @param jtOpenTraceDest  The JTOpen trace data destination.
+     * @param jtOpenTraceLevel The JTOpen trace level.
      * @return A CompletableFuture that resolves to the set config result.
      * @throws ExecutionException
      * @throws InterruptedException
@@ -560,15 +633,27 @@ public class SqlJob {
      * @throws SQLException
      * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level)
+    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level,
+            ServerTraceDest jtOpenTraceDest, ServerTraceLevel jtOpenTraceLevel)
             throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
             SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode setTraceConfigRequest = objectMapper.createObjectNode();
         setTraceConfigRequest.put("id", SqlJob.getNewUniqueId());
         setTraceConfigRequest.put("type", "setconfig");
-        setTraceConfigRequest.put("tracedest", dest.getValue());
-        setTraceConfigRequest.put("tracelevel", level.getValue());
+
+        if (dest != null) {
+            setTraceConfigRequest.put("tracedest", dest.getValue());
+        }
+        if (level != null) {
+            setTraceConfigRequest.put("tracelevel", level.getValue());
+        }
+        if (jtOpenTraceDest != null) {
+            setTraceConfigRequest.put("jtopentracedest", jtOpenTraceDest.getValue());
+        }
+        if (jtOpenTraceLevel != null) {
+            setTraceConfigRequest.put("jtopentracelevel", jtOpenTraceLevel.getValue());
+        }
 
         this.isTracingChannelData = true;
 
@@ -584,9 +669,9 @@ public class SqlJob {
             }
         }
 
-        this.traceDest = setConfigResult.getTraceDest().getValue() != null
-                && setConfigResult.getTraceDest().getValue().charAt(0) == '/'
-                        ? setConfigResult.getTraceDest().getValue()
+        this.traceDest = setConfigResult.getTraceDest() != null
+                && setConfigResult.getTraceDest().charAt(0) == '/'
+                        ? setConfigResult.getTraceDest()
                         : null;
         return CompletableFuture.completedFuture(setConfigResult);
     }

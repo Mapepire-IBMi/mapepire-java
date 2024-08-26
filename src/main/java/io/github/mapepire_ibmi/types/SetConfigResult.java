@@ -10,7 +10,7 @@ public class SetConfigResult extends ServerResponse {
      * The server trace data destination.
      */
     @JsonProperty("tracedest")
-    private ServerTraceDest traceDest;
+    private String traceDest;
 
     /**
      * The server trace level.
@@ -22,7 +22,7 @@ public class SetConfigResult extends ServerResponse {
      * The JTOpen trace data destination.
      */
     @JsonProperty("jtopentracedest")
-    private ServerTraceDest jtOpenTraceDest;
+    private String jtOpenTraceDest;
 
     /**
      * The JTOpen trace level.
@@ -51,7 +51,7 @@ public class SetConfigResult extends ServerResponse {
      * @param jtOpenTraceLevel The JTOpen trace level.
      */
     public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            ServerTraceDest traceDest, ServerTraceLevel traceLevel, ServerTraceDest jtOpenTraceDest,
+    String traceDest, ServerTraceLevel traceLevel, String jtOpenTraceDest,
             ServerTraceLevel jtOpenTraceLevel) {
         super(id, success, error, sqlRc, sqlState);
         this.traceDest = traceDest;
@@ -65,7 +65,7 @@ public class SetConfigResult extends ServerResponse {
      * 
      * @return The server trace data destination.
      */
-    public ServerTraceDest getTraceDest() {
+    public String getTraceDest() {
         return traceDest;
     }
 
@@ -74,7 +74,7 @@ public class SetConfigResult extends ServerResponse {
      * 
      * @param traceDest The server trace data destination.
      */
-    public void setTraceDest(ServerTraceDest traceDest) {
+    public void setTraceDest(String traceDest) {
         this.traceDest = traceDest;
     }
 
@@ -101,7 +101,7 @@ public class SetConfigResult extends ServerResponse {
      * 
      * @return The JTOpen trace data destination.
      */
-    public ServerTraceDest getJtOpenTraceDest() {
+    public String getJtOpenTraceDest() {
         return jtOpenTraceDest;
     }
 
@@ -110,7 +110,7 @@ public class SetConfigResult extends ServerResponse {
      * 
      * @param jtOpenTraceDest The JTOpen trace data destination.
      */
-    public void setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest) {
+    public void setJtOpenTraceDest(String jtOpenTraceDest) {
         this.jtOpenTraceDest = jtOpenTraceDest;
     }
 
