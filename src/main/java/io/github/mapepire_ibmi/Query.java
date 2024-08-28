@@ -83,8 +83,6 @@ public class Query<T> {
     public Query(SqlJob job, String query, QueryOptions opts) {
         this.job = job;
         this.sql = query;
-
-        // TODO: Fix constructor
         this.isPrepared = opts.getParameters() != null;
         this.parameters = opts.getParameters();
         this.isCLCommand = opts.getIsClCommand();
