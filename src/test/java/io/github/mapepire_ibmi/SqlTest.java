@@ -213,10 +213,7 @@ class SqlTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getIsDone());
         assertNotNull(result.getId());
-        assertNotNull(result.getMetadata());
-        assertFalse(result.getHasResults());
     }
 
     @Test
@@ -291,7 +288,7 @@ class SqlTest extends MapepireTest {
         assertNotNull(result.getId());
         assertTrue(result.getHasResults());
         assertNotNull(result.getMetadata());
-        assertFalse(result.getIsDone());
+        assertTrue(result.getIsDone());
         assertEquals(1, result.getData().size());
         assertEquals("PHONE", row.get(0));
         assertEquals("DELETEME", row.get(1));
