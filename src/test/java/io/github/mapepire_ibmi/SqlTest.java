@@ -171,6 +171,7 @@ class SqlTest extends MapepireTest {
 
         Query<Object> query = job.query("DROP TABLE SAMPLE.DELETE IF EXISTS");
         QueryResult<Object> result = query.execute().get();
+
         query.close().get();
         job.close();
 
@@ -369,13 +370,13 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryResult<Object> resultA = job.query("SELECT * FROM SAMPLE.DEPARTMENT").execute().get();
-        assertTrue(resultA.getIsDone());
-
-        QueryResult<Object> resultB = job.query("SELECT * FROM SAMPLE.EMPLOYEE").execute().get();
-        assertTrue(resultB.getIsDone());
+        QueryResult<Object> resultA = job.execute("SELECT * FROM SAMPLE.DEPARTMENT").get();
+        QueryResult<Object> resultB = job.execute("SELECT * FROM SAMPLE.EMPLOYEE").get();
 
         job.close();
+
+        assertTrue(resultA.getIsDone());
+        assertTrue(resultB.getIsDone());
     }
 
     @Test
@@ -383,15 +384,15 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        CompletableFuture<QueryResult<Object>> resultAFuture = job.query("SELECT * FROM SAMPLE.DEPARTMENT").execute();
-        CompletableFuture<QueryResult<Object>> resultBFuture = job.query("SELECT * FROM SAMPLE.EMPLOYEE").execute();
+        CompletableFuture<QueryResult<Object>> resultAFuture = job.execute("SELECT * FROM SAMPLE.DEPARTMENT");
+        CompletableFuture<QueryResult<Object>> resultBFuture = job.execute("SELECT * FROM SAMPLE.EMPLOYEE");
         CompletableFuture.allOf(resultAFuture, resultBFuture).join();
         QueryResult<Object> resultA = resultAFuture.get();
         QueryResult<Object> resultB = resultBFuture.get();
 
+        job.close();
+
         assertTrue(resultA.getIsDone());
         assertTrue(resultB.getIsDone());
-
-        job.close();
     }
 }
