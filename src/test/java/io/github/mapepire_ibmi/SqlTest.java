@@ -2,6 +2,7 @@ package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,9 +33,9 @@ class SqlTest extends MapepireTest {
 
         assertTrue(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
     }
 
@@ -52,9 +53,9 @@ class SqlTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertFalse(result.getIsDone());
         assertEquals(5, result.getData().size());
         assertEquals("NAME", row.get(0));
@@ -73,9 +74,9 @@ class SqlTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertFalse(result.getIsDone());
         assertEquals(50, result.getData().size());
     }
@@ -177,8 +178,8 @@ class SqlTest extends MapepireTest {
 
         assertTrue(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getId());
+        assertNotNull(result.getMetadata());
         assertFalse(result.getHasResults());
     }
 
@@ -231,9 +232,9 @@ class SqlTest extends MapepireTest {
 
         assertTrue(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
     }
 
@@ -251,9 +252,9 @@ class SqlTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertFalse(result.getIsDone());
         assertEquals(1, result.getData().size());
         assertEquals("PHONE", row.get(0));
@@ -275,9 +276,9 @@ class SqlTest extends MapepireTest {
 
         assertTrue(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
     }
 
@@ -359,9 +360,9 @@ class SqlTest extends MapepireTest {
 
         assertTrue(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getHasResults());
-        assertTrue(result.getMetadata() != null);
+        assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
     }
 

@@ -1,6 +1,7 @@
 package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,7 +67,7 @@ class TraceTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
 
         if (traceExists) {
             assertTrue(result.getTraceData()

@@ -3,6 +3,7 @@ package io.github.mapepire_ibmi;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -61,7 +62,7 @@ class ProcedureTest extends MapepireTest {
 
         job.close();
 
-        assertTrue(result.getMetadata().getParameters() != null);
+        assertNotNull(result.getMetadata().getParameters());
         assertEquals(3, result.getMetadata().getParameters().size());
         List<String> inParmNames = result.getMetadata().getParameters().stream().map(p -> p.getName())
                 .collect(Collectors.toList());
@@ -76,7 +77,7 @@ class ProcedureTest extends MapepireTest {
         assertEquals(0, result.getUpdateCount());
         assertEquals(0, result.getData().size());
 
-        assertTrue(result.getOutputParms() != null);
+        assertNotNull(result.getOutputParms());
         assertEquals(3, result.getOutputParms().size());
         List<String> outParmNames = result.getOutputParms().stream().map(p -> p.getName())
                 .collect(Collectors.toList());
@@ -115,7 +116,7 @@ class ProcedureTest extends MapepireTest {
 
         job.close();
 
-        assertTrue(result.getMetadata().getParameters() != null);
+        assertNotNull(result.getMetadata().getParameters());
         assertEquals(3, result.getMetadata().getParameters().size());
         List<String> inParmNames = result.getMetadata().getParameters().stream().map(p -> p.getName())
                 .collect(Collectors.toList());
@@ -133,7 +134,7 @@ class ProcedureTest extends MapepireTest {
         assertEquals(0, result.getUpdateCount());
         assertEquals(0, result.getData().size());
 
-        assertTrue(result.getOutputParms() != null);
+        assertNotNull(result.getOutputParms());
         assertEquals(3, result.getOutputParms().size());
         List<String> outParmNames = result.getOutputParms().stream().map(p -> p.getName())
                 .collect(Collectors.toList());
@@ -175,7 +176,7 @@ class ProcedureTest extends MapepireTest {
 
         job.close();
 
-        assertTrue(result.getMetadata().getParameters() != null);
+        assertNotNull(result.getMetadata().getParameters());
         assertEquals(3, result.getMetadata().getParameters().size());
         List<String> inParmNames = result.getMetadata().getParameters().stream().map(p -> p.getName())
                 .collect(Collectors.toList());
@@ -193,7 +194,7 @@ class ProcedureTest extends MapepireTest {
         assertEquals(0, result.getUpdateCount());
         assertEquals(0, result.getData().size());
 
-        assertTrue(result.getOutputParms() != null);
+        assertNotNull(result.getOutputParms());
         assertEquals(3, result.getOutputParms().size());
         List<String> outParmNames = result.getOutputParms().stream().map(p -> p.getName())
                 .collect(Collectors.toList());

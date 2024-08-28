@@ -2,6 +2,7 @@ package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class CLTest extends MapepireTest {
 
         assertFalse(result.getSuccess());
         assertTrue(result.getIsDone());
-        assertTrue(result.getId() != null);
+        assertNotNull(result.getId());
         assertTrue(result.getData().size() > 0);
         assertEquals(-443, result.getSqlRc());
         assertEquals("38501", result.getSqlState());
