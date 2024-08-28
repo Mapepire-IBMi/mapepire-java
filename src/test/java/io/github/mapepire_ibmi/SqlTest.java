@@ -14,9 +14,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.mapepire_ibmi.types.JDBCOptions;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.jdbcOptions.Naming;
 
 @SuppressWarnings("unchecked")
 class SqlTest extends MapepireTest {
@@ -37,6 +39,40 @@ class SqlTest extends MapepireTest {
         assertTrue(result.getHasResults());
         assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
+    }
+
+    @Test
+    void simpleQueryWithJDBCOptions() throws Exception {
+        JDBCOptions options = new JDBCOptions();
+        options.setLibraries(Arrays.asList("SAMPLE"));
+        options.setNaming(Naming.SQL);
+        SqlJob job = new SqlJob(options);
+        job.connect(MapepireTest.getCreds()).get();
+
+        Query<Object> queryA = job.query("SELECT * FROM DEPARTMENT");
+        QueryResult<Object> result = queryA.execute().get();
+
+        SQLException e = assertThrowsExactly(SQLException.class, () -> {
+            Query<Object> queryB = job.query("SELECT * FROM SAMPLE/DEPARTMENT");
+
+            try {
+                queryB.execute(1).get();
+            } catch (Exception ex) {
+                queryB.close().get();
+                throw ex;
+            }
+        });
+
+        queryA.close().get();
+        job.close();
+
+        assertTrue(result.getSuccess());
+        assertTrue(result.getIsDone());
+        assertNotNull(result.getId());
+        assertTrue(result.getHasResults());
+        assertNotNull(result.getMetadata());
+        assertTrue(result.getData().size() > 0);
+        assertEquals("[SQL5016] Qualified object name DEPARTMENT not valid., 42833, -5016", e.getMessage());
     }
 
     @Test

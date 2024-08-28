@@ -17,7 +17,7 @@ import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 
 class ProcedureTest extends MapepireTest {
-    private static String TEST_SCHEMA = "mapepire_test";
+    private static String testSchema = "mapepire_test";
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -26,7 +26,7 @@ class ProcedureTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.query("CREATE SCHEMA " + TEST_SCHEMA);
+        Query<Object> query = job.query("CREATE SCHEMA " + testSchema);
         try {
             query.execute().get();
         } catch (Exception e) {
@@ -42,21 +42,21 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + TEST_SCHEMA + ".PROCEDURE_TEST(" +
-                        "  IN P1 INTEGER," +
-                        "  INOUT P2 INTEGER," +
-                        "  OUT P3 INTEGER" +
-                        ")" +
-                        "BEGIN" +
-                        "  SET P3 = P1 + P2;" +
-                        "  SET P2 = 0;" +
-                        "END"));
+                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST("
+                        + "  IN P1 INTEGER,"
+                        + "  INOUT P2 INTEGER,"
+                        + "  OUT P3 INTEGER"
+                        + ")"
+                        + "BEGIN"
+                        + "  SET P3 = P1 + P2;"
+                        + "  SET P2 = 0;"
+                        + "END"));
         Query<List<Object>> queryA = job.query(testProc);
         queryA.execute().get();
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList(6, 4, 0));
-        Query<List<Object>> queryB = job.query("CALL " + TEST_SCHEMA + ".PROCEDURE_TEST(?, ?, ?)", options);
+        Query<List<Object>> queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 
@@ -96,21 +96,21 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + TEST_SCHEMA + ".PROCEDURE_TEST_CHAR(" +
-                        "  IN P1 CHAR(5)," +
-                        "  INOUT P2 CHAR(6)," +
-                        "  OUT P3 CHAR(7)" +
-                        ")" +
-                        "BEGIN" +
-                        "  SET P3 = RTRIM(P1) concat RTRIM(P2);" +
-                        "  SET P2 = '';" +
-                        "END"));
+                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST_CHAR("
+                        + "  IN P1 CHAR(5),"
+                        + "  INOUT P2 CHAR(6),"
+                        + "  OUT P3 CHAR(7)"
+                        + ")"
+                        + "BEGIN"
+                        + "  SET P3 = RTRIM(P1) concat RTRIM(P2);"
+                        + "  SET P2 = '';"
+                        + "END"));
         Query<List<Object>> queryA = job.query(testProc);
         queryA.execute().get();
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", ""));
-        Query<List<Object>> queryB = job.query("CALL " + TEST_SCHEMA + ".PROCEDURE_TEST_CHAR(?, ?, ?)", options);
+        Query<List<Object>> queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST_CHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 
@@ -156,21 +156,21 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + TEST_SCHEMA + ".PROCEDURE_TEST_VARCHAR(" +
-                        "  IN P1 VARCHAR(5)," +
-                        "  INOUT P2 VARCHAR(6)," +
-                        "  OUT P3 VARCHAR(7)" +
-                        ")" +
-                        "BEGIN" +
-                        "  SET P3 = P1 concat P2;" +
-                        "  SET P2 = '';" +
-                        "END"));
+                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST_VARCHAR("
+                        + "  IN P1 VARCHAR(5),"
+                        + "  INOUT P2 VARCHAR(6),"
+                        + "  OUT P3 VARCHAR(7)"
+                        + ")"
+                        + "BEGIN"
+                        + "  SET P3 = P1 concat P2;"
+                        + "  SET P2 = '';"
+                        + "END"));
         Query<List<Object>> queryA = job.query(testProc);
         queryA.execute().get();
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", "c"));
-        Query<List<Object>> queryB = job.query("CALL " + TEST_SCHEMA + ".PROCEDURE_TEST_VARCHAR(?, ?, ?)", options);
+        Query<List<Object>> queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST_VARCHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 
