@@ -114,7 +114,7 @@ class PoolTest extends MapepireTest {
         pool.init().get();
 
         List<CompletableFuture<QueryResult<Object>>> futures1 = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 20; i++) {
             futures1.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
         }
         CompletableFuture<Void> allFutures1 = CompletableFuture.allOf(futures1.toArray(new CompletableFuture[0]));
