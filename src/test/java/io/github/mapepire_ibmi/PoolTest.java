@@ -102,7 +102,7 @@ class PoolTest extends MapepireTest {
         });
 
         assertEquals("Max size must be greater than 0", e1.getMessage());
-        assertEquals("Max size must be greater than 0", e2.getMessage());
+        assertEquals("Starting size must be greater than 0", e2.getMessage());
         assertEquals("Max size must be greater than or equal to starting size", e3.getMessage());
     }
 
