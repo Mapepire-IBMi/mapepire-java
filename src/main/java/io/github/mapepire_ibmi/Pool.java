@@ -50,7 +50,7 @@ public class Pool {
      *
      * @param options The options for configuring the connection pool.
      */
-    Pool(PoolOptions options) {
+    public Pool(PoolOptions options) {
         this.options = options;
     }
 
