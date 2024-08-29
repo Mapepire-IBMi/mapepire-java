@@ -123,7 +123,7 @@ public class QueryResult<T> extends ServerResponse {
     }
 
     /**
-     * Get Whether there are results.
+     * Get whether there are results.
      * 
      * @return Whether there are results.
      */
