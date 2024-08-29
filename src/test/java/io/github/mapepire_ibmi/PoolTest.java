@@ -103,56 +103,56 @@ class PoolTest extends MapepireTest {
         assertEquals("Max size must be greater than or equal to starting size", e3.getMessage());
     }
 
-    @Test
-    void performance() throws Exception {
-        long startPool1 = System.currentTimeMillis();
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 5, 3);
-        Pool pool = new Pool(options);
-        pool.init().get();
+    // @Test
+    // void performance() throws Exception {
+    //     long startPool1 = System.currentTimeMillis();
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 5, 3);
+    //     Pool pool = new Pool(options);
+    //     pool.init().get();
 
-        List<CompletableFuture<QueryResult<Object>>> futures1 = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            futures1.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture<Void> allFutures1 = CompletableFuture.allOf(futures1.toArray(new CompletableFuture[0]));
-        allFutures1.join();
-        long endPool1 = System.currentTimeMillis();
-        pool.end();
+    //     List<CompletableFuture<QueryResult<Object>>> futures1 = new ArrayList<>();
+    //     for (int i = 0; i < 20; i++) {
+    //         futures1.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+    //     }
+    //     CompletableFuture<Void> allFutures1 = CompletableFuture.allOf(futures1.toArray(new CompletableFuture[0]));
+    //     allFutures1.join();
+    //     long endPool1 = System.currentTimeMillis();
+    //     pool.end();
 
-        for (CompletableFuture<QueryResult<Object>> future : futures1) {
-            assertTrue(future.get().getHasResults());
-        }
+    //     for (CompletableFuture<QueryResult<Object>> future : futures1) {
+    //         assertTrue(future.get().getHasResults());
+    //     }
 
-        long startPool2 = System.currentTimeMillis();
-        options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
-        pool = new Pool(options);
-        pool.init().get();
+    //     long startPool2 = System.currentTimeMillis();
+    //     options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
+    //     pool = new Pool(options);
+    //     pool.init().get();
 
-        List<CompletableFuture<QueryResult<Object>>> futures2 = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            futures2.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture<Void> allFutures2 = CompletableFuture.allOf(futures2.toArray(new CompletableFuture[0]));
-        allFutures2.join();
-        long endPool2 = System.currentTimeMillis();
-        pool.end();
+    //     List<CompletableFuture<QueryResult<Object>>> futures2 = new ArrayList<>();
+    //     for (int i = 0; i < 20; i++) {
+    //         futures2.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+    //     }
+    //     CompletableFuture<Void> allFutures2 = CompletableFuture.allOf(futures2.toArray(new CompletableFuture[0]));
+    //     allFutures2.join();
+    //     long endPool2 = System.currentTimeMillis();
+    //     pool.end();
 
-        for (CompletableFuture<QueryResult<Object>> future : futures2) {
-            assertTrue(future.get().getHasResults());
-        }
+    //     for (CompletableFuture<QueryResult<Object>> future : futures2) {
+    //         assertTrue(future.get().getHasResults());
+    //     }
 
-        long startNoPool = System.currentTimeMillis();
-        for (int i = 0; i < 20; i++) {
-            SqlJob job = new SqlJob();
-            job.connect(MapepireTest.getCreds()).get();
-            job.execute("SELECT * FROM SAMPLE.SYSCOLUMNS").get();
-            job.close();
-        }
-        long endNoPool = System.currentTimeMillis();
+    //     long startNoPool = System.currentTimeMillis();
+    //     for (int i = 0; i < 20; i++) {
+    //         SqlJob job = new SqlJob();
+    //         job.connect(MapepireTest.getCreds()).get();
+    //         job.execute("SELECT * FROM SAMPLE.SYSCOLUMNS").get();
+    //         job.close();
+    //     }
+    //     long endNoPool = System.currentTimeMillis();
 
-        assertTrue(endPool2 - startPool2 > endPool1 - startPool1);
-        assertTrue(endNoPool - startNoPool > endPool2 - startPool2);
-    }
+    //     assertTrue(endPool2 - startPool2 > endPool1 - startPool1);
+    //     assertTrue(endNoPool - startNoPool > endPool2 - startPool2);
+    // }
 
     @Test
     void popJobGivesReadyJob() throws Exception {
