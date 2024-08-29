@@ -77,7 +77,7 @@ public class Pool {
         if (this.options.getMaxSize() <= 0) {
             throw new ClientException("Max size must be greater than 0");
         } else if (this.options.getStartingSize() <= 0) {
-            throw new ClientException("Max size must be greater than 0");
+            throw new ClientException("Starting size must be greater than 0");
         } else if (this.options.getStartingSize() > this.options.getMaxSize()) {
             throw new ClientException("Max size must be greater than or equal to starting size");
         }
