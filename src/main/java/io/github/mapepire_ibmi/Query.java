@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.QueryState;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 
 /**
  * Represents a SQL query that can be executed and managed within a SQL job.
@@ -81,8 +83,6 @@ public class Query<T> {
     public Query(SqlJob job, String query, QueryOptions opts) {
         this.job = job;
         this.sql = query;
-
-        // TODO: Fix constructor
         this.isPrepared = opts.getParameters() != null;
         this.parameters = opts.getParameters();
         this.isCLCommand = opts.getIsClCommand();
@@ -191,6 +191,10 @@ public class Query<T> {
      */
     public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws ClientException, JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException {
+        if (rowsToFetch <= 0) {
+            throw new ClientException("Rows to fetch must be greater than 0");
+        }
+
         switch (this.state) {
             case RUN_MORE_DATA_AVAILABLE:
                 throw new ClientException("Statement has already been run");
@@ -200,27 +204,27 @@ public class Query<T> {
         }
 
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode queryObject = objectMapper.createObjectNode();
+        ObjectNode executeRequest = objectMapper.createObjectNode();
         if (this.isCLCommand) {
-            queryObject.put("id", SqlJob.getNewUniqueId("clcommand"));
-            queryObject.put("type", "cl");
-            queryObject.put("terse", this.isTerseResults);
-            queryObject.put("cmd", this.sql);
+            executeRequest.put("id", SqlJob.getNewUniqueId("clcommand"));
+            executeRequest.put("type", "cl");
+            executeRequest.put("terse", this.isTerseResults);
+            executeRequest.put("cmd", this.sql);
         } else {
-            queryObject.put("id", SqlJob.getNewUniqueId("query"));
-            queryObject.put("type", this.isPrepared ? "prepare_sql_execute" : "sql");
-            queryObject.put("sql", this.sql);
-            queryObject.put("terse", this.isTerseResults);
-            queryObject.put("rows", rowsToFetch);
+            executeRequest.put("id", SqlJob.getNewUniqueId("query"));
+            executeRequest.put("type", this.isPrepared ? "prepare_sql_execute" : "sql");
+            executeRequest.put("sql", this.sql);
+            executeRequest.put("terse", this.isTerseResults);
+            executeRequest.put("rows", rowsToFetch);
             if (this.parameters != null) {
                 JsonNode parameters = objectMapper.valueToTree(this.parameters);
-                queryObject.set("parameters", parameters);
+                executeRequest.set("parameters", parameters);
             }
         }
 
         this.rowsToFetch = rowsToFetch;
 
-        String result = job.send(objectMapper.writeValueAsString(queryObject)).get();
+        String result = job.send(objectMapper.writeValueAsString(executeRequest)).get();
         QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
 
         this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
@@ -285,6 +289,10 @@ public class Query<T> {
      */
     public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws ClientException, JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        if (rowsToFetch <= 0) {
+            throw new ClientException("Rows to fetch must be greater than 0");
+        }
+
         switch (this.state) {
             case NOT_YET_RUN:
                 throw new ClientException("Statement has not yet been run");
@@ -294,16 +302,16 @@ public class Query<T> {
         }
 
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode queryObject = objectMapper.createObjectNode();
-        queryObject.put("id", SqlJob.getNewUniqueId("fetchMore"));
-        queryObject.put("cont_id", this.correlationId);
-        queryObject.put("type", "sqlmore");
-        queryObject.put("sql", this.sql);
-        queryObject.put("rows", rowsToFetch);
+        ObjectNode fetchMoreRequest = objectMapper.createObjectNode();
+        fetchMoreRequest.put("id", SqlJob.getNewUniqueId("fetchMore"));
+        fetchMoreRequest.put("cont_id", this.correlationId);
+        fetchMoreRequest.put("type", "sqlmore");
+        fetchMoreRequest.put("sql", this.sql);
+        fetchMoreRequest.put("rows", rowsToFetch);
 
         this.rowsToFetch = rowsToFetch;
 
-        String result = job.send(objectMapper.writeValueAsString(queryObject)).get();
+        String result = job.send(objectMapper.writeValueAsString(fetchMoreRequest)).get();
         QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
 
         this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
@@ -338,12 +346,12 @@ public class Query<T> {
             state = QueryState.RUN_DONE;
 
             ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-            ObjectNode queryObject = objectMapper.createObjectNode();
-            queryObject.put("id", SqlJob.getNewUniqueId("sqlclose"));
-            queryObject.put("cont_id", correlationId);
-            queryObject.put("type", "sqlclose");
+            ObjectNode closeRequest = objectMapper.createObjectNode();
+            closeRequest.put("id", SqlJob.getNewUniqueId("sqlclose"));
+            closeRequest.put("cont_id", correlationId);
+            closeRequest.put("type", "sqlclose");
 
-            return job.send(objectMapper.writeValueAsString(queryObject));
+            return job.send(objectMapper.writeValueAsString(closeRequest));
         } else if (correlationId == null) {
             state = QueryState.RUN_DONE;
             return CompletableFuture.completedFuture(null);

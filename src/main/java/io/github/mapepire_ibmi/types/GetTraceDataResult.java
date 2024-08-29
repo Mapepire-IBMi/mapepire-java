@@ -7,10 +7,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class GetTraceDataResult extends ServerResponse {
     /**
-     * The retrieved trace data.
+     * The trace data.
      */
     @JsonProperty("tracedata")
-    private String tracedata;
+    private String traceData;
+
+    /**
+     * The JTOpen trace data.
+     */
+    @JsonProperty("jtopentracedata")
+    private String jtOpenTraceData;
 
     /**
      * Construct a new GetTraceDataResult instance.
@@ -21,32 +27,55 @@ public class GetTraceDataResult extends ServerResponse {
 
     /**
      * Construct a new GetTraceDataResult instance.
-     * @param id       The unique identifier for the request.
-     * @param success  Whether the request was successful.
-     * @param error    The error message, if any.
-     * @param sqlRc    The SQL return code.
-     * @param sqlState The SQL state code.
-     * @param tracedata The retrieved trace data.
+     * 
+     * @param id              The unique identifier for the request.
+     * @param success         Whether the request was successful.
+     * @param error           The error message, if any.
+     * @param sqlRc           The SQL return code.
+     * @param sqlState        The SQL state code.
+     * @param traceData       The trace data.
+     * @param jtOpenTraceData The JTOpen trace data.
      */
     public GetTraceDataResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            String tracedata) {
+            String traceData, String jtOpenTraceData) {
         super(id, success, error, sqlRc, sqlState);
-        this.tracedata = tracedata;
+        this.traceData = traceData;
+        this.jtOpenTraceData = jtOpenTraceData;
     }
 
     /**
-     * Get the retrieved trace data.
-     * @return The retrieved trace data.
+     * Get the trace data.
+     * 
+     * @return The trace data.
      */
-    public String getTracedata() {
-        return tracedata;
+    public String getTraceData() {
+        return traceData;
     }
 
     /**
-     * Set the retrieved trace data.
-     * @param tracedata The retrieved trace data.
+     * Set the trace data.
+     * 
+     * @param traceData The trace data.
      */
-    public void setTracedata(String tracedata) {
-        this.tracedata = tracedata;
+    public void setTraceData(String traceData) {
+        this.traceData = traceData;
+    }
+
+    /**
+     * Get the JTOpen trace data.
+     * 
+     * @return The JTOpen trace data.
+     */
+    public String getJtOpenTraceData() {
+        return jtOpenTraceData;
+    }
+
+    /**
+     * Set the JTOpen trace data.
+     * 
+     * @param jtOpenTraceData The JTOpen trace data.
+     */
+    public void setJtOpenTraceData(String jtOpenTraceData) {
+        this.jtOpenTraceData = jtOpenTraceData;
     }
 }

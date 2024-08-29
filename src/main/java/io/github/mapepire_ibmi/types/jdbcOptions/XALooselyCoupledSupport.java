@@ -22,6 +22,7 @@ public enum XALooselyCoupledSupport {
 
     /**
      * Construct a new XALooselyCoupledSupport instance.
+     * 
      * @param value The "XA loosely coupled support" value.
      */
     XALooselyCoupledSupport(String value) {
@@ -30,6 +31,7 @@ public enum XALooselyCoupledSupport {
 
     /**
      * Get the "XA loosely coupled support" value.
+     * 
      * @return The "XA loosely coupled support" value.
      */
     public String getValue() {
@@ -38,6 +40,7 @@ public enum XALooselyCoupledSupport {
 
     /**
      * Get the enum "XA loosely coupled support" value representation of a string.
+     * 
      * @param value The string representation of the option.
      * @return The enum representation of the option.
      */

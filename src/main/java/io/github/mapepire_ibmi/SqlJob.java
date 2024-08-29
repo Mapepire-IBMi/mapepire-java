@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -43,6 +44,8 @@ import io.github.mapepire_ibmi.types.ServerTraceLevel;
 import io.github.mapepire_ibmi.types.SetConfigResult;
 import io.github.mapepire_ibmi.types.TransactionEndType;
 import io.github.mapepire_ibmi.types.VersionCheckResult;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Option;
 import io.github.mapepire_ibmi.types.jdbcOptions.TransactionIsolation;
 
@@ -66,9 +69,9 @@ public class SqlJob {
     private JobStatus status = JobStatus.NotStarted;
 
     /**
-     * The destination for trace data.
+     * The server trace data destination.
      */
-    private String tracedest;
+    private String traceDest;
 
     /**
      * Whether channel data is being traced.
@@ -243,8 +246,10 @@ public class SqlJob {
         synchronized (this.socket) {
             this.socket.send(content + "\n");
         }
+        this.status = JobStatus.Busy;
         String message = future.get();
         responseMap.remove(id);
+        this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
         return CompletableFuture.completedFuture(message);
     }
 
@@ -254,7 +259,7 @@ public class SqlJob {
      * @return The current status of the job.
      */
     public JobStatus getStatus() {
-        return this.getRunningCount() > 0 ? JobStatus.Busy : this.status;
+        return this.status;
     }
 
     /**
@@ -263,8 +268,7 @@ public class SqlJob {
      * @return The number of ongoing requests.
      */
     public int getRunningCount() {
-        // TODO:
-        return 0;
+        return this.responseMap.size();
     }
 
     /**
@@ -298,8 +302,8 @@ public class SqlJob {
                         .entrySet()
                         .stream()
                         .map(entry -> {
-                            if (entry.getValue() instanceof String[]) {
-                                return entry.getKey() + "=" + String.join(",", (String[]) entry.getValue());
+                            if (entry.getValue() instanceof List) {
+                                return entry.getKey() + "=" + String.join(",", (List) entry.getValue());
                             } else {
                                 return entry.getKey() + "=" + entry.getValue();
                             }
@@ -307,16 +311,16 @@ public class SqlJob {
                         .collect(Collectors.toList()));
 
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode connectionObject = objectMapper.createObjectNode();
-        connectionObject.put("id", SqlJob.getNewUniqueId());
-        connectionObject.put("type", "connect");
-        connectionObject.put("technique", "tcp");
-        connectionObject.put("application", "Java client");
+        ObjectNode connectRequest = objectMapper.createObjectNode();
+        connectRequest.put("id", SqlJob.getNewUniqueId());
+        connectRequest.put("type", "connect");
+        connectRequest.put("technique", "tcp");
+        connectRequest.put("application", "Java client");
         if (props.length() > 0) {
-            connectionObject.put("props", props);
+            connectRequest.put("props", props);
         }
 
-        String result = this.send(objectMapper.writeValueAsString(connectionObject)).get();
+        String result = this.send(objectMapper.writeValueAsString(connectRequest)).get();
         ConnectionResult connectResult = objectMapper.readValue(result, ConnectionResult.class);
 
         if (connectResult.getSuccess()) {
@@ -431,11 +435,11 @@ public class SqlJob {
     public CompletableFuture<VersionCheckResult> getVersion() throws JsonMappingException, JsonProcessingException,
             InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode verObj = objectMapper.createObjectNode();
-        verObj.put("id", SqlJob.getNewUniqueId());
-        verObj.put("type", "getversion");
+        ObjectNode versionRequest = objectMapper.createObjectNode();
+        versionRequest.put("id", SqlJob.getNewUniqueId());
+        versionRequest.put("type", "getversion");
 
-        String result = this.send(objectMapper.writeValueAsString(verObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(versionRequest)).get();
         VersionCheckResult versionCheckResult = objectMapper.readValue(result, VersionCheckResult.class);
 
         if (!versionCheckResult.getSuccess()) {
@@ -464,7 +468,7 @@ public class SqlJob {
      */
     public CompletableFuture<ExplainResults<?>> explain(String statement) throws JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
-        return this.explain(statement, ExplainType.Run);
+        return this.explain(statement, ExplainType.RUN);
     }
 
     /**
@@ -487,7 +491,7 @@ public class SqlJob {
         explainRequest.put("id", SqlJob.getNewUniqueId());
         explainRequest.put("type", "dove");
         explainRequest.put("sql", statement);
-        explainRequest.put("run", type == ExplainType.Run);
+        explainRequest.put("run", type == ExplainType.RUN);
 
         String result = this.send(objectMapper.writeValueAsString(explainRequest)).get();
         ExplainResults<?> explainResult = objectMapper.readValue(result, ExplainResults.class);
@@ -508,7 +512,7 @@ public class SqlJob {
      * Get the file path of the trace file, if available.
      */
     public String getTraceFilePath() {
-        return this.tracedest;
+        return this.traceDest;
     }
 
     /**
@@ -525,11 +529,11 @@ public class SqlJob {
     public CompletableFuture<GetTraceDataResult> getTraceData() throws JsonMappingException, JsonProcessingException,
             InterruptedException, ExecutionException, SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode tracedataReqObj = objectMapper.createObjectNode();
-        tracedataReqObj.put("id", SqlJob.getNewUniqueId());
-        tracedataReqObj.put("type", "gettracedata");
+        ObjectNode traceDataRequest = objectMapper.createObjectNode();
+        traceDataRequest.put("id", SqlJob.getNewUniqueId());
+        traceDataRequest.put("type", "gettracedata");
 
-        String result = this.send(objectMapper.writeValueAsString(tracedataReqObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(traceDataRequest)).get();
         GetTraceDataResult traceDataResult = objectMapper.readValue(result, GetTraceDataResult.class);
 
         if (!traceDataResult.getSuccess()) {
@@ -545,10 +549,82 @@ public class SqlJob {
     }
 
     /**
+     * Set the server trace destination.
+     * 
+     * @param dest The server trace destination.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setTraceDest(ServerTraceDest dest) throws JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        return setTraceConfig(dest, null, null, null);
+    }
+
+    /**
+     * Set the server trace level.
+     * 
+     * @param level The server trace level.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setTraceLevel(ServerTraceLevel level) throws JsonMappingException,
+            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+        return setTraceConfig(null, level, null, null);
+    }
+
+    /**
+     * Set the JTOpen trace data destination.
+     * 
+     * @param jtOpenTraceDest The JTOpen trace data destination.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest)
+            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
+            SQLException, UnknownServerException {
+        return setTraceConfig(null, null, jtOpenTraceDest, null);
+    }
+
+    /**
+     * Set the JTOpen trace level.
+     * 
+     * @param jtOpenTraceLevel The JTOpen trace level.
+     * @return A CompletableFuture that resolves to the set config result.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws SQLException
+     * @throws UnknownServerException
+     */
+    public CompletableFuture<SetConfigResult> setJtOpenTraceLevel(ServerTraceLevel jtOpenTraceLevel)
+            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
+            SQLException, UnknownServerException {
+        return setTraceConfig(null, null, null, jtOpenTraceLevel);
+    }
+
+    /**
      * Set the trace config on the backend.
      *
-     * @param dest  The server trace destination.
-     * @param level The server trace level.
+     * @param dest             The server trace destination.
+     * @param level            The server trace level.
+     * @param jtOpenTraceDest  The JTOpen trace data destination.
+     * @param jtOpenTraceLevel The JTOpen trace level.
      * @return A CompletableFuture that resolves to the set config result.
      * @throws ExecutionException
      * @throws InterruptedException
@@ -557,19 +633,31 @@ public class SqlJob {
      * @throws SQLException
      * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level)
+    public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level,
+            ServerTraceDest jtOpenTraceDest, ServerTraceLevel jtOpenTraceLevel)
             throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
             SQLException, UnknownServerException {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode reqObj = objectMapper.createObjectNode();
-        reqObj.put("id", SqlJob.getNewUniqueId());
-        reqObj.put("type", "setconfig");
-        reqObj.put("tracedest", dest.getValue());
-        reqObj.put("tracelevel", level.getValue());
+        ObjectNode setTraceConfigRequest = objectMapper.createObjectNode();
+        setTraceConfigRequest.put("id", SqlJob.getNewUniqueId());
+        setTraceConfigRequest.put("type", "setconfig");
+
+        if (dest != null) {
+            setTraceConfigRequest.put("tracedest", dest.getValue());
+        }
+        if (level != null) {
+            setTraceConfigRequest.put("tracelevel", level.getValue());
+        }
+        if (jtOpenTraceDest != null) {
+            setTraceConfigRequest.put("jtopentracedest", jtOpenTraceDest.getValue());
+        }
+        if (jtOpenTraceLevel != null) {
+            setTraceConfigRequest.put("jtopentracelevel", jtOpenTraceLevel.getValue());
+        }
 
         this.isTracingChannelData = true;
 
-        String result = this.send(objectMapper.writeValueAsString(reqObj)).get();
+        String result = this.send(objectMapper.writeValueAsString(setTraceConfigRequest)).get();
         SetConfigResult setConfigResult = objectMapper.readValue(result, SetConfigResult.class);
 
         if (!setConfigResult.getSuccess()) {
@@ -581,9 +669,9 @@ public class SqlJob {
             }
         }
 
-        this.tracedest = setConfigResult.getTracedest().getValue() != null
-                && setConfigResult.getTracedest().getValue().charAt(0) == '/'
-                        ? setConfigResult.getTracedest().getValue()
+        this.traceDest = setConfigResult.getTraceDest() != null
+                && setConfigResult.getTraceDest().charAt(0) == '/'
+                        ? setConfigResult.getTraceDest()
                         : null;
         return CompletableFuture.completedFuture(setConfigResult);
     }
@@ -594,7 +682,7 @@ public class SqlJob {
      * @param cmd The CL command.
      * @return A new Query instance for the command.
      */
-    public Query<?> clcommand(String cmd) {
+    public <T> Query<T> clcommand(String cmd) {
         QueryOptions options = new QueryOptions();
         options.setIsClCommand(true);
         return new Query(this, cmd, options);
@@ -616,30 +704,31 @@ public class SqlJob {
      *
      * @return A CompletableFuture that resolves to the count of pending
      *         transactions.
+     * @throws SQLException
+     * @throws ClientException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws JsonProcessingException
+     * @throws JsonMappingException
      */
-    public CompletableFuture<Integer> getPendingTransactions() {
-        // TODO: Fix implementation
+    public CompletableFuture<Integer> getPendingTransactions() throws JsonMappingException, JsonProcessingException,
+            InterruptedException, ExecutionException, ClientException, SQLException {
         String transactionCountQuery = String.join("\n", Arrays.asList(
                 "select count(*) as thecount",
                 "  from qsys2.db_transaction_info",
                 "  where JOB_NAME = qsys2.job_name and",
                 "    (local_record_changes_pending = 'YES' or local_object_changes_pending = 'YES')"));
-        // return CompletableFuture.supplyAsync(() -> {
-        // QueryResult rows;
-        // try {
-        // rows = this.query(this.transactionCountQuery).execute(1).get();
 
-        // if (rows.isSuccess() && rows.getData() != null && rows.getData().size() == 1)
-        // {
-        // Object row = rows.getData().get(0);
-        // }
+        QueryResult<Object> queryResult = this.query(transactionCountQuery).execute(1).get();
 
-        // return 0;
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // return 0;
-        // }
-        // });
+        if (queryResult.getSuccess() && queryResult.getData() != null && queryResult.getData().size() == 1) {
+            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+            String data = objectMapper.writeValueAsString(queryResult.getData().get(0));
+            Map<String, Object> req = objectMapper.readValue(data, Map.class);
+            Integer count = (Integer) req.get("THECOUNT");
+            return CompletableFuture.completedFuture(count);
+        }
+
         return CompletableFuture.completedFuture(0);
     }
 
@@ -687,9 +776,23 @@ public class SqlJob {
     }
 
     /**
+     * Enable local tracing of channel data.
+     */
+    public void enableLocalTrace() {
+        this.isTracingChannelData = true;
+    }
+
+    /**
+     * Close the job.
+     */
+    public void close() {
+        this.dispose();
+    }
+
+    /**
      * Close the socket and set the status to be ended.
      */
-    public void dispose() {
+    private void dispose() {
         if (this.socket != null) {
             this.socket.close();
         }
