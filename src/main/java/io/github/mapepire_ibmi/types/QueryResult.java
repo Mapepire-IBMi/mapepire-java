@@ -132,7 +132,7 @@ public class QueryResult<T> extends ServerResponse {
     }
 
     /**
-     * Set Whether there are results.
+     * Set whether there are results.
      * 
      * @param hasResults Whether there are results.
      */
