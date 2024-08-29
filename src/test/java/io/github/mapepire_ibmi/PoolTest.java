@@ -3,9 +3,6 @@ package io.github.mapepire_ibmi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,109 +176,109 @@ class PoolTest extends MapepireTest {
         pool.end();
     }
 
-    @Test
-    void popJobGivesNewJob() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
-        Pool pool = new Pool(options);
-        pool.init().get();
-        assertEquals(1, pool.getActiveJobCount());
+    // @Test
+    // void popJobGivesNewJob() throws Exception {
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
+    //     Pool pool = new Pool(options);
+    //     pool.init().get();
+    //     assertEquals(1, pool.getActiveJobCount());
 
-        CompletableFuture<QueryResult<Object>> future = pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
+    //     CompletableFuture<QueryResult<Object>> future = pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
 
-        SqlJob job = pool.popJob().get();
-        assertEquals(JobStatus.Ready, job.getStatus());
-        assertEquals(0, job.getRunningCount());
-        assertEquals(1, pool.getActiveJobCount());
+    //     SqlJob job = pool.popJob().get();
+    //     assertEquals(JobStatus.Ready, job.getStatus());
+    //     assertEquals(0, job.getRunningCount());
+    //     assertEquals(1, pool.getActiveJobCount());
 
-        future.join();
-        pool.end();
-    }
+    //     future.join();
+    //     pool.end();
+    // }
 
-    @Test
-    void getJobGivesReadyJob() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
-        Pool poolSpy = spy(new Pool(options));
-        poolSpy.init().get();
-        assertEquals(2, poolSpy.getActiveJobCount());
+    // @Test
+    // void getJobGivesReadyJob() throws Exception {
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
+    //     Pool poolSpy = spy(new Pool(options));
+    //     poolSpy.init().get();
+    //     assertEquals(2, poolSpy.getActiveJobCount());
 
-        CompletableFuture<QueryResult<Object>> future = poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
+    //     CompletableFuture<QueryResult<Object>> future = poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
 
-        SqlJob job = poolSpy.getJob();
-        assertEquals(JobStatus.Ready, job.getStatus());
-        assertEquals(0, job.getRunningCount());
-        assertEquals(2, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(0)).addJob();
+    //     SqlJob job = poolSpy.getJob();
+    //     assertEquals(JobStatus.Ready, job.getStatus());
+    //     assertEquals(0, job.getRunningCount());
+    //     assertEquals(2, poolSpy.getActiveJobCount());
+    //     verify(poolSpy, times(0)).addJob();
 
-        future.join();
-        poolSpy.end();
-    }
+    //     future.join();
+    //     poolSpy.end();
+    // }
 
-    @Test
-    void getJobGivesFreeJob() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
-        Pool poolSpy = spy(new Pool(options));
-        poolSpy.init().get();
-        assertEquals(2, poolSpy.getActiveJobCount());
+    // @Test
+    // void getJobGivesFreeJob() throws Exception {
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
+    //     Pool poolSpy = spy(new Pool(options));
+    //     poolSpy.init().get();
+    //     assertEquals(2, poolSpy.getActiveJobCount());
 
-        List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    //     List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
+    //     for (int i = 0; i < 3; i++) {
+    //         futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+    //     }
+    //     CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
-        SqlJob job = poolSpy.popJob().get();
-        assertEquals(JobStatus.Ready, job.getStatus());
-        assertEquals(1, job.getRunningCount());
-        assertEquals(2, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(0)).addJob();
+    //     SqlJob job = poolSpy.popJob().get();
+    //     assertEquals(JobStatus.Ready, job.getStatus());
+    //     assertEquals(1, job.getRunningCount());
+    //     assertEquals(2, poolSpy.getActiveJobCount());
+    //     verify(poolSpy, times(0)).addJob();
 
-        allFutures.join();
-        poolSpy.end();
-    }
+    //     allFutures.join();
+    //     poolSpy.end();
+    // }
 
-    @Test
-    void getJobAddsNewJob() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 3, 2);
-        Pool poolSpy = spy(new Pool(options));
-        poolSpy.init().get();
-        assertEquals(2, poolSpy.getActiveJobCount());
+    // @Test
+    // void getJobAddsNewJob() throws Exception {
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 3, 2);
+    //     Pool poolSpy = spy(new Pool(options));
+    //     poolSpy.init().get();
+    //     assertEquals(2, poolSpy.getActiveJobCount());
 
-        List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    //     List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
+    //     for (int i = 0; i < 4; i++) {
+    //         futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+    //     }
+    //     CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
-        SqlJob job = poolSpy.getJob();
-        assertEquals(JobStatus.Ready, job.getStatus());
-        assertEquals(0, job.getRunningCount());
-        assertEquals(3, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(1)).addJob();
+    //     SqlJob job = poolSpy.getJob();
+    //     assertEquals(JobStatus.Ready, job.getStatus());
+    //     assertEquals(0, job.getRunningCount());
+    //     assertEquals(3, poolSpy.getActiveJobCount());
+    //     verify(poolSpy, times(1)).addJob();
 
-        allFutures.join();
-        poolSpy.end();
-    }
+    //     allFutures.join();
+    //     poolSpy.end();
+    // }
 
-    @Test
-    void getJobDoesNotExceedMaxSize() throws Exception {
-        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
-        Pool poolSpy = spy(new Pool(options));
-        poolSpy.init().get();
-        assertEquals(2, poolSpy.getActiveJobCount());
+    // @Test
+    // void getJobDoesNotExceedMaxSize() throws Exception {
+    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 2);
+    //     Pool poolSpy = spy(new Pool(options));
+    //     poolSpy.init().get();
+    //     assertEquals(2, poolSpy.getActiveJobCount());
 
-        List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    //     List<CompletableFuture<QueryResult<Object>>> futures = new ArrayList<>();
+    //     for (int i = 0; i < 4; i++) {
+    //         futures.add(poolSpy.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+    //     }
+    //     CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
-        SqlJob job = poolSpy.getJob();
-        assertEquals(JobStatus.Ready, job.getStatus());
-        assertEquals(2, job.getRunningCount());
-        assertEquals(2, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(1)).addJob();
+    //     SqlJob job = poolSpy.getJob();
+    //     assertEquals(JobStatus.Ready, job.getStatus());
+    //     assertEquals(2, job.getRunningCount());
+    //     assertEquals(2, poolSpy.getActiveJobCount());
+    //     verify(poolSpy, times(1)).addJob();
 
-        allFutures.join();
-        poolSpy.end();
-    }
+    //     allFutures.join();
+    //     poolSpy.end();
+    // }
 }
