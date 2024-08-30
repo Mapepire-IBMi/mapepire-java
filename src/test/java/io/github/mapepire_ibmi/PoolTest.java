@@ -113,7 +113,7 @@ class PoolTest extends MapepireTest {
         long startPool1 = System.currentTimeMillis();
         List<CompletableFuture<QueryResult<Object>>> futures1 = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            futures1.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+            futures1.add(pool.execute("SELECT * FROM SAMPLE.DEPARTMENT"));
         }
         CompletableFuture.allOf(futures1.toArray(new CompletableFuture[0])).get();
         long endPool1 = System.currentTimeMillis();
@@ -130,7 +130,7 @@ class PoolTest extends MapepireTest {
         long startPool2 = System.currentTimeMillis();
         List<CompletableFuture<QueryResult<Object>>> futures2 = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            futures2.add(pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
+            futures2.add(pool.execute("SELECT * FROM SAMPLE.DEPARTMENT"));
         }
         CompletableFuture.allOf(futures2.toArray(new CompletableFuture[0])).get();
         long endPool2 = System.currentTimeMillis();
