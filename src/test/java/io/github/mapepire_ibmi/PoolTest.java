@@ -227,11 +227,11 @@ class PoolTest extends MapepireTest {
         }
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
-        SqlJob job = poolSpy.popJob().get();
-        assertEquals(JobStatus.Ready, job.getStatus());
+        SqlJob job = poolSpy.getJob();
+        assertEquals(JobStatus.Busy, job.getStatus());
         assertEquals(2, job.getRunningCount());
         assertEquals(3, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(2)).addJob();
+        verify(poolSpy, times(3)).addJob();
 
         allFutures.get();
         poolSpy.end();
@@ -253,8 +253,8 @@ class PoolTest extends MapepireTest {
         SqlJob job = poolSpy.getJob();
         assertEquals(JobStatus.Busy, job.getStatus());
         assertEquals(5, job.getRunningCount());
-        assertEquals(2, poolSpy.getActiveJobCount());
-        verify(poolSpy, times(3)).addJob();
+        assertEquals(1, poolSpy.getActiveJobCount());
+        verify(poolSpy, times(2)).addJob();
 
         allFutures.get();
         poolSpy.end();
