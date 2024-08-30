@@ -245,18 +245,12 @@ public class SqlJob {
         CompletableFuture<String> future = new CompletableFuture<>();
         responseMap.put(id, future);
 
-        return CompletableFuture.runAsync(() -> {
-            synchronized (this.socket) {
-                this.socket.send(content + "\n");
-            }
-            this.status = JobStatus.Busy;
+        this.socket.send(content + "\n");
+        this.status = JobStatus.Busy;
 
-            future.whenComplete((message, throwable) -> {
-                responseMap.remove(id);
-                this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
-            });
-        }).thenCompose(v -> {
-            return future;
+        return future.whenComplete((message, throwable) -> {
+            responseMap.remove(id);
+            this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
         });
     }
 

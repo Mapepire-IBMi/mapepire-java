@@ -59,7 +59,7 @@ class SqlTest extends MapepireTest {
                 queryB.execute(1).get();
             } catch (Exception ex) {
                 queryB.close().get();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -130,7 +130,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -152,7 +152,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -172,7 +172,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -329,7 +329,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -352,7 +352,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -373,7 +373,7 @@ class SqlTest extends MapepireTest {
             } catch (Exception ex) {
                 query.close().get();
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
@@ -420,7 +420,7 @@ class SqlTest extends MapepireTest {
 
         CompletableFuture<QueryResult<Object>> resultAFuture = job.execute("SELECT * FROM SAMPLE.DEPARTMENT");
         CompletableFuture<QueryResult<Object>> resultBFuture = job.execute("SELECT * FROM SAMPLE.EMPLOYEE");
-        CompletableFuture.allOf(resultAFuture, resultBFuture).join();
+        CompletableFuture.allOf(resultAFuture, resultBFuture).get();
         QueryResult<Object> resultA = resultAFuture.get();
         QueryResult<Object> resultB = resultBFuture.get();
 

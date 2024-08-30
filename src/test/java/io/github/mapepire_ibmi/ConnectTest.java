@@ -31,7 +31,7 @@ class ConnectTest extends MapepireTest {
                 job.connect(MapepireTest.getInvalidCreds()).get();
             } catch (Exception ex) {
                 job.close();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
