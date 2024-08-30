@@ -186,7 +186,10 @@ public class SqlJob {
 
                     CompletableFuture<String> future = responseMap.get(id);
                     if (future != null) {
-                        future.complete(message);
+                        Thread thread = new Thread(() -> {
+                            future.complete(message);
+                        });
+                        thread.start();
                     }
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();

@@ -139,7 +139,7 @@ class PoolTest extends MapepireTest {
         for (CompletableFuture<QueryResult<Object>> future : futures2) {
             assertTrue(future.get().getHasResults());
         }
-        
+
         assertTrue(endPool2 - startPool2 > endPool1 - startPool1);
     }
 
