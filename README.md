@@ -22,7 +22,7 @@ Full Documentation: https://mapepire-ibmi.github.io
 <dependency>
     <groupId>io.github.mapepire-ibmi</groupId>
     <artifactId>mapepire-sdk</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>  <!-- Use the latest version -->
 </dependency>
 ```
 
@@ -58,7 +58,7 @@ public final class App {
         job.connect(creds).get();
 
         // Initialize and execute query
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
+        Query query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
         QueryResult<Object> result = query.execute(3).get();
 
         // Convert to JSON string and output

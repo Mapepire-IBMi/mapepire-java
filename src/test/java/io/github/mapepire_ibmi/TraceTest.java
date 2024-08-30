@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.SQLException;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -23,6 +24,16 @@ class TraceTest extends MapepireTest {
     public void beforeEach() {
         time = Long.toString(System.currentTimeMillis());
         invalidQuery = "SELECT * FROM SAMPLE." + time;
+    }
+
+    @AfterAll
+    public static void afterAll() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        job.setTraceLevel(ServerTraceLevel.OFF).get();
+
+        job.close();
     }
 
     @Test
@@ -52,13 +63,13 @@ class TraceTest extends MapepireTest {
         job.setTraceLevel(level).get();
 
         assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> query = job.query(sql);
+            Query query = job.query(sql);
 
             try {
                 query.execute(1).get();
             } catch (Exception ex) {
                 query.close().get();
-                throw ex;
+                throw ex.getCause();
             }
         });
 
