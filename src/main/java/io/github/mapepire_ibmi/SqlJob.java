@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -243,14 +244,20 @@ public class SqlJob {
 
         CompletableFuture<String> future = new CompletableFuture<>();
         responseMap.put(id, future);
-        synchronized (this.socket) {
-            this.socket.send(content + "\n");
-        }
-        this.status = JobStatus.Busy;
-        String message = future.get();
-        responseMap.remove(id);
-        this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
-        return CompletableFuture.completedFuture(message);
+
+        return CompletableFuture.runAsync(() -> {
+            synchronized (this.socket) {
+                this.socket.send(content + "\n");
+            }
+            this.status = JobStatus.Busy;
+
+            future.whenComplete((message, throwable) -> {
+                responseMap.remove(id);
+                this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
+            });
+        }).thenCompose(v -> {
+            return future;
+        });
     }
 
     /**
@@ -290,79 +297,93 @@ public class SqlJob {
             NoSuchAlgorithmException, InterruptedException, ExecutionException, URISyntaxException,
             JsonMappingException, JsonProcessingException, SQLException, UnknownServerException {
         this.status = JobStatus.Connecting;
-
-        this.socket = this.getChannel(db2Server).get();
-        openedConnectionFuture = new CompletableFuture<>();
-        this.socket.connect();
-        openedConnectionFuture.get();
-        openedConnectionFuture = null;
-
-        String props = String.join(";",
-                this.options.getOptions()
-                        .entrySet()
-                        .stream()
-                        .map(entry -> {
-                            if (entry.getValue() instanceof List) {
-                                return entry.getKey() + "=" + String.join(",", (List) entry.getValue());
-                            } else {
-                                return entry.getKey() + "=" + entry.getValue();
-                            }
-                        })
-                        .collect(Collectors.toList()));
-
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-        ObjectNode connectRequest = objectMapper.createObjectNode();
-        connectRequest.put("id", SqlJob.getNewUniqueId());
-        connectRequest.put("type", "connect");
-        connectRequest.put("technique", "tcp");
-        connectRequest.put("application", "Java client");
-        if (props.length() > 0) {
-            connectRequest.put("props", props);
-        }
 
-        String result = this.send(objectMapper.writeValueAsString(connectRequest)).get();
-        ConnectionResult connectResult = objectMapper.readValue(result, ConnectionResult.class);
+        return this.getChannel(db2Server)
+                .thenCompose(socket -> {
+                    this.socket = socket;
+                    openedConnectionFuture = new CompletableFuture<>();
+                    this.socket.connect();
+                    return openedConnectionFuture;
+                })
+                .thenCompose(v -> {
+                    openedConnectionFuture = null;
 
-        if (connectResult.getSuccess()) {
-            this.status = JobStatus.Ready;
-        } else {
-            this.dispose();
-            this.status = JobStatus.NotStarted;
+                    String props = String.join(";",
+                            this.options.getOptions()
+                                    .entrySet()
+                                    .stream()
+                                    .map(entry -> {
+                                        if (entry.getValue() instanceof List) {
+                                            return entry.getKey() + "=" + String.join(",", (List) entry.getValue());
+                                        } else {
+                                            return entry.getKey() + "=" + entry.getValue();
+                                        }
+                                    })
+                                    .collect(Collectors.toList()));
 
-            String error = connectResult.getError();
-            if (error != null) {
-                throw new SQLException(error, connectResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to connect to server");
-            }
-        }
+                    ObjectNode connectRequest = objectMapper.createObjectNode();
+                    connectRequest.put("id", SqlJob.getNewUniqueId());
+                    connectRequest.put("type", "connect");
+                    connectRequest.put("technique", "tcp");
+                    connectRequest.put("application", "Java client");
+                    if (props.length() > 0) {
+                        connectRequest.put("props", props);
+                    }
 
-        this.id = connectResult.getJob();
-        this.isTracingChannelData = false;
+                    try {
+                        return this.send(objectMapper.writeValueAsString(connectRequest));
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
+                })
+                .thenApply(result -> {
+                    ConnectionResult connectResult;
+                    try {
+                        connectResult = objectMapper.readValue(result, ConnectionResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        return CompletableFuture.completedFuture(connectResult);
+                    if (connectResult.getSuccess()) {
+                        this.status = JobStatus.Ready;
+                    } else {
+                        this.dispose();
+                        this.status = JobStatus.NotStarted;
+
+                        String error = connectResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, connectResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to connect to server"));
+                        }
+                    }
+
+                    this.id = connectResult.getJob();
+                    this.isTracingChannelData = false;
+
+                    return connectResult;
+                });
     }
 
     /**
      * Create a Query object for the specified SQL statement.
      *
-     * @param <T> The type of data to be returned.
      * @param sql The SQL query.
      * @return A new Query instance.
      */
-    public <T> Query<T> query(String sql) {
+    public Query query(String sql) {
         return this.query(sql, new QueryOptions());
     }
 
     /**
      * Create a Query object for the specified SQL statement.
      *
-     * @param <T>  The type of data to be returned.
      * @param sql  The SQL query.
      * @param opts The options for configuring the query.
      * @return A new Query instance.
      */
-    public <T> Query<T> query(String sql, QueryOptions opts) {
+    public Query query(String sql, QueryOptions opts) {
         return new Query(this, sql, opts);
     }
 
@@ -404,21 +425,26 @@ public class SqlJob {
     public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts)
             throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
             ExecutionException, SQLException, UnknownServerException {
-        Query<T> query = query(sql, opts);
-        CompletableFuture<QueryResult<T>> future = query.execute();
-        QueryResult<T> queryResult = future.get();
-        query.close().get();
+        Query query = query(sql, opts);
+        return query.<T>execute()
+                .thenCompose(queryResult -> {
+                    try {
+                        return query.close().thenApply(v -> queryResult);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
+                }).thenApply(queryResult -> {
+                    if (!queryResult.getSuccess()) {
+                        String error = queryResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, queryResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to execute"));
+                        }
+                    }
 
-        if (!queryResult.getSuccess()) {
-            String error = queryResult.getError();
-            if (error != null) {
-                throw new SQLException(error, queryResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to execute");
-            }
-        }
-
-        return CompletableFuture.completedFuture(queryResult);
+                    return queryResult;
+                });
     }
 
     /**
@@ -439,19 +465,26 @@ public class SqlJob {
         versionRequest.put("id", SqlJob.getNewUniqueId());
         versionRequest.put("type", "getversion");
 
-        String result = this.send(objectMapper.writeValueAsString(versionRequest)).get();
-        VersionCheckResult versionCheckResult = objectMapper.readValue(result, VersionCheckResult.class);
+        return this.send(objectMapper.writeValueAsString(versionRequest))
+                .thenApply(result -> {
+                    VersionCheckResult versionCheckResult;
+                    try {
+                        versionCheckResult = objectMapper.readValue(result, VersionCheckResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        if (!versionCheckResult.getSuccess()) {
-            String error = versionCheckResult.getError();
-            if (error != null) {
-                throw new SQLException(error, versionCheckResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to get version");
-            }
-        }
+                    if (!versionCheckResult.getSuccess()) {
+                        String error = versionCheckResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, versionCheckResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to get version"));
+                        }
+                    }
 
-        return CompletableFuture.completedFuture(versionCheckResult);
+                    return versionCheckResult;
+                });
     }
 
     /**
@@ -493,19 +526,26 @@ public class SqlJob {
         explainRequest.put("sql", statement);
         explainRequest.put("run", type == ExplainType.RUN);
 
-        String result = this.send(objectMapper.writeValueAsString(explainRequest)).get();
-        ExplainResults<?> explainResult = objectMapper.readValue(result, ExplainResults.class);
+        return this.send(objectMapper.writeValueAsString(explainRequest))
+                .thenApply(result -> {
+                    ExplainResults<?> explainResult;
+                    try {
+                        explainResult = objectMapper.readValue(result, ExplainResults.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        if (!explainResult.getSuccess()) {
-            String error = explainResult.getError();
-            if (error != null) {
-                throw new SQLException(error, explainResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to explain");
-            }
-        }
+                    if (!explainResult.getSuccess()) {
+                        String error = explainResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, explainResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to explain"));
+                        }
+                    }
 
-        return CompletableFuture.completedFuture(explainResult);
+                    return explainResult;
+                });
     }
 
     /**
@@ -533,19 +573,26 @@ public class SqlJob {
         traceDataRequest.put("id", SqlJob.getNewUniqueId());
         traceDataRequest.put("type", "gettracedata");
 
-        String result = this.send(objectMapper.writeValueAsString(traceDataRequest)).get();
-        GetTraceDataResult traceDataResult = objectMapper.readValue(result, GetTraceDataResult.class);
+        return this.send(objectMapper.writeValueAsString(traceDataRequest))
+                .thenApply(result -> {
+                    GetTraceDataResult traceDataResult;
+                    try {
+                        traceDataResult = objectMapper.readValue(result, GetTraceDataResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        if (!traceDataResult.getSuccess()) {
-            String error = traceDataResult.getError();
-            if (error != null) {
-                throw new SQLException(error, traceDataResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to get trace data");
-            }
-        }
+                    if (!traceDataResult.getSuccess()) {
+                        String error = traceDataResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, traceDataResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to get trace data"));
+                        }
+                    }
 
-        return CompletableFuture.completedFuture(traceDataResult);
+                    return traceDataResult;
+                });
     }
 
     /**
@@ -657,23 +704,30 @@ public class SqlJob {
 
         this.isTracingChannelData = true;
 
-        String result = this.send(objectMapper.writeValueAsString(setTraceConfigRequest)).get();
-        SetConfigResult setConfigResult = objectMapper.readValue(result, SetConfigResult.class);
+        return this.send(objectMapper.writeValueAsString(setTraceConfigRequest))
+                .thenApply(result -> {
+                    SetConfigResult setConfigResult;
+                    try {
+                        setConfigResult = objectMapper.readValue(result, SetConfigResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        if (!setConfigResult.getSuccess()) {
-            String error = setConfigResult.getError();
-            if (error != null) {
-                throw new SQLException(error, setConfigResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to set trace config");
-            }
-        }
+                    if (!setConfigResult.getSuccess()) {
+                        String error = setConfigResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, setConfigResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to set trace config"));
+                        }
+                    }
 
-        this.traceDest = setConfigResult.getTraceDest() != null
-                && setConfigResult.getTraceDest().charAt(0) == '/'
-                        ? setConfigResult.getTraceDest()
-                        : null;
-        return CompletableFuture.completedFuture(setConfigResult);
+                    this.traceDest = setConfigResult.getTraceDest() != null
+                            && setConfigResult.getTraceDest().charAt(0) == '/'
+                                    ? setConfigResult.getTraceDest()
+                                    : null;
+                    return setConfigResult;
+                });
     }
 
     /**
@@ -682,7 +736,7 @@ public class SqlJob {
      * @param cmd The CL command.
      * @return A new Query instance for the command.
      */
-    public <T> Query<T> clCommand(String cmd) {
+    public Query clCommand(String cmd) {
         QueryOptions options = new QueryOptions();
         options.setIsClCommand(true);
         return new Query(this, cmd, options);
@@ -713,23 +767,30 @@ public class SqlJob {
      */
     public CompletableFuture<Integer> getPendingTransactions() throws JsonMappingException, JsonProcessingException,
             InterruptedException, ExecutionException, ClientException, SQLException {
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         String transactionCountQuery = String.join("\n", Arrays.asList(
                 "select count(*) as thecount",
                 "  from qsys2.db_transaction_info",
                 "  where JOB_NAME = qsys2.job_name and",
                 "    (local_record_changes_pending = 'YES' or local_object_changes_pending = 'YES')"));
 
-        QueryResult<Object> queryResult = this.query(transactionCountQuery).execute(1).get();
+        return this.query(transactionCountQuery).execute(1)
+                .thenApply(queryResult -> {
+                    if (queryResult.getSuccess() && queryResult.getData() != null
+                            && queryResult.getData().size() == 1) {
+                        String data;
+                        try {
+                            data = objectMapper.writeValueAsString(queryResult.getData().get(0));
+                            Map<String, Object> req = objectMapper.readValue(data, Map.class);
+                            Integer count = (Integer) req.get("THECOUNT");
+                            return count;
+                        } catch (Exception e) {
+                            throw new CompletionException(e);
+                        }
+                    }
 
-        if (queryResult.getSuccess() && queryResult.getData() != null && queryResult.getData().size() == 1) {
-            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-            String data = objectMapper.writeValueAsString(queryResult.getData().get(0));
-            Map<String, Object> req = objectMapper.readValue(data, Map.class);
-            Integer count = (Integer) req.get("THECOUNT");
-            return CompletableFuture.completedFuture(count);
-        }
-
-        return CompletableFuture.completedFuture(0);
+                    return 0;
+                });
     }
 
     /**

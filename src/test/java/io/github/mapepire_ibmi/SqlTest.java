@@ -27,7 +27,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
+        Query query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
         QueryResult<Object> result = query.execute().get();
 
         query.close().get();
@@ -49,11 +49,11 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob(options);
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> queryA = job.query("SELECT * FROM DEPARTMENT");
+        Query queryA = job.query("SELECT * FROM DEPARTMENT");
         QueryResult<Object> result = queryA.execute().get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> queryB = job.query("SELECT * FROM SAMPLE/DEPARTMENT");
+            Query queryB = job.query("SELECT * FROM SAMPLE/DEPARTMENT");
 
             try {
                 queryB.execute(1).get();
@@ -81,7 +81,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         QueryOptions options = new QueryOptions(true, false, null);
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS", options);
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS", options);
         QueryResult<Object> result = query.execute(5).get();
         ArrayList<String> row = (ArrayList<String>) result.getData().get(0);
 
@@ -103,7 +103,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
         QueryResult<Object> result = query.execute(50).get();
 
         query.close().get();
@@ -123,7 +123,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> query = job.query("SELECT * from SCOOBY");
+            Query query = job.query("SELECT * from SCOOBY");
 
             try {
                 query.execute(1).get();
@@ -145,7 +145,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> query = job.query("");
+            Query query = job.query("");
 
             try {
                 query.execute(1).get();
@@ -165,7 +165,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> query = job.query("a");
+            Query query = job.query("a");
 
             try {
                 query.execute(1).get();
@@ -187,7 +187,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         ClientException e = assertThrowsExactly(ClientException.class, () -> {
-            Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
+            Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
 
             try {
                 query.execute(0).get();
@@ -206,7 +206,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.query("DROP TABLE SAMPLE.DELETE IF EXISTS");
+        Query query = job.query("DROP TABLE SAMPLE.DELETE IF EXISTS");
         QueryResult<Object> result = query.execute().get();
 
         query.close().get();
@@ -221,7 +221,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS");
         QueryResult<Object> result = query.execute(5).get();
 
         while (!result.getIsDone()) {
@@ -239,7 +239,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("N"));
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE IS_NULLABLE = ?", options);
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE IS_NULLABLE = ?", options);
         QueryResult<Object> result = query.execute(5).get();
 
         while (!result.getIsDone()) {
@@ -257,7 +257,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("LONG_COMMENT"));
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
         QueryResult<Object> result = query.execute(10).get();
 
         query.close().get();
@@ -277,7 +277,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         QueryOptions options = new QueryOptions(true, false, Arrays.asList("PHONE"));
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
         QueryResult<Object> result = query.execute().get();
         ArrayList<String> row = (ArrayList<String>) result.getData().get(0);
 
@@ -301,7 +301,7 @@ class SqlTest extends MapepireTest {
 
         QueryOptions options = new QueryOptions(false, false,
                 Arrays.asList("TABLE_NAME", "LONG_COMMENT", "CONSTRAINT_NAME"));
-        Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME IN (?, ?, ?)", options);
+        Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME IN (?, ?, ?)", options);
         QueryResult<Object> result = query.execute(30).get();
 
         query.close().get();
@@ -322,7 +322,7 @@ class SqlTest extends MapepireTest {
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
             QueryOptions options = new QueryOptions(false, false, Collections.emptyList());
-            Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
+            Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
 
             try {
                 query.execute().get();
@@ -345,7 +345,7 @@ class SqlTest extends MapepireTest {
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
             QueryOptions options = new QueryOptions(false, false, Arrays.asList("A", "B"));
-            Query<Object> query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
+            Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
 
             try {
                 query.execute().get();
@@ -366,7 +366,7 @@ class SqlTest extends MapepireTest {
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
             QueryOptions options = new QueryOptions(false, false, Arrays.asList("FAKE_COLUMN"));
-            Query<Object> query = job.query("SELECT * FROM FAKE_SCHEMA.FAKE_TABLE WHERE COLUMN_NAME = ?", options);
+            Query query = job.query("SELECT * FROM FAKE_SCHEMA.FAKE_TABLE WHERE COLUMN_NAME = ?", options);
 
             try {
                 query.execute().get();

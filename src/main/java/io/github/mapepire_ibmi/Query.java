@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -22,11 +23,11 @@ import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 /**
  * Represents a SQL query that can be executed and managed within a SQL job.
  */
-public class Query<T> {
+public class Query {
     /**
      * A list of all global queries that are currently open.
      */
-    private static List<Query<?>> globalQueryList = new ArrayList<>();
+    private static List<Query> globalQueryList = new ArrayList<>();
 
     /**
      * The SQL job that this query will be executed in.
@@ -97,7 +98,7 @@ public class Query<T> {
      * @param id The correlation ID of the query.
      * @return The corresponding Query instance or null if not found.
      */
-    public static Query<?> byId(String id) {
+    public static Query byId(String id) {
         if (id == null || id.equals("")) {
             return null;
         } else {
@@ -140,7 +141,7 @@ public class Query<T> {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void cleanup() throws InterruptedException, ExecutionException {
+    public CompletableFuture<Void> cleanup() throws InterruptedException, ExecutionException {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
                 .map(query -> CompletableFuture.runAsync(() -> {
@@ -152,11 +153,12 @@ public class Query<T> {
                 }))
                 .collect(Collectors.toList());
 
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
-
-        globalQueryList = globalQueryList.stream()
-                .filter(q -> q.getState() != QueryState.RUN_DONE)
-                .collect(Collectors.toList());
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenRun(() -> {
+                    globalQueryList = globalQueryList.stream()
+                            .filter(q -> q.getState() != QueryState.RUN_DONE)
+                            .collect(Collectors.toList());
+                });
     }
 
     /**
@@ -224,37 +226,45 @@ public class Query<T> {
 
         this.rowsToFetch = rowsToFetch;
 
-        String result = job.send(objectMapper.writeValueAsString(executeRequest)).get();
-        QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
+        return job.send(objectMapper.writeValueAsString(executeRequest))
+                .thenApply(result -> {
+                    QueryResult<T> queryResult;
+                    try {
+                        queryResult = objectMapper.readValue(result, QueryResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
-                : QueryState.RUN_MORE_DATA_AVAILABLE;
+                    this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
+                            : QueryState.RUN_MORE_DATA_AVAILABLE;
 
-        if (!queryResult.getSuccess() && !this.isCLCommand) {
-            this.state = QueryState.ERROR;
+                    if (!queryResult.getSuccess() && !this.isCLCommand) {
+                        this.state = QueryState.ERROR;
 
-            List<String> errorList = new ArrayList<>();
-            String error = queryResult.getError();
-            if (error != null) {
-                errorList.add(error);
-            }
-            String sqlState = queryResult.getSqlState();
-            if (sqlState != null) {
-                errorList.add(sqlState);
-            }
-            String sqlRc = String.valueOf(queryResult.getSqlRc());
-            if (sqlRc != null) {
-                errorList.add(sqlRc);
-            }
-            if (errorList.isEmpty()) {
-                errorList.add("Failed to run query");
-            }
+                        List<String> errorList = new ArrayList<>();
+                        String error = queryResult.getError();
+                        if (error != null) {
+                            errorList.add(error);
+                        }
+                        String sqlState = queryResult.getSqlState();
+                        if (sqlState != null) {
+                            errorList.add(sqlState);
+                        }
+                        String sqlRc = String.valueOf(queryResult.getSqlRc());
+                        if (sqlRc != null) {
+                            errorList.add(sqlRc);
+                        }
+                        if (errorList.isEmpty()) {
+                            errorList.add("Failed to run query");
+                        }
 
-            throw new SQLException(String.join(", ", errorList), queryResult.getSqlState());
-        }
+                        throw new CompletionException(
+                                new SQLException(String.join(", ", errorList), queryResult.getSqlState()));
+                    }
 
-        this.correlationId = queryResult.getId();
-        return CompletableFuture.completedFuture(queryResult);
+                    this.correlationId = queryResult.getId();
+                    return queryResult;
+                });
     }
 
     /**
@@ -269,7 +279,7 @@ public class Query<T> {
      * @throws JsonMappingException
      * @throws ClientException
      */
-    public CompletableFuture<QueryResult<T>> fetchMore() throws JsonMappingException, JsonProcessingException,
+    public <T> CompletableFuture<QueryResult<T>> fetchMore() throws JsonMappingException, JsonProcessingException,
             UnknownServerException, InterruptedException, ExecutionException, SQLException, ClientException {
         return this.fetchMore(this.rowsToFetch);
     }
@@ -287,7 +297,8 @@ public class Query<T> {
      * @throws SQLException
      * @throws UnknownServerException
      */
-    public CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws ClientException, JsonMappingException,
+    public <T> CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch)
+            throws ClientException, JsonMappingException,
             JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
         if (rowsToFetch <= 0) {
             throw new ClientException("Rows to fetch must be greater than 0");
@@ -311,24 +322,32 @@ public class Query<T> {
 
         this.rowsToFetch = rowsToFetch;
 
-        String result = job.send(objectMapper.writeValueAsString(fetchMoreRequest)).get();
-        QueryResult<T> queryResult = objectMapper.readValue(result, QueryResult.class);
+        return job.send(objectMapper.writeValueAsString(fetchMoreRequest))
+                .thenApply(result -> {
+                    QueryResult<T> queryResult;
+                    try {
+                        queryResult = objectMapper.readValue(result, QueryResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
 
-        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
-                : QueryState.RUN_MORE_DATA_AVAILABLE;
+                    this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
+                            : QueryState.RUN_MORE_DATA_AVAILABLE;
 
-        if (!queryResult.getSuccess()) {
-            this.state = QueryState.ERROR;
+                    if (!queryResult.getSuccess()) {
+                        this.state = QueryState.ERROR;
 
-            String error = queryResult.getError();
-            if (error != null) {
-                throw new SQLException(error.toString(), queryResult.getSqlState());
-            } else {
-                throw new UnknownServerException("Failed to fetch more");
-            }
-        }
+                        String error = queryResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(
+                                    new SQLException(error.toString(), queryResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(new UnknownServerException("Failed to fetch more"));
+                        }
+                    }
 
-        return CompletableFuture.completedFuture(queryResult);
+                    return queryResult;
+                });
     }
 
     /**

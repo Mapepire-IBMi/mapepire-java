@@ -52,7 +52,7 @@ class TraceTest extends MapepireTest {
         job.setTraceLevel(level).get();
 
         assertThrowsExactly(SQLException.class, () -> {
-            Query<Object> query = job.query(sql);
+            Query query = job.query(sql);
 
             try {
                 query.execute(1).get();

@@ -22,7 +22,7 @@ Full Documentation: https://mapepire-ibmi.github.io
 <dependency>
     <groupId>io.github.mapepire-ibmi</groupId>
     <artifactId>mapepire-sdk</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>  <!-- Use the latest version -->
 </dependency>
 ```
 

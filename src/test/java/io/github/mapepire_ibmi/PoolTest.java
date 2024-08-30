@@ -176,23 +176,23 @@ class PoolTest extends MapepireTest {
         pool.end();
     }
 
-    // @Test
-    // void popJobGivesNewJob() throws Exception {
-    //     PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
-    //     Pool pool = new Pool(options);
-    //     pool.init().get();
-    //     assertEquals(1, pool.getActiveJobCount());
+    @Test
+    void popJobGivesNewJob() throws Exception {
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 1, 1);
+        Pool pool = new Pool(options);
+        pool.init().get();
+        assertEquals(1, pool.getActiveJobCount());
 
-    //     CompletableFuture<QueryResult<Object>> future = pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
+        CompletableFuture<QueryResult<Object>> future = pool.execute("SELECT * FROM SAMPLE.SYSCOLUMNS");
 
-    //     SqlJob job = pool.popJob().get();
-    //     assertEquals(JobStatus.Ready, job.getStatus());
-    //     assertEquals(0, job.getRunningCount());
-    //     assertEquals(1, pool.getActiveJobCount());
+        SqlJob job = pool.popJob().get();
+        assertEquals(JobStatus.Ready, job.getStatus());
+        assertEquals(0, job.getRunningCount());
+        assertEquals(1, pool.getActiveJobCount());
 
-    //     future.join();
-    //     pool.end();
-    // }
+        future.join();
+        pool.end();
+    }
 
     // @Test
     // void getJobGivesReadyJob() throws Exception {

@@ -15,7 +15,7 @@ class CLTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.clCommand("WRKACTJOB");
+        Query query = job.clCommand("WRKACTJOB");
         QueryResult<Object> result = query.execute().get();
         job.close();
 
@@ -28,7 +28,7 @@ class CLTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query<Object> query = job.clCommand("INVALIDCOMMAND");
+        Query query = job.clCommand("INVALIDCOMMAND");
         QueryResult<Object> result = query.execute().get();
         job.close();
 

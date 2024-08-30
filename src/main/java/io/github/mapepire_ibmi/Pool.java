@@ -173,7 +173,10 @@ public class Pool {
         }
 
         if (newSqlJob.getStatus() == JobStatus.NotStarted) {
-            newSqlJob.connect(this.options.getCreds()).get();
+            return newSqlJob.connect(this.options.getCreds())
+                    .thenApply(v -> {
+                        return newSqlJob;
+                    });
         }
 
         return CompletableFuture.completedFuture(newSqlJob);
@@ -324,7 +327,6 @@ public class Pool {
     /**
      * Create a Query object using a job from the pool.
      *
-     * @param <T> The type of data to be returned.
      * @param sql The SQL query.
      * @return A new Query instance.
      * @throws UnknownServerException
@@ -337,7 +339,7 @@ public class Pool {
      * @throws KeyManagementException
      * @throws JsonMappingException
      */
-    public <T> Query<T> query(String sql)
+    public Query query(String sql)
             throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
             InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
         QueryOptions queryOptions = new QueryOptions();
@@ -347,7 +349,6 @@ public class Pool {
     /**
      * Create a Query object using a job from the pool.
      *
-     * @param <T>  The type of data to be returned.
      * @param sql  The SQL query.
      * @param opts The options for configuring the query.
      * @return A new Query instance.
@@ -361,7 +362,7 @@ public class Pool {
      * @throws KeyManagementException
      * @throws JsonMappingException
      */
-    public <T> Query<T> query(String sql, QueryOptions opts)
+    public Query query(String sql, QueryOptions opts)
             throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
             InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
         SqlJob job = this.getJob();
