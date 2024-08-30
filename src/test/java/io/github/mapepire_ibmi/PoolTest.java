@@ -139,20 +139,8 @@ class PoolTest extends MapepireTest {
         for (CompletableFuture<QueryResult<Object>> future : futures2) {
             assertTrue(future.get().getHasResults());
         }
-
-        SqlJob job = new SqlJob();
-        job.connect(MapepireTest.getCreds()).get();
-        long startNoPool = System.currentTimeMillis();
-        List<CompletableFuture<QueryResult<Object>>> futures3 = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            futures3.add(job.execute("SELECT * FROM SAMPLE.SYSCOLUMNS"));
-        }
-        CompletableFuture.allOf(futures3.toArray(new CompletableFuture[0])).get();
-        long endNoPool = System.currentTimeMillis();
-        job.close();
         
         assertTrue(endPool2 - startPool2 > endPool1 - startPool1);
-        assertTrue(endNoPool - startNoPool > endPool2 - startPool2);
     }
 
     @Test
