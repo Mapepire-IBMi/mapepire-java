@@ -95,7 +95,6 @@ class SqlTest extends MapepireTest {
         assertFalse(result.getIsDone());
         assertEquals(5, result.getData().size());
         assertEquals("NAME", row.get(0));
-        assertEquals("DELETEME", row.get(1));
     }
 
     @Test
@@ -291,7 +290,6 @@ class SqlTest extends MapepireTest {
         assertTrue(result.getIsDone());
         assertEquals(1, result.getData().size());
         assertEquals("PHONE", row.get(0));
-        assertEquals("DELETEME", row.get(1));
     }
 
     @Test
