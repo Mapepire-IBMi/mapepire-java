@@ -18,6 +18,8 @@ Full Documentation: https://mapepire-ibmi.github.io
 
 ### Install with `maven`
 
+Add `mapepire-sdk` as a dependency in your project and make sure to use the latest version on the [Maven Central Repository](https://central.sonatype.com/artifact/io.github.mapepire-ibmi/mapepire-sdk):
+
 ```xml
 <dependency>
     <groupId>io.github.mapepire-ibmi</groupId>
