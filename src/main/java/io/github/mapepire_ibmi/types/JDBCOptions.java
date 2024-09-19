@@ -52,6 +52,10 @@ public class JDBCOptions {
 
     }
 
+    public JDBCOptions(Properties _props) {
+        this.options = _props;
+    }
+
     /**
      * Get the JDBC options.
      * 
