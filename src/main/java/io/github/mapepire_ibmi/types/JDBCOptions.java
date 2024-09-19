@@ -1,8 +1,7 @@
 package io.github.mapepire_ibmi.types;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import io.github.mapepire_ibmi.types.jdbcOptions.Access;
 import io.github.mapepire_ibmi.types.jdbcOptions.BidiStringType;
@@ -42,9 +41,9 @@ import io.github.mapepire_ibmi.types.jdbcOptions.XALooselyCoupledSupport;
  */
 public class JDBCOptions {
     /**
-     * Map of JDBC options.
+     * The JDBC options.
      */
-    private Map<String, Object> options = new HashMap<>();
+    private Properties options = new Properties();
 
     /**
      * Construct a new JDBCOptions instance.
@@ -54,11 +53,11 @@ public class JDBCOptions {
     }
 
     /**
-     * Get the map of JDBC options.
+     * Get the JDBC options.
      * 
-     * @return The map of JDBC options.
+     * @return The JDBC options.
      */
-    public Map<String, Object> getOptions() {
+    public Properties getOptions() {
         return this.options;
     }
 
