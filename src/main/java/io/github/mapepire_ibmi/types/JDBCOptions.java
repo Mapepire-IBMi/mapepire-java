@@ -53,6 +53,15 @@ public class JDBCOptions {
     }
 
     /**
+     * Construct a new JDBCOptions instance.
+     * 
+     * @param options The JDBC options.
+     */
+    public JDBCOptions(Properties options) {
+        this.options = options;
+    }
+
+    /**
      * Get the JDBC options.
      * 
      * @return The JDBC options.
