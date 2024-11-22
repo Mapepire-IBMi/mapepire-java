@@ -29,7 +29,7 @@ public class Tls {
     /**
      * Get the SSL server certificate for a specified DB2 server.
      * 
-     * @param creds The server details for the connection.
+     * @param db2Server The server details for the connection.
      * @return A CompletableFuture that resolves to the SSL server certificate.
      */
     public static CompletableFuture<String> getCertificate(DaemonServer db2Server) throws Exception {
