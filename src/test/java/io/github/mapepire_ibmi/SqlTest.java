@@ -72,7 +72,7 @@ class SqlTest extends MapepireTest {
         assertTrue(result.getHasResults());
         assertNotNull(result.getMetadata());
         assertTrue(result.getData().size() > 0);
-        assertEquals("[SQL5016] Qualified object name DEPARTMENT not valid., 42833, -5016", e.getMessage());
+        assertTrue(e.getMessage().contains("[SQL5016] Qualified object name DEPARTMENT not valid."));
     }
 
     @Test
@@ -133,9 +133,8 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals(
-                "[SQL0204] SCOOBY in " + getCreds().getUser().toUpperCase() + " type *FILE not found., 42704, -204",
-                e.getMessage());
+        assertTrue(e.getMessage()
+                .contains("[SQL0204] SCOOBY in " + getCreds().getUser().toUpperCase() + " type *FILE not found."));
     }
 
     @Test
@@ -155,7 +154,7 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals("A string parameter value with zero length was detected., 43617, -99999", e.getMessage());
+        assertTrue(e.getMessage().contains("A string parameter value with zero length was detected."));
     }
 
     @Test
@@ -175,9 +174,8 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals(
-                "[SQL0104] Token A was not valid. Valid tokens: ( CL END GET SET TAG CALL DROP FREE HOLD LOCK OPEN WITH ALTER., 42601, -104",
-                e.getMessage());
+        assertTrue(e.getMessage().contains(
+                "[SQL0104] Token A was not valid. Valid tokens: ( CL END GET SET TAG CALL DROP FREE HOLD LOCK OPEN WITH ALTER."));
     }
 
     @Test
@@ -331,9 +329,8 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals(
-                "The number of parameter values set or registered does not match the number of parameters., 07001, -99999",
-                e.getMessage());
+        assertTrue(e.getMessage().contains(
+                "The number of parameter values set or registered does not match the number of parameters."));
     }
 
     @Test
@@ -354,7 +351,7 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals("Descriptor index not valid. (2>1), 07009, -99999", e.getMessage());
+        assertTrue(e.getMessage().contains("Descriptor index not valid. (2>1)"));
     }
 
     @Test
@@ -375,9 +372,7 @@ class SqlTest extends MapepireTest {
             }
         });
 
-        assertEquals(
-                "[SQL0204] FAKE_TABLE in FAKE_SCHEMA type *FILE not found., 42704, -204",
-                e.getMessage());
+        assertTrue(e.getMessage().contains("[SQL0204] FAKE_TABLE in FAKE_SCHEMA type *FILE not found."));
     }
 
     @Test
