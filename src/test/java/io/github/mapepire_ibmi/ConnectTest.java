@@ -36,7 +36,7 @@ class ConnectTest extends MapepireTest {
         });
 
         assertEquals(
-                "java.sql.SQLException: The application server rejected the connection. (User ID is not known.:FAKE_USER)",
+                "java.sql.SQLNonTransientConnectionException: The application server rejected the connection. (User ID is not known.:FAKE_USER)",
                 e.getMessage());
     }
 
