@@ -151,9 +151,39 @@ public class SqlJob {
      * @return A CompletableFuture that resolves to the WebSocketClient instance.
      */
     private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init((KeyStore) null);
+        TrustManagerFactory tmf;
+        X509TrustManager customTrustManager = null;
         X509TrustManager jdkTrustManager = null;
+
+        if (db2Server.getCa() != null) {
+            // Convert custom CA from string to X509Certificate
+            InputStream inputStream = new ByteArrayInputStream(db2Server.getCa().getBytes());
+            X509Certificate caCert = (X509Certificate) CertificateFactory.getInstance("X509")
+                    .generateCertificate(inputStream);
+
+            // Create a custom key store and load custom certificate
+            KeyStore customKeyStore = KeyStore.getInstance("PKCS12");
+            customKeyStore.load(null, null);
+            customKeyStore.setCertificateEntry("mapepire-ca", caCert);
+
+            // Initialize a TrustManagerFactory with custom key store
+            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(customKeyStore);
+
+            // Get the custom X509TrustManager
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    customTrustManager = (X509TrustManager) tm;
+                    break;
+                }
+            }
+        }
+
+        // Initialize TrustManagerFactory
+        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init((KeyStore) null);
+
+        // Get the JDK X509TrustManager
         for (TrustManager tm : tmf.getTrustManagers()) {
             if (tm instanceof X509TrustManager) {
                 jdkTrustManager = (X509TrustManager) tm;
@@ -161,45 +191,38 @@ public class SqlJob {
             }
         }
 
+        final X509TrustManager finalCustomTrustManager = customTrustManager;
         final X509TrustManager finalJdkTrustManager = jdkTrustManager;
         X509TrustManager mapepireTrustManager = new X509TrustManager() {
             @Override
             public X509Certificate[] getAcceptedIssuers() {
-                X509Certificate[] jdkTrust = finalJdkTrustManager.getAcceptedIssuers();
-                if (db2Server.getCa() != null) {
-                    X509Certificate[] merge = new X509Certificate[jdkTrust.length + 1];
-                    for (int i = 0; i < jdkTrust.length; i++) {
-                        merge[i] = jdkTrust[i];
+                if (finalCustomTrustManager != null) {
+                    X509Certificate[] jdkTrust = finalJdkTrustManager.getAcceptedIssuers();
+                    X509Certificate[] custTrust = finalCustomTrustManager.getAcceptedIssuers();
+                    X509Certificate[] merge = new X509Certificate[custTrust.length + jdkTrust.length];
+
+                    for (int i = 0; i < custTrust.length; i++) {
+                        merge[i] = custTrust[i];
                     }
 
-                    try {
-                        InputStream inputStream = new ByteArrayInputStream(db2Server.getCa().getBytes());
-                        X509Certificate caCert = (X509Certificate) CertificateFactory.getInstance("X509")
-                                .generateCertificate(inputStream);
-                        merge[jdkTrust.length] = caCert;
-                    } catch (CertificateException e) {
-                        e.printStackTrace();
+                    for (int i = 0; i < jdkTrust.length; i++) {
+                        merge[custTrust.length + i] = jdkTrust[i];
                     }
 
                     return merge;
                 } else {
-                    return jdkTrust;
+                    return finalJdkTrustManager.getAcceptedIssuers();
                 }
             }
 
             @Override
             public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                 if (db2Server.getRejectUnauthorized()) {
-                    String ca = db2Server.getCa();
-                    if (ca != null) {
-                        InputStream inputStream = new ByteArrayInputStream(db2Server.getCa().getBytes());
-                        X509Certificate caCert = (X509Certificate) CertificateFactory.getInstance("X509")
-                                .generateCertificate(inputStream);
-
+                    if (finalCustomTrustManager != null) {
                         try {
-                            chain[0].verify(caCert.getPublicKey());
-                        } catch (Exception e) {
-                            throw new CertificateException("Server certificate is not trusted by the provided CA.", e);
+                            finalCustomTrustManager.checkServerTrusted(chain, authType);
+                        } catch (CertificateException e) {
+                            finalJdkTrustManager.checkServerTrusted(chain, authType);
                         }
                     } else {
                         finalJdkTrustManager.checkServerTrusted(chain, authType);
