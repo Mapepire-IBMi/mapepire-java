@@ -27,11 +27,10 @@ import io.github.mapepire_ibmi.types.DaemonServer;
  */
 public class Tls {
     /**
-     * Get the SSL certificate for a specified DB2 server.
+     * Get the SSL server certificate for a specified DB2 server.
      * 
      * @param creds The server details for the connection.
-     * @return A CompletableFuture that resolves to the detailed peer certificate
-     *         information.
+     * @return A CompletableFuture that resolves to the SSL server certificate.
      */
     public static CompletableFuture<String> getCertificate(DaemonServer db2Server) throws Exception {
         X509TrustManager noAuthTrustManager = new X509TrustManager() {
