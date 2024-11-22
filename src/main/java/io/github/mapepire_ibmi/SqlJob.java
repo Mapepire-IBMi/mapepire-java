@@ -137,7 +137,7 @@ public class SqlJob {
      * @param prefix The custom prefix.
      * @return The unique ID.
      */
-    public static String getNewUniqueId(String prefix) {
+    public static synchronized String getNewUniqueId(String prefix) {
         return prefix + (++uniqueIdCounter);
     }
 
