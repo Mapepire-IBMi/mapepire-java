@@ -52,10 +52,10 @@ public class DaemonServer {
     /**
      * Construct a new DaemonServer instance.
      * 
-     * @param host               The hostname or IP address of the server.
-     * @param port               The port number to connect to.
-     * @param user               The username for authentication.
-     * @param password           The password for authentication.
+     * @param host     The hostname or IP address of the server.
+     * @param port     The port number to connect to.
+     * @param user     The username for authentication.
+     * @param password The password for authentication.
      */
     public DaemonServer(String host, int port, String user, String password) {
         this.host = host;

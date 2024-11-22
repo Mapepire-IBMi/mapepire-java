@@ -1,7 +1,6 @@
 package io.github.mapepire_ibmi;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -22,7 +21,7 @@ class MapepireTest {
     private static final String CONFIG_FILE = "config.properties";
 
     @BeforeAll
-    public static void setup() throws IOException, ParseException {
+    public static void setup() throws Exception {
         Properties properties = new Properties();
         try (InputStream input = MapepireTest.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
             if (input == null) {
@@ -46,10 +45,10 @@ class MapepireTest {
         String password = secrets.get(keys.get(2));
         int port = Integer.parseInt(secrets.get(keys.get(3)));
 
-        creds = new DaemonServer(host, port, user, password, true, "");
-        invalidCreds = new DaemonServer(host, port, "FAKE_USER", "FAKE_PASSWORD", true, "");
-
-        // TODO: Get certificate
+        creds = new DaemonServer(host, port, user, password);
+        String ca = Tls.getCertificate(creds).get();
+        creds.setCa(ca);
+        invalidCreds = new DaemonServer(host, port, "FAKE_USER", "FAKE_PASSWORD", false);
     }
 
     public static DaemonServer getCreds() {

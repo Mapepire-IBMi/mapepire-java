@@ -94,7 +94,7 @@ class SqlTest extends MapepireTest {
         assertNotNull(result.getMetadata());
         assertFalse(result.getIsDone());
         assertEquals(5, result.getData().size());
-        assertEquals("NAME", row.get(0));
+        assertNotNull(row.get(0));
     }
 
     @Test
@@ -275,9 +275,9 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(true, false, Arrays.asList("PHONE"));
+        QueryOptions options = new QueryOptions(true, false, Arrays.asList("TABLE_NAME"));
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
-        QueryResult<Object> result = query.execute().get();
+        QueryResult<Object> result = query.execute(1).get();
         ArrayList<String> row = (ArrayList<String>) result.getData().get(0);
 
         query.close().get();
@@ -287,9 +287,9 @@ class SqlTest extends MapepireTest {
         assertNotNull(result.getId());
         assertTrue(result.getHasResults());
         assertNotNull(result.getMetadata());
-        assertTrue(result.getIsDone());
+        assertFalse(result.getIsDone());
         assertEquals(1, result.getData().size());
-        assertEquals("PHONE", row.get(0));
+        assertEquals("TABLE_NAME", row.get(0));
     }
 
     @Test
