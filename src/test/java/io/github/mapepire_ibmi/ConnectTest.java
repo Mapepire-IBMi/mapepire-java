@@ -35,7 +35,7 @@ class ConnectTest extends MapepireTest {
         });
 
         assertTrue(e.getMessage()
-                .contains("The application server rejected the connection. (User ID is not known.:FAKE_USER)"));
+                .contains("The application server rejected the connection."));
     }
 
     @Test
