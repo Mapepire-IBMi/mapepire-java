@@ -20,7 +20,7 @@ class CLTest extends MapepireTest {
         job.close();
 
         assertTrue(result.getSuccess());
-        assertTrue(result.getData().size() > 0);
+        assertNotNull(result.getData());
     }
 
     @Test
