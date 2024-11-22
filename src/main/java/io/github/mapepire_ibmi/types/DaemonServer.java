@@ -33,8 +33,8 @@ public class DaemonServer {
     /**
      * Whether to ignore unauthorized certificates.
      */
-    @JsonProperty("ignoreUnauthorized")
-    private boolean ignoreUnauthorized;
+    @JsonProperty("rejectUnauthorized")
+    private boolean rejectUnauthorized = true;
 
     /**
      * The certificate authority (CA) for validating the server's certificate.
@@ -56,17 +56,17 @@ public class DaemonServer {
      * @param port               The port number to connect to.
      * @param user               The username for authentication.
      * @param password           The password for authentication.
-     * @param ignoreUnauthorized Whether to ignore unauthorized certificates.
+     * @param rejectUnauthorized Whether to ignore unauthorized certificates.
      * @param ca                 The certificate authority (CA) for validating the
      *                           server's certificate.
      */
-    public DaemonServer(String host, int port, String user, String password, boolean ignoreUnauthorized,
+    public DaemonServer(String host, int port, String user, String password, boolean rejectUnauthorized,
             String ca) {
         this.host = host;
         this.port = port;
         this.user = user;
         this.password = password;
-        this.ignoreUnauthorized = ignoreUnauthorized;
+        this.rejectUnauthorized = rejectUnauthorized;
         this.ca = ca;
     }
 
@@ -147,17 +147,17 @@ public class DaemonServer {
      * 
      * @return Whether to ignore unauthorized certificates.
      */
-    public boolean getIgnoreUnauthorized() {
-        return ignoreUnauthorized;
+    public boolean getRejectUnauthorized() {
+        return rejectUnauthorized;
     }
 
     /**
      * Set whether to ignore unauthorized certificates.
      * 
-     * @param ignoreUnauthorized Whether to ignore unauthorized certificates.
+     * @param rejectUnauthorized Whether to ignore unauthorized certificates.
      */
-    public void setIgnoreUnauthorized(boolean ignoreUnauthorized) {
-        this.ignoreUnauthorized = ignoreUnauthorized;
+    public void setRejectUnauthorized(boolean rejectUnauthorized) {
+        this.rejectUnauthorized = rejectUnauthorized;
     }
 
     /**

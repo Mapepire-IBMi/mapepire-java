@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -137,17 +134,14 @@ public class Query {
     /**
      * Clean up queries that are done or are in error state from the global query
      * list.
-     * 
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
-    public CompletableFuture<Void> cleanup() throws InterruptedException, ExecutionException {
+    public CompletableFuture<Void> cleanup() throws Exception {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
                 .map(query -> CompletableFuture.runAsync(() -> {
                     try {
                         query.close();
-                    } catch (JsonProcessingException | InterruptedException | ExecutionException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }))
@@ -166,15 +160,8 @@ public class Query {
      * 
      * @param <T> The type of data to be returned.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ClientException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute() throws JsonMappingException, JsonProcessingException,
-            ClientException, InterruptedException, ExecutionException, SQLException {
+    public <T> CompletableFuture<QueryResult<T>> execute() throws Exception {
         return this.execute(100);
     }
 
@@ -184,15 +171,8 @@ public class Query {
      * @param <T>         The type of data to be returned.
      * @param rowsToFetch The number of rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws ClientException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws ClientException, JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException {
+    public <T> CompletableFuture<QueryResult<T>> execute(int rowsToFetch) throws Exception {
         if (rowsToFetch <= 0) {
             throw new ClientException("Rows to fetch must be greater than 0");
         }
@@ -271,16 +251,8 @@ public class Query {
      * Fetch more rows from the currently running query.
      * 
      * @return A CompletableFuture that resolves to the query result.
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws UnknownServerException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws ClientException
      */
-    public <T> CompletableFuture<QueryResult<T>> fetchMore() throws JsonMappingException, JsonProcessingException,
-            UnknownServerException, InterruptedException, ExecutionException, SQLException, ClientException {
+    public <T> CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
         return this.fetchMore(this.rowsToFetch);
     }
 
@@ -289,17 +261,8 @@ public class Query {
      * 
      * @param rowsToFetch The number of additional rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws ClientException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public <T> CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch)
-            throws ClientException, JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public <T> CompletableFuture<QueryResult<T>> fetchMore(int rowsToFetch) throws Exception {
         if (rowsToFetch <= 0) {
             throw new ClientException("Rows to fetch must be greater than 0");
         }
@@ -354,13 +317,8 @@ public class Query {
      * Close the query.
      * 
      * @return A CompletableFuture that resolves when the query is closed.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<String> close()
-            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException {
+    public CompletableFuture<String> close() throws Exception {
         if (correlationId != null && state != QueryState.RUN_DONE) {
             state = QueryState.RUN_DONE;
 
