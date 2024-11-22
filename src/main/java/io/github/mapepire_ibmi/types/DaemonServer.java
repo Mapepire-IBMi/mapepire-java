@@ -56,6 +56,38 @@ public class DaemonServer {
      * @param port               The port number to connect to.
      * @param user               The username for authentication.
      * @param password           The password for authentication.
+     */
+    public DaemonServer(String host, int port, String user, String password) {
+        this.host = host;
+        this.port = port;
+        this.user = user;
+        this.password = password;
+    }
+
+    /**
+     * Construct a new DaemonServer instance.
+     * 
+     * @param host               The hostname or IP address of the server.
+     * @param port               The port number to connect to.
+     * @param user               The username for authentication.
+     * @param password           The password for authentication.
+     * @param rejectUnauthorized Whether to ignore unauthorized certificates.
+     */
+    public DaemonServer(String host, int port, String user, String password, boolean rejectUnauthorized) {
+        this.host = host;
+        this.port = port;
+        this.user = user;
+        this.password = password;
+        this.rejectUnauthorized = rejectUnauthorized;
+    }
+
+    /**
+     * Construct a new DaemonServer instance.
+     * 
+     * @param host               The hostname or IP address of the server.
+     * @param port               The port number to connect to.
+     * @param user               The username for authentication.
+     * @param password           The password for authentication.
      * @param rejectUnauthorized Whether to ignore unauthorized certificates.
      * @param ca                 The certificate authority (CA) for validating the
      *                           server's certificate.
