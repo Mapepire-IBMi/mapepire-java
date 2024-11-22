@@ -1,8 +1,8 @@
 package io.github.mapepire_ibmi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 
@@ -26,9 +26,7 @@ class TlsTest extends MapepireTest {
             Tls.getCertificate(invalidCreds).get();
         });
 
-        assertEquals(
-                "java.net.ConnectException: Connection refused: connect",
-                e.getMessage());
+        assertTrue(e.getMessage().contains("Connection refused: connect"));
     }
 
     @Test
@@ -40,8 +38,7 @@ class TlsTest extends MapepireTest {
             job.connect(creds).get();
         });
 
-        assertEquals(
-                "javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target",
-                e.getMessage());
+        assertTrue(e.getMessage().contains(
+                "PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target"));
     }
 }

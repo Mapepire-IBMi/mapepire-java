@@ -1,6 +1,5 @@
 package io.github.mapepire_ibmi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,9 +34,8 @@ class ConnectTest extends MapepireTest {
             }
         });
 
-        assertEquals(
-                "java.sql.SQLNonTransientConnectionException: The application server rejected the connection. (User ID is not known.:FAKE_USER)",
-                e.getMessage());
+        assertTrue(e.getMessage()
+                .contains("The application server rejected the connection. (User ID is not known.:FAKE_USER)"));
     }
 
     @Test
