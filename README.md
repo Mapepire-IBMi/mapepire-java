@@ -87,27 +87,37 @@ Output:
       "display_size" : 3,
       "label" : "DEPTNO",
       "name" : "DEPTNO",
-      "type" : "CHAR"
+      "type" : "CHAR",
+      "precision" : 3,
+      "scale" : 0
     }, {
       "display_size" : 36,
       "label" : "DEPTNAME",
       "name" : "DEPTNAME",
-      "type" : "VARCHAR"
+      "type" : "VARCHAR",
+      "precision" : 36,
+      "scale" : 0
     }, {
       "display_size" : 6,
       "label" : "MGRNO",
       "name" : "MGRNO",
-      "type" : "CHAR"
+      "type" : "CHAR",
+      "precision" : 6,
+      "scale" : 0
     }, {
       "display_size" : 3,
       "label" : "ADMRDEPT",
       "name" : "ADMRDEPT",
-      "type" : "CHAR"
+      "type" : "CHAR",
+      "precision" : 3,
+      "scale" : 0
     }, {
       "display_size" : 16,
       "label" : "LOCATION",
       "name" : "LOCATION",
-      "type" : "CHAR"
+      "type" : "CHAR",
+      "precision" : 16,
+      "scale" : 0
     } ],
     "job" : "930740/QUSER/QZDASOINIT"
   },
