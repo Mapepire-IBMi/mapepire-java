@@ -25,7 +25,8 @@ class TlsTest extends MapepireTest {
             invalidCreds.setHost("FAKE_HOST");
             Tls.getCertificate(invalidCreds).get();
         });
-
+        System.out.println(e.getMessage());
+        e.printStackTrace();
         assertTrue(e.getMessage().contains("Connection refused: connect"));
     }
 }
