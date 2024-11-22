@@ -20,7 +20,7 @@ class MapepireTest {
     private static String user;
     private static String password;
     private static int port;
-    public static String invalidCA = "-----BEGIN CERTIFICATE-----\n" +
+    private static String invalidCA = "-----BEGIN CERTIFICATE-----\n" +
             "MIIDtjCCAp6gAwIBAgIUaZwqO1YXrSGUZ+j2YlefGD+Li3UwDQYJKoZIhvcNAQEL\n" +
             "BQAwcjELMAkGA1UEBhMCZHIxCzAJBgNVBAgMAnNlMQwwCgYDVQQHDAN0eXUxDDAK\n" +
             "BgNVBAoMA3NlcjELMAkGA1UECwwCaGYxDzANBgNVBAMMBmRyZnRnZzEcMBoGCSqG\n" +
@@ -42,7 +42,7 @@ class MapepireTest {
             "HaelrFfJI+UCGwOnr4qTKxkEB/lNz47O7kh4vmAk4mU3IsSWDMsydFHCTPLMg/Me\n" +
             "TYn5iFqPQJhDoSiE8W0CeyAUXyhwWg7l9qiBaA+nI+t1Y307ld4T46x4\n" +
             "-----END CERTIFICATE-----";
-    private static final String configFile = "config.properties";
+    private static String configFile = "config.properties";
 
     @BeforeAll
     public static void setup() throws Exception {
