@@ -86,7 +86,11 @@ public class Query {
         this.isCLCommand = opts.getIsClCommand();
         this.isTerseResults = opts.getIsTerseResults();
 
-        Query.globalQueryList.add(this);
+        Query.addQuery(this);
+    }
+
+    public static synchronized void addQuery(Query query) {
+        globalQueryList.add(query);
     }
 
     /**
@@ -95,7 +99,7 @@ public class Query {
      * @param id The correlation ID of the query.
      * @return The corresponding Query instance or null if not found.
      */
-    public static Query byId(String id) {
+    public static synchronized Query byId(String id) {
         if (id == null || id.equals("")) {
             return null;
         } else {
@@ -122,7 +126,7 @@ public class Query {
      * @param forJob The job to filter the queries by.
      * @return A list of correlation IDs for open queries.
      */
-    public static List<String> getOpenIds(SqlJob forJob) {
+    public static synchronized List<String> getOpenIds(SqlJob forJob) {
         return Query.globalQueryList.stream()
                 .filter(q -> q.job.equals(forJob) || forJob == null)
                 .filter(q -> q.getState() == QueryState.NOT_YET_RUN
@@ -135,7 +139,7 @@ public class Query {
      * Clean up queries that are done or are in error state from the global query
      * list.
      */
-    public CompletableFuture<Void> cleanup() throws Exception {
+    public synchronized CompletableFuture<Void> cleanup() throws Exception {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
                 .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
                 .map(query -> CompletableFuture.runAsync(() -> {
