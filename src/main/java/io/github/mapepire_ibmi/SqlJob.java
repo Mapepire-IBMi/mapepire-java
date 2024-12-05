@@ -1,11 +1,14 @@
 package io.github.mapepire_ibmi;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -14,19 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -45,7 +48,6 @@ import io.github.mapepire_ibmi.types.ServerTraceLevel;
 import io.github.mapepire_ibmi.types.SetConfigResult;
 import io.github.mapepire_ibmi.types.TransactionEndType;
 import io.github.mapepire_ibmi.types.VersionCheckResult;
-import io.github.mapepire_ibmi.types.exceptions.ClientException;
 import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Option;
 import io.github.mapepire_ibmi.types.jdbcOptions.TransactionIsolation;
@@ -147,17 +149,95 @@ public class SqlJob {
      *
      * @param db2Server The server details for the connection.
      * @return A CompletableFuture that resolves to the WebSocketClient instance.
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     * @throws URISyntaxException
      */
-    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server)
-            throws NoSuchAlgorithmException, KeyManagementException, URISyntaxException {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        NoAuthTrustManager trustManager = new NoAuthTrustManager();
-        sslContext.init(null, new TrustManager[] { trustManager }, new SecureRandom());
-        SSLSocketFactory factory = sslContext.getSocketFactory();
+    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
+        TrustManagerFactory tmf;
+        X509TrustManager customTrustManager = null;
+        X509TrustManager jdkTrustManager = null;
 
+        if (db2Server.getCa() != null) {
+            // Convert custom CA from string to X509Certificate
+            InputStream inputStream = new ByteArrayInputStream(db2Server.getCa().getBytes());
+            X509Certificate caCert = (X509Certificate) CertificateFactory.getInstance("X509")
+                    .generateCertificate(inputStream);
+
+            // Create a custom key store and load custom certificate
+            KeyStore customKeyStore = KeyStore.getInstance("PKCS12");
+            customKeyStore.load(null, null);
+            customKeyStore.setCertificateEntry("mapepire-ca", caCert);
+
+            // Initialize a TrustManagerFactory with custom key store
+            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(customKeyStore);
+
+            // Get the custom X509TrustManager
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    customTrustManager = (X509TrustManager) tm;
+                    break;
+                }
+            }
+        }
+
+        // Initialize TrustManagerFactory
+        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init((KeyStore) null);
+
+        // Get the JDK X509TrustManager
+        for (TrustManager tm : tmf.getTrustManagers()) {
+            if (tm instanceof X509TrustManager) {
+                jdkTrustManager = (X509TrustManager) tm;
+                break;
+            }
+        }
+
+        final X509TrustManager finalCustomTrustManager = customTrustManager;
+        final X509TrustManager finalJdkTrustManager = jdkTrustManager;
+        X509TrustManager mapepireTrustManager = new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                if (finalCustomTrustManager != null) {
+                    X509Certificate[] jdkTrust = finalJdkTrustManager.getAcceptedIssuers();
+                    X509Certificate[] custTrust = finalCustomTrustManager.getAcceptedIssuers();
+                    X509Certificate[] merge = new X509Certificate[custTrust.length + jdkTrust.length];
+
+                    for (int i = 0; i < custTrust.length; i++) {
+                        merge[i] = custTrust[i];
+                    }
+
+                    for (int i = 0; i < jdkTrust.length; i++) {
+                        merge[custTrust.length + i] = jdkTrust[i];
+                    }
+
+                    return merge;
+                } else {
+                    return finalJdkTrustManager.getAcceptedIssuers();
+                }
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                if (db2Server.getRejectUnauthorized()) {
+                    if (finalCustomTrustManager != null) {
+                        try {
+                            finalCustomTrustManager.checkServerTrusted(chain, authType);
+                        } catch (CertificateException e) {
+                            finalJdkTrustManager.checkServerTrusted(chain, authType);
+                        }
+                    } else {
+                        finalJdkTrustManager.checkServerTrusted(chain, authType);
+                    }
+                }
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[] { mapepireTrustManager }, new SecureRandom());
+        SSLContext.setDefault(sslContext);
         URI uri = new URI("wss://" + db2Server.getHost() + ":" + db2Server.getPort() + "/db/");
         Map<String, String> httpHeaders = new HashMap<>();
         String auth = db2Server.getUser() + ":" + db2Server.getPassword();
@@ -214,13 +294,8 @@ public class SqlJob {
                 }
             }
         };
+        SSLSocketFactory factory = sslContext.getSocketFactory();
         wsc.setSocketFactory(factory);
-
-        // TODO: Implement
-        // if (db2Server.getIgnoreUnauthorized()) {
-        // }
-        // if (db2Server.getCa() != null) {
-        // }
 
         return CompletableFuture.completedFuture(wsc);
     }
@@ -230,13 +305,8 @@ public class SqlJob {
      *
      * @param content The message content to send.
      * @return A CompletableFuture that resolves to the server's response.
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
-    public CompletableFuture<String> send(String content)
-            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException {
+    public CompletableFuture<String> send(String content) throws Exception {
         if (this.isTracingChannelData) {
             System.out.println("\n>> " + content);
         }
@@ -280,19 +350,8 @@ public class SqlJob {
      *
      * @param db2Server The server details for the connection.
      * @return A CompletableFuture that resolves to the connection result.
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) throws KeyManagementException,
-            NoSuchAlgorithmException, InterruptedException, ExecutionException, URISyntaxException,
-            JsonMappingException, JsonProcessingException, SQLException, UnknownServerException {
+    public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) throws Exception {
         this.status = JobStatus.Connecting;
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
 
@@ -390,17 +449,8 @@ public class SqlJob {
      * @param <T> The type of data to be returned.
      * @param sql The SQL command to execute.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ClientException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql)
-            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
-            ExecutionException, SQLException, UnknownServerException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws Exception {
         return this.execute(sql, new QueryOptions());
     }
 
@@ -411,17 +461,8 @@ public class SqlJob {
      * @param sql  The SQL command to execute.
      * @param opts The options for configuring the query.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ClientException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws UnknownServerException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts)
-            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
-            ExecutionException, SQLException, UnknownServerException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws Exception {
         Query query = query(sql, opts);
         return query.<T>execute()
                 .thenCompose(queryResult -> {
@@ -448,15 +489,8 @@ public class SqlJob {
      * Get the version information from the database server.
      *
      * @return A CompletableFuture that resolves to the version check result.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<VersionCheckResult> getVersion() throws JsonMappingException, JsonProcessingException,
-            InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<VersionCheckResult> getVersion() throws Exception {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode versionRequest = objectMapper.createObjectNode();
         versionRequest.put("id", SqlJob.getNewUniqueId());
@@ -489,15 +523,8 @@ public class SqlJob {
      *
      * @param statement The SQL statement to explain.
      * @return A CompletableFuture that resolves to the explain results.
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<ExplainResults<?>> explain(String statement) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<ExplainResults<?>> explain(String statement) throws Exception {
         return this.explain(statement, ExplainType.RUN);
     }
 
@@ -507,15 +534,8 @@ public class SqlJob {
      * @param statement The SQL statement to explain.
      * @param type      The type of explain to perform (default is ExplainType.Run).
      * @return A CompletableFuture that resolves to the explain results.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<ExplainResults<?>> explain(String statement, ExplainType type) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<ExplainResults<?>> explain(String statement, ExplainType type) throws Exception {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode explainRequest = objectMapper.createObjectNode();
         explainRequest.put("id", SqlJob.getNewUniqueId());
@@ -556,15 +576,8 @@ public class SqlJob {
      * Get trace data from the backend.
      *
      * @return A CompletableFuture that resolves to the trace data result.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<GetTraceDataResult> getTraceData() throws JsonMappingException, JsonProcessingException,
-            InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<GetTraceDataResult> getTraceData() throws Exception {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode traceDataRequest = objectMapper.createObjectNode();
         traceDataRequest.put("id", SqlJob.getNewUniqueId());
@@ -597,15 +610,8 @@ public class SqlJob {
      * 
      * @param dest The server trace destination.
      * @return A CompletableFuture that resolves to the set config result.
-     * @throws JsonMappingException
-     * @throws JsonProcessingException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setTraceDest(ServerTraceDest dest) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<SetConfigResult> setTraceDest(ServerTraceDest dest) throws Exception {
         return setTraceConfig(dest, null, null, null);
     }
 
@@ -614,15 +620,8 @@ public class SqlJob {
      * 
      * @param level The server trace level.
      * @return A CompletableFuture that resolves to the set config result.
-     * @throws JsonMappingException
-     * @throws JsonProcessingException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setTraceLevel(ServerTraceLevel level) throws JsonMappingException,
-            JsonProcessingException, InterruptedException, ExecutionException, SQLException, UnknownServerException {
+    public CompletableFuture<SetConfigResult> setTraceLevel(ServerTraceLevel level) throws Exception {
         return setTraceConfig(null, level, null, null);
     }
 
@@ -631,16 +630,8 @@ public class SqlJob {
      * 
      * @param jtOpenTraceDest The JTOpen trace data destination.
      * @return A CompletableFuture that resolves to the set config result.
-     * @throws JsonMappingException
-     * @throws JsonProcessingException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest)
-            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
-            SQLException, UnknownServerException {
+    public CompletableFuture<SetConfigResult> setJtOpenTraceDest(ServerTraceDest jtOpenTraceDest) throws Exception {
         return setTraceConfig(null, null, jtOpenTraceDest, null);
     }
 
@@ -649,16 +640,8 @@ public class SqlJob {
      * 
      * @param jtOpenTraceLevel The JTOpen trace level.
      * @return A CompletableFuture that resolves to the set config result.
-     * @throws JsonMappingException
-     * @throws JsonProcessingException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
-    public CompletableFuture<SetConfigResult> setJtOpenTraceLevel(ServerTraceLevel jtOpenTraceLevel)
-            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
-            SQLException, UnknownServerException {
+    public CompletableFuture<SetConfigResult> setJtOpenTraceLevel(ServerTraceLevel jtOpenTraceLevel) throws Exception {
         return setTraceConfig(null, null, null, jtOpenTraceLevel);
     }
 
@@ -670,17 +653,9 @@ public class SqlJob {
      * @param jtOpenTraceDest  The JTOpen trace data destination.
      * @param jtOpenTraceLevel The JTOpen trace level.
      * @return A CompletableFuture that resolves to the set config result.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
-     * @throws SQLException
-     * @throws UnknownServerException
      */
     public CompletableFuture<SetConfigResult> setTraceConfig(ServerTraceDest dest, ServerTraceLevel level,
-            ServerTraceDest jtOpenTraceDest, ServerTraceLevel jtOpenTraceLevel)
-            throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException,
-            SQLException, UnknownServerException {
+            ServerTraceDest jtOpenTraceDest, ServerTraceLevel jtOpenTraceLevel) throws Exception {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode setTraceConfigRequest = objectMapper.createObjectNode();
         setTraceConfigRequest.put("id", SqlJob.getNewUniqueId());
@@ -755,15 +730,8 @@ public class SqlJob {
      *
      * @return A CompletableFuture that resolves to the count of pending
      *         transactions.
-     * @throws SQLException
-     * @throws ClientException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<Integer> getPendingTransactions() throws JsonMappingException, JsonProcessingException,
-            InterruptedException, ExecutionException, ClientException, SQLException {
+    public CompletableFuture<Integer> getPendingTransactions() throws Exception {
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         String transactionCountQuery = String.join("\n", Arrays.asList(
                 "select count(*) as thecount",
@@ -796,16 +764,8 @@ public class SqlJob {
      * @param type The type of transaction ending (commit or rollback).
      * @return A CompletableFuture that resolves to the result of the transaction
      *         operation.
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ClientException
-     * @throws JsonProcessingException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type)
-            throws JsonMappingException, JsonProcessingException, ClientException, InterruptedException,
-            ExecutionException, SQLException {
+    public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type) throws Exception {
         String query;
 
         switch (type) {
