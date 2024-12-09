@@ -11,5 +11,6 @@
     <suppress files=".*" checks="ImportOrder" />
     <suppress files=".*" checks="IllegalCatch" />
     <suppress files=".*" checks="HideUtilityClassConstructor" />
+    <suppress files=".*" checks="OperatorWrap" />
     <suppress files="Test.java$" checks="LineLength" />
 </suppressions>

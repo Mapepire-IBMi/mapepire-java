@@ -1,9 +1,5 @@
 package io.github.mapepire_ibmi;
 
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,11 +7,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.github.mapepire_ibmi.types.JobStatus;
 import io.github.mapepire_ibmi.types.PoolAddOptions;
@@ -23,7 +15,6 @@ import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.exceptions.ClientException;
-import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 
 /**
  * Represents a connection pool for managing SQL jobs.
@@ -59,21 +50,8 @@ public class Pool {
      * size.
      *
      * @return A CompletableFuture that resolves when all jobs have been created.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
-     * @throws ClientException
      */
-    public CompletableFuture<Void> init()
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException,
-            ClientException {
+    public CompletableFuture<Void> init() throws Exception {
         if (this.options.getMaxSize() <= 0) {
             throw new ClientException("Max size must be greater than 0");
         } else if (this.options.getStartingSize() <= 0) {
@@ -126,19 +104,8 @@ public class Pool {
      * Add a new job to the pool.
      *
      * @return A CompletableFuture that resolves to the new job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<SqlJob> addJob()
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public CompletableFuture<SqlJob> addJob() throws Exception {
         PoolAddOptions poolAddOptions = new PoolAddOptions();
         return this.addJob(poolAddOptions);
     }
@@ -148,19 +115,8 @@ public class Pool {
      *
      * @param options Options for configuring an addition to the connection pool.
      * @return A CompletableFuture that resolves to the new job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<SqlJob> addJob(PoolAddOptions options)
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public CompletableFuture<SqlJob> addJob(PoolAddOptions options) throws Exception {
         if (options.getExistingJob() != null) {
             cleanup();
         }
@@ -201,19 +157,8 @@ public class Pool {
      * full but all jobs are busy.
      *
      * @return The retrieved job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public synchronized SqlJob getJob()
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public synchronized SqlJob getJob() throws Exception {
         SqlJob job = this.getReadyJob();
         if (job == null) {
             // This code finds a job that is busy, but has the least requests on the queue
@@ -241,19 +186,8 @@ public class Pool {
      * otherwise, it may create a new job if the pool is not full.
      *
      * @return A CompletableFuture that resolves to a ready job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<SqlJob> waitForJob()
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public CompletableFuture<SqlJob> waitForJob() throws Exception {
         return this.waitForJob(false);
     }
 
@@ -264,19 +198,8 @@ public class Pool {
      * @param useNewJob Whether a new job should be created even if the pool is
      *                  full.
      * @return A CompletableFuture that resolves to a ready job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<SqlJob> waitForJob(boolean useNewJob)
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public CompletableFuture<SqlJob> waitForJob(boolean useNewJob) throws Exception {
         SqlJob job = getReadyJob();
 
         if (job == null) {
@@ -298,19 +221,8 @@ public class Pool {
      * the pool.
      *
      * @return A CompletableFuture that resolves to a ready job or a new job.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public CompletableFuture<SqlJob> popJob()
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public CompletableFuture<SqlJob> popJob() throws Exception {
         // TODO: dead code: what to do with it?
         SqlJob readyJob = getReadyJob();
         if (readyJob != null) {
@@ -329,19 +241,8 @@ public class Pool {
      *
      * @param sql The SQL query.
      * @return A new Query instance.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public Query query(String sql)
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public Query query(String sql) throws Exception {
         QueryOptions queryOptions = new QueryOptions();
         return this.query(sql, queryOptions);
     }
@@ -352,19 +253,8 @@ public class Pool {
      * @param sql  The SQL query.
      * @param opts The options for configuring the query.
      * @return A new Query instance.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public Query query(String sql, QueryOptions opts)
-            throws JsonMappingException, KeyManagementException, JsonProcessingException, NoSuchAlgorithmException,
-            InterruptedException, ExecutionException, URISyntaxException, SQLException, UnknownServerException {
+    public Query query(String sql, QueryOptions opts) throws Exception {
         SqlJob job = this.getJob();
         return job.query(sql, opts);
     }
@@ -375,20 +265,8 @@ public class Pool {
      * @param <T> The type of data to be returned.
      * @param sql The SQL command to execute.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws ClientException
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws JsonMappingException,
-            KeyManagementException, JsonProcessingException, NoSuchAlgorithmException, InterruptedException,
-            ExecutionException, URISyntaxException, SQLException, UnknownServerException, ClientException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql) throws Exception {
         QueryOptions queryOptions = new QueryOptions();
         return this.execute(sql, queryOptions);
     }
@@ -400,20 +278,8 @@ public class Pool {
      * @param sql  The SQL command to execute.
      * @param opts The options for configuring the query.
      * @return A CompletableFuture that resolves to the query result.
-     * @throws UnknownServerException
-     * @throws SQLException
-     * @throws URISyntaxException
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws NoSuchAlgorithmException
-     * @throws JsonProcessingException
-     * @throws KeyManagementException
-     * @throws JsonMappingException
-     * @throws ClientException
      */
-    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws JsonMappingException,
-            KeyManagementException, JsonProcessingException, NoSuchAlgorithmException, InterruptedException,
-            ExecutionException, URISyntaxException, SQLException, UnknownServerException, ClientException {
+    public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws Exception {
         SqlJob job = this.getJob();
         return job.execute(sql, opts);
     }
