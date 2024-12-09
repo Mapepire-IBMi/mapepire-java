@@ -53,7 +53,7 @@ import io.github.mapepire_ibmi.types.QueryResult;
 public final class App {
     public static void main(String[] args) throws Exception {
         // Initialize credentials
-        DaemonServer creds = new DaemonServer("HOST", 8085, "USER", "PASSWORD", true, "CA");
+        DaemonServer creds = new DaemonServer("HOST", 8076, "USER", "PASSWORD");
 
         // Establish connection
         SqlJob job = new SqlJob();
