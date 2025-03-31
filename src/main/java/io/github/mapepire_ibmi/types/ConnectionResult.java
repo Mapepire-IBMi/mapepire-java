@@ -22,15 +22,17 @@ public class ConnectionResult extends ServerResponse {
     /**
      * Construct a new ConnectionResult instance.
      * 
-     * @param id       The unique identifier for the request.
-     * @param success  Whether the request was successful.
-     * @param error    The error message, if any.
-     * @param sqlRc    The SQL return code.
-     * @param sqlState The SQL state code.
-     * @param job      The unique job identifier for the connection.
+     * @param id            The unique identifier for the request.
+     * @param success       Whether the request was successful.
+     * @param error         The error message, if any.
+     * @param sqlRc         The SQL return code.
+     * @param sqlState      The SQL state code.
+     * @param executionTime The execution time in milliseconds.
+     * @param job           The unique job identifier for the connection.
      */
-    public ConnectionResult(String id, boolean success, String error, int sqlRc, String sqlState, String job) {
-        super(id, success, error, sqlRc, sqlState);
+    public ConnectionResult(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime,
+            String job) {
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.job = job;
     }
 

@@ -1,5 +1,6 @@
 package io.github.mapepire_ibmi;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -19,6 +20,7 @@ class SingletonObjectMapper {
     public static ObjectMapper getInstance() {
         if (instance == null) {
             instance = new ObjectMapper();
+            instance.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }
 
         return instance;

@@ -25,16 +25,18 @@ public class CLCommandResult extends ServerResponse {
     /**
      * Construct a new CLCommandResult instance.
      * 
-     * @param id       The unique identifier for the request.
-     * @param success  Whether the request was successful.
-     * @param error    The error message, if any.
-     * @param sqlRc    The SQL return code.
-     * @param sqlState The SQL state code.
-     * @param joblog   The log entries generated during the execution of the job.
+     * @param id            The unique identifier for the request.
+     * @param success       Whether the request was successful.
+     * @param error         The error message, if any.
+     * @param sqlRc         The SQL return code.
+     * @param sqlState      The SQL state code.
+     * @param executionTime The execution time in milliseconds.
+     * @param joblog        The log entries generated during the execution of the
+     *                      job.
      */
     public CLCommandResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            List<JobLogEntry> joblog) {
-        super(id, success, error, sqlRc, sqlState);
+            long executionTime, List<JobLogEntry> joblog) {
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.joblog = joblog;
     }
 
