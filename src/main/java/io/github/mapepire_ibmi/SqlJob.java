@@ -567,6 +567,8 @@ public class SqlJob {
 
     /**
      * Get the file path of the trace file, if available.
+     * 
+     * @return The server trace data destination.
      */
     public String getTraceFilePath() {
         return this.traceDest;
