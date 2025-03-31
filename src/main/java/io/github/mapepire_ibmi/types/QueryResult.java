@@ -65,6 +65,7 @@ public class QueryResult<T> extends ServerResponse {
      * @param error          The error message, if any.
      * @param sqlRc          The SQL return code.
      * @param sqlState       The SQL state code.
+     * @param executionTime  The execution time in milliseconds.
      * @param metadata       The metadata about the query results.
      * @param isDone         Whether the query execution is complete.
      * @param hasResults     Whether there are results.
@@ -73,10 +74,10 @@ public class QueryResult<T> extends ServerResponse {
      * @param parameterCount The number of parameters in the prepared query.
      * @param outputParms    The output parameters returned from the query.
      */
-    public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState, QueryMetadata metadata,
-            boolean isDone, boolean hasResults, int updateCount, List<T> data, int parameterCount,
-            List<ParameterResult> outputParms) {
-        super(id, success, error, sqlRc, sqlState);
+    public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
+            QueryMetadata metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data,
+            int parameterCount, List<ParameterResult> outputParms) {
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.metadata = metadata;
         this.isDone = isDone;
         this.hasResults = hasResults;

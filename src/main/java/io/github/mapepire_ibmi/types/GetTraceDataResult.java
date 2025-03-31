@@ -33,12 +33,13 @@ public class GetTraceDataResult extends ServerResponse {
      * @param error           The error message, if any.
      * @param sqlRc           The SQL return code.
      * @param sqlState        The SQL state code.
+     * @param executionTime   The execution time in milliseconds.
      * @param traceData       The trace data.
      * @param jtOpenTraceData The JTOpen trace data.
      */
-    public GetTraceDataResult(String id, boolean success, String error, int sqlRc, String sqlState,
+    public GetTraceDataResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
             String traceData, String jtOpenTraceData) {
-        super(id, success, error, sqlRc, sqlState);
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.traceData = traceData;
         this.jtOpenTraceData = jtOpenTraceData;
     }

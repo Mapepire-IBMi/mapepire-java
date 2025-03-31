@@ -28,17 +28,18 @@ public class VersionCheckResult extends ServerResponse {
     /**
      * Construct a new VersionCheckResult instance.
      * 
-     * @param id        The unique identifier for the request.
-     * @param success   Whether the request was successful.
-     * @param error     The error message, if any.
-     * @param sqlRc     The SQL return code.
-     * @param sqlState  The SQL state code.
-     * @param buildDate The build date of the version.
-     * @param version   The version string.
+     * @param id            The unique identifier for the request.
+     * @param success       Whether the request was successful.
+     * @param error         The error message, if any.
+     * @param sqlRc         The SQL return code.
+     * @param sqlState      The SQL state code.
+     * @param executionTime The execution time in milliseconds.
+     * @param buildDate     The build date of the version.
+     * @param version       The version string.
      */
-    public VersionCheckResult(String id, boolean success, String error, int sqlRc, String sqlState,
+    public VersionCheckResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
             String buildDate, String version) {
-        super(id, success, error, sqlRc, sqlState);
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.buildDate = buildDate;
         this.version = version;
     }

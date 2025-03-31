@@ -45,15 +45,16 @@ public class SetConfigResult extends ServerResponse {
      * @param error            The error message, if any.
      * @param sqlRc            The SQL return code.
      * @param sqlState         The SQL state code.
+     * @param executionTime    The execution time in milliseconds.
      * @param traceDest        The server trace data destination.
      * @param traceLevel       The server trace level.
      * @param jtOpenTraceDest  The JTOpen trace data destination.
      * @param jtOpenTraceLevel The JTOpen trace level.
      */
-    public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState,
+    public SetConfigResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
             String traceDest, ServerTraceLevel traceLevel, String jtOpenTraceDest,
             ServerTraceLevel jtOpenTraceLevel) {
-        super(id, success, error, sqlRc, sqlState);
+        super(id, success, error, sqlRc, sqlState, executionTime);
         this.traceDest = traceDest;
         this.traceLevel = traceLevel;
         this.jtOpenTraceDest = jtOpenTraceDest;
