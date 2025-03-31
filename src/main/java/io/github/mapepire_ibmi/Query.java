@@ -138,6 +138,8 @@ public class Query {
     /**
      * Clean up queries that are done or are in error state from the global query
      * list.
+     * 
+     * @return A CompletableFuture that resolves when the cleanup is complete.
      */
     public synchronized CompletableFuture<Void> cleanup() throws Exception {
         List<CompletableFuture<Void>> futures = globalQueryList.stream()
@@ -254,6 +256,7 @@ public class Query {
     /**
      * Fetch more rows from the currently running query.
      * 
+     * @param <T> The type of data to be returned.
      * @return A CompletableFuture that resolves to the query result.
      */
     public <T> CompletableFuture<QueryResult<T>> fetchMore() throws Exception {
@@ -263,6 +266,7 @@ public class Query {
     /**
      * Fetch more rows from the currently running query.
      * 
+     * @param <T>         The type of data to be returned.
      * @param rowsToFetch The number of additional rows to fetch.
      * @return A CompletableFuture that resolves to the query result.
      */

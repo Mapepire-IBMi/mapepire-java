@@ -52,11 +52,12 @@ public class ServerResponse {
     /**
      * Construct a new ServerResponse instance.
      * 
-     * @param id       The unique identifier for the request.
-     * @param success  Whether the request was successful.
-     * @param error    The error message, if any.
-     * @param sqlRc    The SQL return code.
-     * @param sqlState The SQL state code.
+     * @param id            The unique identifier for the request.
+     * @param success       Whether the request was successful.
+     * @param error         The error message, if any.
+     * @param sqlRc         The SQL return code.
+     * @param sqlState      The SQL state code.
+     * @param executionTime The execution time in milliseconds.
      */
     public ServerResponse(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime) {
         this.id = id;
