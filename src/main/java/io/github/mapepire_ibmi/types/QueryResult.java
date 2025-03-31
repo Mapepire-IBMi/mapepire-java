@@ -74,7 +74,7 @@ public class QueryResult<T> extends ServerResponse {
      * @param parameterCount The number of parameters in the prepared query.
      * @param outputParms    The output parameters returned from the query.
      */
-    public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
+    public QueryResult(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime,
             QueryMetadata metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data,
             int parameterCount, List<ParameterResult> outputParms) {
         super(id, success, error, sqlRc, sqlState, executionTime);

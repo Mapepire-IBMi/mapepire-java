@@ -40,7 +40,7 @@ public class ServerResponse {
      * The execution time in milliseconds.
      */
     @JsonProperty("execution_time")
-    private int executionTime;
+    private long executionTime;
 
     /**
      * Construct a new ServerResponse instance.
@@ -58,7 +58,7 @@ public class ServerResponse {
      * @param sqlRc    The SQL return code.
      * @param sqlState The SQL state code.
      */
-    public ServerResponse(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime) {
+    public ServerResponse(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime) {
         this.id = id;
         this.success = success;
         this.error = error;
@@ -162,7 +162,7 @@ public class ServerResponse {
      * 
      * @return The execution time in milliseconds.
      */
-    public int getExecutionTime() {
+    public long getExecutionTime() {
         return executionTime;
     }
 
@@ -171,7 +171,7 @@ public class ServerResponse {
      * 
      * @param executionTime The execution time in milliseconds.
      */
-    public void setExecutionTime(int executionTime) {
+    public void setExecutionTime(long executionTime) {
         this.executionTime = executionTime;
     }
 }

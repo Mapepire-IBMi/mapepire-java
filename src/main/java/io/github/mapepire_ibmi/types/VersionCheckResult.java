@@ -37,7 +37,7 @@ public class VersionCheckResult extends ServerResponse {
      * @param buildDate     The build date of the version.
      * @param version       The version string.
      */
-    public VersionCheckResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
+    public VersionCheckResult(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime,
             String buildDate, String version) {
         super(id, success, error, sqlRc, sqlState, executionTime);
         this.buildDate = buildDate;

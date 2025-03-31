@@ -46,7 +46,7 @@ public class ExplainResults<T> extends QueryResult<T> {
      * @param vemetadata     The metadata about the query execution.
      * @param vedata         The data returned from the explain request.
      */
-    public ExplainResults(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
+    public ExplainResults(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime,
             QueryMetadata metadata, boolean isDone, boolean hasResults, int updateCount, List<T> data,
             int parameterCount, List<ParameterResult> outputParms, QueryMetadata vemetadata, Object vedata) {
         super(id, success, error, sqlRc, sqlState, executionTime, metadata, isDone, hasResults, updateCount, data,

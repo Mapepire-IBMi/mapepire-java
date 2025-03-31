@@ -35,7 +35,7 @@ public class CLCommandResult extends ServerResponse {
      *                      job.
      */
     public CLCommandResult(String id, boolean success, String error, int sqlRc, String sqlState,
-            int executionTime, List<JobLogEntry> joblog) {
+            long executionTime, List<JobLogEntry> joblog) {
         super(id, success, error, sqlRc, sqlState, executionTime);
         this.joblog = joblog;
     }

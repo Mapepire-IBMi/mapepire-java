@@ -30,7 +30,7 @@ public class ConnectionResult extends ServerResponse {
      * @param executionTime The execution time in milliseconds.
      * @param job           The unique job identifier for the connection.
      */
-    public ConnectionResult(String id, boolean success, String error, int sqlRc, String sqlState, int executionTime,
+    public ConnectionResult(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime,
             String job) {
         super(id, success, error, sqlRc, sqlState, executionTime);
         this.job = job;
