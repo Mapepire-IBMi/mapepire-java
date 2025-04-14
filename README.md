@@ -55,13 +55,17 @@ public final class App {
         // Initialize credentials
         DaemonServer creds = new DaemonServer("HOST", 8076, "USER", "PASSWORD");
 
-        // Establish connection
+        // Create a single job and connect
         SqlJob job = new SqlJob();
         job.connect(creds).get();
 
         // Initialize and execute query
         Query query = job.query("SELECT * FROM SAMPLE.DEPARTMENT");
         QueryResult<Object> result = query.execute(3).get();
+
+        // Close query and job
+        query.close().get();
+        job.close();
 
         // Convert to JSON string and output
         ObjectMapper mapper = new ObjectMapper();
@@ -81,68 +85,29 @@ Output:
   "error" : null,
   "sql_rc" : 0,
   "sql_state" : null,
+  "execution_time" : 174,
   "metadata" : {
     "column_count" : 5,
-    "columns" : [ {
-      "display_size" : 3,
-      "label" : "DEPTNO",
-      "name" : "DEPTNO",
-      "type" : "CHAR",
-      "precision" : 3,
-      "scale" : 0
-    }, {
-      "display_size" : 36,
-      "label" : "DEPTNAME",
-      "name" : "DEPTNAME",
-      "type" : "VARCHAR",
-      "precision" : 36,
-      "scale" : 0
-    }, {
-      "display_size" : 6,
-      "label" : "MGRNO",
-      "name" : "MGRNO",
-      "type" : "CHAR",
-      "precision" : 6,
-      "scale" : 0
-    }, {
-      "display_size" : 3,
-      "label" : "ADMRDEPT",
-      "name" : "ADMRDEPT",
-      "type" : "CHAR",
-      "precision" : 3,
-      "scale" : 0
-    }, {
-      "display_size" : 16,
-      "label" : "LOCATION",
-      "name" : "LOCATION",
-      "type" : "CHAR",
-      "precision" : 16,
-      "scale" : 0
-    } ],
-    "job" : "930740/QUSER/QZDASOINIT"
+    "columns" : [ 
+      { "display_size" : 3, "label" : "DEPTNO", "name" : "DEPTNO", "type" : "CHAR", "precision" : 3, "scale" : 0 },
+      { "display_size" : 36, "label" : "DEPTNAME", "name" : "DEPTNAME", "type" : "VARCHAR", "precision" : 36, "scale" : 0 },
+      { "display_size" : 6, "label" : "MGRNO", "name" : "MGRNO", "type" : "CHAR", "precision" : 6, "scale" : 0 },
+      { "display_size" : 3, "label" : "ADMRDEPT", "name" : "ADMRDEPT", "type" : "CHAR", "precision" : 3, "scale" : 0 },
+      { "display_size" : 16, "label" : "LOCATION", "name" : "LOCATION", "type" : "CHAR", "precision" : 16, "scale" : 0 }
+    ],
+    "job" : "058971/QUSER/QZDASOINIT",
+    "parameters" : null
   },
   "is_done" : false,
   "has_results" : true,
   "update_count" : -1,
-  "data" : [ {
-    "DEPTNO" : "A00",
-    "DEPTNAME" : "SPIFFY COMPUTER SERVICE DIV.",
-    "MGRNO" : "000010",
-    "ADMRDEPT" : "A00",
-    "LOCATION" : null
-  }, {
-    "DEPTNO" : "B01",
-    "DEPTNAME" : "PLANNING",
-    "MGRNO" : "000020",
-    "ADMRDEPT" : "A00",
-    "LOCATION" : null
-  }, {
-    "DEPTNO" : "C01",
-    "DEPTNAME" : "INFORMATION CENTER",
-    "MGRNO" : "000030",
-    "ADMRDEPT" : "A00",
-    "LOCATION" : null
-  } ]
+  "data" : [ 
+    { "DEPTNO" : "A00", "DEPTNAME" : "SPIFFY COMPUTER SERVICE DIV.", "MGRNO" : "000010", "ADMRDEPT" : "A00", "LOCATION" : null },
+    { "DEPTNO" : "B01", "DEPTNAME" : "PLANNING", "MGRNO" : "000020", "ADMRDEPT" : "A00", "LOCATION" : null },
+    { "DEPTNO" : "C01", "DEPTNAME" : "INFORMATION CENTER", "MGRNO" : "000030", "ADMRDEPT" : "A00", "LOCATION" : null }
+  ],
+  "parameter_count" : 0,
+  "output_parms" : null
 }
 ```
 
