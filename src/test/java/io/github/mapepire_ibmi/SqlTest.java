@@ -10,8 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.JDBCOptions;
@@ -22,6 +24,12 @@ import io.github.mapepire_ibmi.types.jdbcOptions.Naming;
 
 @SuppressWarnings("unchecked")
 class SqlTest extends MapepireTest {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
+        MapepireTest.setupCreds();
+        MapepireTest.setupTestSchema();
+    }
+
     @Test
     void simpleQuery() throws Exception {
         SqlJob job = new SqlJob();
@@ -95,6 +103,46 @@ class SqlTest extends MapepireTest {
         assertFalse(result.getIsDone());
         assertEquals(5, result.getData().size());
         assertNotNull(row.get(0));
+    }
+
+    @Test
+    void queryWithSpecialCharacters() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        Query queryA = job.query(
+                "CREATE OR REPLACE TABLE " + MapepireTest.getTestSchema()
+                        + ".GERMAN_TEXT ( id INTEGER NOT NULL, text VARCHAR(2000) CCSID 273 DEFAULT '' )");
+        QueryResult<Object> resultA = queryA.execute().get();
+
+        Query queryB = job.query(
+                "DELETE FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT");
+        QueryResult<Object> resultB = queryB.execute().get();
+
+        Query queryC = job.query("INSERT INTO " + MapepireTest.getTestSchema()
+                + ".GERMAN_TEXT (id, text) values(1, 'grün'), (2, 'weiß'), (3, 'Perücke')");
+        QueryResult<Object> resultC = queryC.execute().get();
+
+        Query queryD = job.query("SELECT * FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT");
+        QueryResult<Object> resultD = queryD.execute().get();
+
+        queryA.close().get();
+        queryB.close().get();
+        queryC.close().get();
+        queryD.close().get();
+        job.close();
+
+        String value1 = ((LinkedHashMap<String, String>) resultD.getData().get(0)).get("TEXT");
+        String value2 = ((LinkedHashMap<String, String>) resultD.getData().get(1)).get("TEXT");
+        String value3 = ((LinkedHashMap<String, String>) resultD.getData().get(2)).get("TEXT");
+
+        assertTrue(resultA.getSuccess());
+        assertTrue(resultB.getSuccess());
+        assertTrue(resultC.getSuccess());
+        assertTrue(resultD.getSuccess());
+        assertEquals("grün", value1);
+        assertEquals("weiß", value2);
+        assertEquals("Perücke", value3);
     }
 
     @Test

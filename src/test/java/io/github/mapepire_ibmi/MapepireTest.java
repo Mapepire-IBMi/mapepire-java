@@ -43,9 +43,14 @@ class MapepireTest {
             "TYn5iFqPQJhDoSiE8W0CeyAUXyhwWg7l9qiBaA+nI+t1Y307ld4T46x4\n" +
             "-----END CERTIFICATE-----";
     private static String configFile = "config.properties";
+    private static String testSchema = "MAPETEST";
 
     @BeforeAll
-    public static void setup() throws Exception {
+    public static void beforeAll() throws Exception {
+        setupCreds();
+    }
+
+    public static void setupCreds() throws Exception {
         Properties properties = new Properties();
         try (InputStream input = MapepireTest.class.getClassLoader().getResourceAsStream(configFile)) {
             if (input == null) {
@@ -70,6 +75,20 @@ class MapepireTest {
         port = Integer.parseInt(secrets.get(keys.get(3)));
     }
 
+    public static void setupTestSchema() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        Query query = job.query("CREATE SCHEMA " + testSchema);
+        try {
+            query.execute().get();
+        } catch (Exception e) {
+        } finally {
+            query.close().get();
+            job.close();
+        }
+    }
+
     public static DaemonServer getCreds() throws Exception {
         DaemonServer creds = new DaemonServer(host, port, user, password);
         String ca = Tls.getCertificate(creds).get();
@@ -79,5 +98,9 @@ class MapepireTest {
 
     public static DaemonServer getInvalidCreds() {
         return new DaemonServer(host, port, "FAKE_USER", "FAKE_PASSWORD", false, invalidCA);
+    }
+
+    public static String getTestSchema() {
+        return testSchema;
     }
 }
