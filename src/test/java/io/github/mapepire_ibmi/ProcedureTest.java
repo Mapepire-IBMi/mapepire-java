@@ -20,7 +20,7 @@ class ProcedureTest extends MapepireTest {
     @BeforeAll
     public static void beforeAll() throws Exception {
         MapepireTest.setupCreds();
-        MapepireTest.getTestSchema();
+        MapepireTest.setupTestSchema();
     }
 
     @Test
