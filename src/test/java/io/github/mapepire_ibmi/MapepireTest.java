@@ -43,7 +43,7 @@ class MapepireTest {
             "TYn5iFqPQJhDoSiE8W0CeyAUXyhwWg7l9qiBaA+nI+t1Y307ld4T46x4\n" +
             "-----END CERTIFICATE-----";
     private static String configFile = "config.properties";
-    private static String testSchema = "MAPEPIRE_TEST";
+    private static String testSchema = "MAPETEST";
 
     @BeforeAll
     public static void beforeAll() throws Exception {
