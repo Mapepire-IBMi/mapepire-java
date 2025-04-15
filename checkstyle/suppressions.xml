@@ -12,5 +12,6 @@
     <suppress files=".*" checks="IllegalCatch" />
     <suppress files=".*" checks="HideUtilityClassConstructor" />
     <suppress files=".*" checks="OperatorWrap" />
+    <suppress files=".*" checks="MethodLength" />
     <suppress files="Test.java$" checks="LineLength" />
 </suppressions>
