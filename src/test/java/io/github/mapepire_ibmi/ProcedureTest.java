@@ -17,23 +17,10 @@ import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 
 class ProcedureTest extends MapepireTest {
-    private static String testSchema = "mapepire_test";
-
     @BeforeAll
     public static void beforeAll() throws Exception {
-        MapepireTest.setup();
-
-        SqlJob job = new SqlJob();
-        job.connect(MapepireTest.getCreds()).get();
-
-        Query query = job.query("CREATE SCHEMA " + testSchema);
-        try {
-            query.execute().get();
-        } catch (Exception e) {
-        } finally {
-            query.close().get();
-            job.close();
-        }
+        MapepireTest.setupCreds();
+        MapepireTest.setupTestSchema();
     }
 
     @Test
@@ -42,7 +29,7 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST("
+                "CREATE OR REPLACE PROCEDURE " + MapepireTest.testSchema + ".PROCEDURE_TEST("
                         + "  IN P1 INTEGER,"
                         + "  INOUT P2 INTEGER,"
                         + "  OUT P3 INTEGER"
