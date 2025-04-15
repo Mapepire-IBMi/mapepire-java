@@ -20,7 +20,7 @@ class ProcedureTest extends MapepireTest {
     @BeforeAll
     public static void beforeAll() throws Exception {
         MapepireTest.setupCreds();
-        MapepireTest.setupTestSchema();
+        MapepireTest.getTestSchema();
     }
 
     @Test
@@ -29,7 +29,7 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + MapepireTest.testSchema + ".PROCEDURE_TEST("
+                "CREATE OR REPLACE PROCEDURE " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST("
                         + "  IN P1 INTEGER,"
                         + "  INOUT P2 INTEGER,"
                         + "  OUT P3 INTEGER"
@@ -43,7 +43,7 @@ class ProcedureTest extends MapepireTest {
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList(6, 4, 0));
-        Query queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST(?, ?, ?)", options);
+        Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 
@@ -83,7 +83,7 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST_CHAR("
+                "CREATE OR REPLACE PROCEDURE " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CHAR("
                         + "  IN P1 CHAR(5),"
                         + "  INOUT P2 CHAR(6),"
                         + "  OUT P3 CHAR(7)"
@@ -97,7 +97,7 @@ class ProcedureTest extends MapepireTest {
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", ""));
-        Query queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST_CHAR(?, ?, ?)", options);
+        Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 
@@ -143,7 +143,7 @@ class ProcedureTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         String testProc = String.join("\n", Arrays.asList(
-                "CREATE OR REPLACE PROCEDURE " + testSchema + ".PROCEDURE_TEST_VARCHAR("
+                "CREATE OR REPLACE PROCEDURE " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_VARCHAR("
                         + "  IN P1 VARCHAR(5),"
                         + "  INOUT P2 VARCHAR(6),"
                         + "  OUT P3 VARCHAR(7)"
@@ -157,7 +157,7 @@ class ProcedureTest extends MapepireTest {
         queryA.close().get();
 
         QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", "c"));
-        Query queryB = job.query("CALL " + testSchema + ".PROCEDURE_TEST_VARCHAR(?, ?, ?)", options);
+        Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_VARCHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
 

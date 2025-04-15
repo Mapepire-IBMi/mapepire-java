@@ -111,19 +111,19 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         Query queryA = job.query(
-                "CREATE OR REPLACE TABLE " + MapepireTest.testSchema
+                "CREATE OR REPLACE TABLE " + MapepireTest.getTestSchema()
                         + ".GERMAN_TEXT ( id INTEGER NOT NULL, text VARCHAR(2000) CCSID 273 DEFAULT '' )");
         QueryResult<Object> resultA = queryA.execute().get();
 
         Query queryB = job.query(
-                "DELETE FROM " + MapepireTest.testSchema + ".GERMAN_TEXT");
+                "DELETE FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT");
         QueryResult<Object> resultB = queryB.execute().get();
 
-        Query queryC = job.query("INSERT INTO " + MapepireTest.testSchema
+        Query queryC = job.query("INSERT INTO " + MapepireTest.getTestSchema()
                 + ".GERMAN_TEXT (id, text) values(1, 'grün'), (2, 'weiß'), (3, 'Perücke')");
         QueryResult<Object> resultC = queryC.execute().get();
 
-        Query queryD = job.query("SELECT * FROM " + MapepireTest.testSchema + ".GERMAN_TEXT");
+        Query queryD = job.query("SELECT * FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT");
         QueryResult<Object> resultD = queryD.execute().get();
 
         queryA.close().get();

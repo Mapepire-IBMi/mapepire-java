@@ -43,7 +43,7 @@ class MapepireTest {
             "TYn5iFqPQJhDoSiE8W0CeyAUXyhwWg7l9qiBaA+nI+t1Y307ld4T46x4\n" +
             "-----END CERTIFICATE-----";
     private static String configFile = "config.properties";
-    public static String testSchema = "MAPEPIRE_TEST";
+    private static String testSchema = "MAPEPIRE_TEST";
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -98,5 +98,9 @@ class MapepireTest {
 
     public static DaemonServer getInvalidCreds() {
         return new DaemonServer(host, port, "FAKE_USER", "FAKE_PASSWORD", false, invalidCA);
+    }
+
+    public static String getTestSchema() {
+        return testSchema;
     }
 }
