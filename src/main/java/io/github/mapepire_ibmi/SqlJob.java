@@ -3,6 +3,7 @@ package io.github.mapepire_ibmi;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -251,6 +252,12 @@ public class SqlJob {
                     System.out.println("Opened connection");
                 }
                 openedConnectionFuture.complete("Opened connection");
+            }
+
+            @Override
+            public void onMessage(ByteBuffer byteBuffer) {
+                String message = StandardCharsets.UTF_8.decode(byteBuffer).toString();
+                this.onMessage(message);
             }
 
             @Override
