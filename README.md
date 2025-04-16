@@ -24,7 +24,7 @@ Add `mapepire-sdk` as a dependency in your project and make sure to use the late
 <dependency>
     <groupId>io.github.mapepire-ibmi</groupId>
     <artifactId>mapepire-sdk</artifactId>
-    <version>0.1.1</version>  <!-- Use the latest version -->
+    <version>0.1.2</version>  <!-- Use the latest version -->
 </dependency>
 ```
 
