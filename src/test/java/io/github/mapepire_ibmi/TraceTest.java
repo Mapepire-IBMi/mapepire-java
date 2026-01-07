@@ -47,13 +47,18 @@ class TraceTest extends MapepireTest {
     }
 
     @Test
-    void errorServerTracing() throws Exception {
+    void serverTracingErrors() throws Exception {
         assertTraceData(invalidQuery, ServerTraceLevel.ERRORS, true);
     }
 
     @Test
-    void dataStreamServerTracing() throws Exception {
+    void serverTracingDatastream() throws Exception {
         assertTraceData(invalidQuery, ServerTraceLevel.DATASTREAM, true);
+    }
+
+    @Test
+    void serverTracingInputAndErrors() throws Exception {
+        assertTraceData(invalidQuery, ServerTraceLevel.INPUT_AND_ERRORS, true);
     }
 
     GetTraceDataResult assertTraceData(String sql, ServerTraceLevel level, boolean traceExists) throws Exception {
