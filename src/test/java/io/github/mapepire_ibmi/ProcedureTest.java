@@ -216,7 +216,7 @@ class ProcedureTest extends MapepireTest {
 
         StringBuilder sb = new StringBuilder("test".length() * 262144);
         for (int i = 0; i < 262144; i++) {
-                sb.append("test");
+            sb.append("test");
         }
         QueryOptions options = new QueryOptions(false, false, Arrays.asList(sb.toString(), ""));
         Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CLOB(?, ?)", options);
