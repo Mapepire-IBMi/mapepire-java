@@ -67,6 +67,12 @@ public class ColumnMetadata {
     private boolean writeable;
 
     /**
+     * The column's table name.
+     */
+    @JsonProperty("table")
+    private String table;
+    
+    /**
      * Construct a new ColumnMetadata instance.
      */
     public ColumnMetadata() {
@@ -281,4 +287,23 @@ public class ColumnMetadata {
     public void setWriteable(boolean writeable) {
         this.writeable = writeable;
     }
+
+    /**
+     * Get the column's table name.
+     *
+     * @return The column's table name.
+     */
+    public String getTable() {
+        return table;
+    }
+
+    /**
+     * Set the column's table name.
+     *
+     * @param table The column's table name.
+     */
+    public void setTable(String table) {
+        this.table = table;
+    }
 }
+
