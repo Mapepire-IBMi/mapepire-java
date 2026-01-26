@@ -67,6 +67,12 @@ public class ColumnMetadata {
     private boolean writeable;
 
     /**
+     * The column's table name.
+     */
+    @JsonProperty("table")
+    private String table;
+    
+    /**
      * Construct a new ColumnMetadata instance.
      */
     public ColumnMetadata() {
@@ -87,9 +93,10 @@ public class ColumnMetadata {
      * @param readOnly      Indicates whether the column is definitely not writable.
      * @param writeable     Indicates whether it is possible for a write on the
      *                      column to succeed.
+     * @param table         The column's table name.
      */
     public ColumnMetadata(int displaySize, String label, String name, String type, int precision, int scale,
-            boolean autoIncrement, int nullable, boolean readOnly, boolean writeable) {
+            boolean autoIncrement, int nullable, boolean readOnly, boolean writeable, String table) {
         this.displaySize = displaySize;
         this.label = label;
         this.name = name;
@@ -100,6 +107,7 @@ public class ColumnMetadata {
         this.nullable = nullable;
         this.readOnly = readOnly;
         this.writeable = writeable;
+        this.table = table;
     }
 
     /**
@@ -281,4 +289,24 @@ public class ColumnMetadata {
     public void setWriteable(boolean writeable) {
         this.writeable = writeable;
     }
+
+    /**
+     * Get the column's table name.
+     *
+     * @return The column's table name.
+     */
+    public String getTable() {
+        return table;
+    }
+
+    /**
+     * Set the column's table name.
+     *
+     * @param table The column's table name.
+     */
+    public void setTable(String table) {
+        this.table = table;
+    }
 }
+
+
