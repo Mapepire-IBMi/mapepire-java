@@ -93,9 +93,10 @@ public class ColumnMetadata {
      * @param readOnly      Indicates whether the column is definitely not writable.
      * @param writeable     Indicates whether it is possible for a write on the
      *                      column to succeed.
+     * @param table         The column's table name.
      */
     public ColumnMetadata(int displaySize, String label, String name, String type, int precision, int scale,
-            boolean autoIncrement, int nullable, boolean readOnly, boolean writeable) {
+            boolean autoIncrement, int nullable, boolean readOnly, boolean writeable, String table) {
         this.displaySize = displaySize;
         this.label = label;
         this.name = name;
@@ -106,6 +107,7 @@ public class ColumnMetadata {
         this.nullable = nullable;
         this.readOnly = readOnly;
         this.writeable = writeable;
+        this.table = table;
     }
 
     /**
@@ -306,4 +308,5 @@ public class ColumnMetadata {
         this.table = table;
     }
 }
+
 
