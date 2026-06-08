@@ -481,28 +481,9 @@ public class SqlJob {
                         + blobRef.getBlobUrl());
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
-                // Apply the same TLS trust settings as the WebSocket channel
-                if (!server.getRejectUnauthorized()) {
-                    // Accept any certificate — build a trust-all SSLContext
-                    javax.net.ssl.SSLContext trustAll = javax.net.ssl.SSLContext.getInstance("TLS");
-                    trustAll.init(null, new javax.net.ssl.TrustManager[]{
-                        new javax.net.ssl.X509TrustManager() {
-                            public X509Certificate[] getAcceptedIssuers() {
-                                return new X509Certificate[0];
-                            }
-
-                            public void checkClientTrusted(X509Certificate[] c, String a) {
-                                // trust all — no-op
-                            }
-
-                            public void checkServerTrusted(X509Certificate[] c, String a) {
-                                // trust all — no-op
-                            }
-                        }
-                    }, new SecureRandom());
-                    conn.setSSLSocketFactory(trustAll.getSocketFactory());
-                    conn.setHostnameVerifier((hostname, session) -> true);
-                } else if (server.getCa() != null) {
+                // Apply TLS trust settings for HTTPS blob fetches.
+                // Never disable certificate/hostname validation.
+                if (server.getCa() != null) {
                     // Use the same custom CA certificate as the WebSocket channel
                     InputStream caStream = new ByteArrayInputStream(
                             server.getCa().getBytes(StandardCharsets.UTF_8));
