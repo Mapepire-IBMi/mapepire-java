@@ -193,7 +193,6 @@ class BlobTest extends MapepireTest {
 
         URL url = new URL("https://" + creds.getHost() + ":" + creds.getPort() + path);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-        conn.setHostnameVerifier((hostname, session) -> true);
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
         conn.setConnectTimeout(10_000);
