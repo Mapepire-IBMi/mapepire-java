@@ -21,6 +21,7 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -280,6 +281,15 @@ public class SqlJob {
                     }
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
+                }
+            }
+
+            @Override
+            protected void onSetSSLParameters(SSLParameters sslParameters) {
+                if (db2Server.getRejectUnauthorized()) {
+                    super.onSetSSLParameters(sslParameters);
+                } else {
+                    sslParameters.setEndpointIdentificationAlgorithm(null);
                 }
             }
 
