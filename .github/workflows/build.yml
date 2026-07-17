@@ -31,12 +31,18 @@ jobs:
         cache: maven
 
     - name: Set Test Secrets
+      if: contains(env.IBMI_HOST, '.')
       run: |
         cp ${{ env.CONFIG_PROPERTIES_SAMPLE }} ${{ env.CONFIG_PROPERTIES }}
-        sed -i 's/^IBMI_HOST=/IBMI_HOST=${{ secrets.IBMI_HOST }}/' ${{ env.CONFIG_PROPERTIES }}
-        sed -i 's/^IBMI_USER=/IBMI_USER=${{ secrets.IBMI_USER }}/' ${{ env.CONFIG_PROPERTIES }}
-        sed -i 's/^IBMI_PASSWORD=/IBMI_PASSWORD=${{ secrets.IBMI_PASSWORD }}/' ${{ env.CONFIG_PROPERTIES }}
-        sed -i 's/^IBMI_PORT=/IBMI_PORT=${{ secrets.IBMI_PORT }}/' ${{ env.CONFIG_PROPERTIES }}
+        sed -i "s/^IBMI_HOST=/IBMI_HOST=$IBMI_HOST/" ${{ env.CONFIG_PROPERTIES }}
+        sed -i "s/^IBMI_USER=/IBMI_USER=$IBMI_USER/" ${{ env.CONFIG_PROPERTIES }}
+        sed -i "s/^IBMI_PASSWORD=/IBMI_PASSWORD=$IBMI_PASSWORD/" ${{ env.CONFIG_PROPERTIES }}
+        sed -i "s/^IBMI_PORT=/IBMI_PORT=$IBMI_PORT/" ${{ env.CONFIG_PROPERTIES }}
+      env:
+        IBMI_HOST: ${{ secrets.IBMI_HOST }}
+        IBMI_USER: ${{ secrets.IBMI_USER }}
+        IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+        IBMI_PORT: ${{ secrets.IBMI_PORT }}
 
     - name: Build with Maven
       run: mvn --batch-mode clean package --file pom.xml
