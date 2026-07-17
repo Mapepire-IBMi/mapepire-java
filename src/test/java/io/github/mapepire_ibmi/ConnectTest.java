@@ -45,13 +45,16 @@ class ConnectTest extends MapepireTest {
     @Test
     void rejectUnauthorizedFalseConnectsWhenCertificateDoesNotMatchHost() throws Exception {
         DaemonServer creds = MapepireTest.getCreds();
-        String mismatchedHost = InetAddress.getByName(creds.getHost()).getHostAddress();
-        Assumptions.assumeTrue(!mismatchedHost.equals(creds.getHost()));
+        String host = creds.getHost();
+        String mismatchedHost = InetAddress.getByName(host).getHostAddress();
+        Assumptions.assumeTrue(!mismatchedHost.equals(host));
+
         DaemonServer relaxedCreds = new DaemonServer(
                 mismatchedHost, creds.getPort(), creds.getUser(), creds.getPassword(), false);
         SqlJob job = new SqlJob();
         ConnectionResult result = job.connect(relaxedCreds).get();
         job.close();
+
         assertTrue(result.getSuccess());
         assertTrue(result.getJob().contains("QZDASOINIT"));
     }
@@ -59,8 +62,9 @@ class ConnectTest extends MapepireTest {
     @Test
     void rejectUnauthorizedTrueFailsWhenCertificateDoesNotMatchHost() throws Exception {
         DaemonServer creds = MapepireTest.getCreds();
-        String mismatchedHost = InetAddress.getByName(creds.getHost()).getHostAddress();
-        Assumptions.assumeTrue(!mismatchedHost.equals(creds.getHost()));
+        String host = creds.getHost();
+        String mismatchedHost = InetAddress.getByName(host).getHostAddress();
+        Assumptions.assumeTrue(!mismatchedHost.equals(host));
 
         DaemonServer strictCreds = new DaemonServer(
                 mismatchedHost, creds.getPort(), creds.getUser(), creds.getPassword(), true, creds.getCa());
@@ -73,7 +77,6 @@ class ConnectTest extends MapepireTest {
                 job.close();
             }
         });
-
         assertTrue(e.getCause().getMessage().contains("No subject alternative"));
     }
 
