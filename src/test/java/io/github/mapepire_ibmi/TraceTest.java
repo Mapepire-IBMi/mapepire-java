@@ -85,11 +85,14 @@ class TraceTest extends MapepireTest {
         assertTrue(result.getSuccess());
         assertNotNull(result.getId());
 
+        String traceData = result.getTraceData();
         if (traceExists) {
-            assertTrue(result.getTraceData()
-                    .contains("com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time));
+            // Retrieving the trace data was temporarily removed in the server (https://github.com/Mapepire-IBMi/mapepire-server/pull/120) so revert the below assertion once the functionality is restored
+            assertTrue(traceData.contains("<prohibited>"));
+            // assertTrue(traceData
+            //         .contains("com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time));
         } else {
-            assertFalse(result.getTraceData()
+            assertFalse(traceData
                     .contains("com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time));
         }
 
