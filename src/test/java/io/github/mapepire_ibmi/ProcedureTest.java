@@ -196,4 +196,66 @@ class ProcedureTest extends MapepireTest {
         assertArrayEquals(Arrays.asList(null, "", "ab").toArray(), outParmValues.toArray());
         assertArrayEquals(Arrays.asList(5, 6, 7).toArray(), outParmPrecisions.toArray());
     }
+
+    @Test
+    void clobParameters() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        String testProc = String.join("\n", Arrays.asList(
+                "CREATE OR REPLACE PROCEDURE " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CLOB("
+                        + "  IN IN1 CLOB(1M),"
+                        + "  OUT OUT1 CLOB(1M)"
+                        + ")"
+                        + "BEGIN"
+                        + "  SET OUT1 = UPPER(IN1);"
+                        + "END"));
+        Query queryA = job.query(testProc);
+        queryA.execute().get();
+        queryA.close().get();
+
+        StringBuilder sb = new StringBuilder("test".length() * 262144);
+        for (int i = 0; i < 262144; i++) {
+            sb.append("test");
+        }
+        QueryOptions options = new QueryOptions(false, false, Arrays.asList(sb.toString(), ""));
+        Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CLOB(?, ?)", options);
+        QueryResult<Object> result = queryB.execute().get();
+        queryB.close().get();
+
+        job.close();
+
+        assertNotNull(result.getMetadata().getParameters());
+        assertEquals(2, result.getMetadata().getParameters().size());
+        List<String> inParmNames = result.getMetadata().getParameters().stream().map(p -> p.getName())
+                .collect(Collectors.toList());
+        List<String> inParmTypes = result.getMetadata().getParameters().stream().map(p -> p.getType())
+                .collect(Collectors.toList());
+        List<Integer> inParmPrecisions = result.getMetadata().getParameters().stream().map(p -> p.getPrecision())
+                .collect(Collectors.toList());
+        assertArrayEquals(Arrays.asList("IN1", "OUT1").toArray(), inParmNames.toArray());
+        assertArrayEquals(Arrays.asList("CLOB", "CLOB").toArray(), inParmTypes.toArray());
+        assertArrayEquals(Arrays.asList(1048576, 1048576).toArray(), inParmPrecisions.toArray());
+
+        assertTrue(result.getSuccess());
+        assertFalse(result.getHasResults());
+        assertEquals(2, result.getParameterCount());
+        assertEquals(0, result.getUpdateCount());
+        assertEquals(0, result.getData().size());
+
+        assertNotNull(result.getOutputParms());
+        assertEquals(2, result.getOutputParms().size());
+        List<String> outParmNames = result.getOutputParms().stream().map(p -> p.getName())
+                .collect(Collectors.toList());
+        List<String> outParmTypes = result.getOutputParms().stream().map(p -> p.getType())
+                .collect(Collectors.toList());
+        List<Object> outParmValues = result.getOutputParms().stream().map(p -> p.getValue())
+                .collect(Collectors.toList());
+        List<Object> outParmPrecisions = result.getOutputParms().stream().map(p -> p.getPrecision())
+                .collect(Collectors.toList());
+        assertArrayEquals(Arrays.asList("IN1", "OUT1").toArray(), outParmNames.toArray());
+        assertArrayEquals(Arrays.asList("CLOB", "CLOB").toArray(), outParmTypes.toArray());
+        assertArrayEquals(Arrays.asList(null, sb.toString().toUpperCase()).toArray(), outParmValues.toArray());
+        assertArrayEquals(Arrays.asList(1048576, 1048576).toArray(), outParmPrecisions.toArray());
+    }
 }
