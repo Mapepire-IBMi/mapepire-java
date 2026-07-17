@@ -198,7 +198,7 @@ class ProcedureTest extends MapepireTest {
     }
 
     @Test
-    void clobParameters() throws Exception {
+    void clobParameters() throws Exception { 
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
