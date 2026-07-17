@@ -8,9 +8,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: write
-
 env:
   CONFIG_PROPERTIES: ./src/test/resources/config.properties
   CONFIG_PROPERTIES_SAMPLE: ./src/test/resources/config.properties.sample
@@ -58,4 +55,5 @@ jobs:
         fi
 
     - name: Update Dependency Graph
+      if: github.ref == 'refs/heads/main'
       uses: advanced-security/maven-dependency-submission-action@v4
