@@ -22,7 +22,12 @@ public enum ServerTraceLevel {
     /**
      * All trace data is collected including datastream.
      */
-    DATASTREAM("DATASTREAM");
+    DATASTREAM("DATASTREAM"),
+
+    /**
+     * Input data stream and errors.
+     */
+    INPUT_AND_ERRORS("INPUT_AND_ERRORS");
 
     /**
      * The server trace level.
