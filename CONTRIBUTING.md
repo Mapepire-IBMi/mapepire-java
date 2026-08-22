@@ -46,12 +46,16 @@ If you would like to contribute code to the project, follow the steps below to g
 
 [Visual Studio Code](https://code.visualstudio.com/) is the recommended code editor to be used as it is lightweight and has several extensions which can be installed to enhacene the developer experience.
 
-For this project, the following extensions should be installed:
+The following extensions should be installed:
 
 - [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
-- [GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions)
+- [Checkstyle for Java](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle)
+
+The following extensions are recommended:
+
 - [TODO Highlight](https://marketplace.visualstudio.com/items?itemName=wayou.vscode-todo-highlight)
 - [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+- [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github)
 
 ### Getting Started
 
