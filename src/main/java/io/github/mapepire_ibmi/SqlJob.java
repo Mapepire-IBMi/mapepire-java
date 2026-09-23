@@ -39,6 +39,7 @@ import io.github.mapepire_ibmi.types.ConnectionResult;
 import io.github.mapepire_ibmi.types.DaemonServer;
 import io.github.mapepire_ibmi.types.ExplainResults;
 import io.github.mapepire_ibmi.types.ExplainType;
+import io.github.mapepire_ibmi.types.GetClDocResult;
 import io.github.mapepire_ibmi.types.GetTraceDataResult;
 import io.github.mapepire_ibmi.types.JDBCOptions;
 import io.github.mapepire_ibmi.types.JobLogEntry;
@@ -718,6 +719,44 @@ public class SqlJob {
                                     ? setConfigResult.getTraceDest()
                                     : null;
                     return setConfigResult;
+                });
+    }
+
+    /**
+     * Get HTML and UIM documentation for a CL command.
+     *
+     * @param path The fully qualified IFS path of the command object (e.g.
+     *             {@code /QSYS.LIB/CRTLIB.CMD}).
+     * @return A CompletableFuture that resolves to the CL command documentation
+     *         result.
+     */
+    public CompletableFuture<GetClDocResult> getClDoc(String path) throws Exception {
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+        ObjectNode clDocRequest = objectMapper.createObjectNode();
+        clDocRequest.put("id", SqlJob.getNewUniqueId());
+        clDocRequest.put("type", "getcldoc");
+        clDocRequest.put("path", path);
+
+        return this.send(objectMapper.writeValueAsString(clDocRequest))
+                .thenApply(result -> {
+                    GetClDocResult clDocResult;
+                    try {
+                        clDocResult = objectMapper.readValue(result, GetClDocResult.class);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
+
+                    if (!clDocResult.getSuccess()) {
+                        String error = clDocResult.getError();
+                        if (error != null) {
+                            throw new CompletionException(new SQLException(error, clDocResult.getSqlState()));
+                        } else {
+                            throw new CompletionException(
+                                    new UnknownServerException("Failed to get CL command documentation"));
+                        }
+                    }
+
+                    return clDocResult;
                 });
     }
 
