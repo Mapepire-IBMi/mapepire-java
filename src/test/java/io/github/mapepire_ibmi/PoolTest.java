@@ -1,6 +1,7 @@
 package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -19,6 +21,7 @@ import io.github.mapepire_ibmi.types.JobStatus;
 import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 
 @Timeout(100)
 @SuppressWarnings("unchecked")
@@ -57,6 +60,33 @@ class PoolTest extends MapepireTest {
         assertEquals(15, jobNames2.size());
         assertTrue(pool.getActiveJobCount() >= 3);
         assertTrue(pool.getActiveJobCount() <= 5);
+
+        pool.end();
+    }
+
+    @Test
+    void poolJobsUseRequestTimeout() throws Exception {
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 5, 1);
+        options.setRequestTimeout(30000);
+        Pool pool = new Pool(options);
+        pool.init().get();
+
+        assertEquals(30000, pool.getJob().getRequestTimeout());
+
+        pool.end();
+    }
+
+    @Test
+    void poolInitTimesOut() throws Exception {
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 5, 2);
+        options.setRequestTimeout(1);
+        Pool pool = new Pool(options);
+
+        ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> {
+            pool.init().get();
+        });
+        assertInstanceOf(RequestTimeoutException.class, e.getCause());
+        assertEquals(0, pool.getActiveJobCount());
 
         pool.end();
     }
