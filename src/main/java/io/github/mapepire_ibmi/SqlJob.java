@@ -2,6 +2,7 @@ package io.github.mapepire_ibmi;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -437,7 +438,9 @@ public class SqlJob {
                 timeoutTask.cancel(false);
             }
             responseMap.remove(id);
-            this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
+            if (this.status == JobStatus.Ready || this.status == JobStatus.Busy) {
+                this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
+            }
         });
     }
 
@@ -931,12 +934,20 @@ public class SqlJob {
     }
 
     /**
-     * Close the socket and set the status to be ended.
+     * Close the socket and set the status to be ended. Any pending requests in the
+     * response map are failed immediately so callers do not hang forever.
      */
     private void dispose() {
+        this.status = JobStatus.Ended;
         if (this.socket != null) {
             this.socket.close();
         }
-        this.status = JobStatus.Ended;
+        if (!this.responseMap.isEmpty()) {
+            Exception cause = new SocketException("Connection closed");
+            for (CompletableFuture<String> pending : this.responseMap.values()) {
+                pending.completeExceptionally(cause);
+            }
+            this.responseMap.clear();
+        }
     }
 }

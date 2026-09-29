@@ -15,6 +15,7 @@ import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.QueryState;
 import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 
 /**
@@ -188,6 +189,8 @@ public class Query {
                 throw new ClientException("Statement has already been run");
             case RUN_DONE:
                 throw new ClientException("Statement has already been fully run");
+            case TIMED_OUT:
+                throw new ClientException("Statement cannot be used after a request timed out");
             default:
         }
 
@@ -213,6 +216,14 @@ public class Query {
         this.rowsToFetch = rowsToFetch;
 
         return job.send(objectMapper.writeValueAsString(executeRequest))
+                .whenComplete((result, throwable) -> {
+                    if (throwable != null) {
+                        Throwable cause = throwable instanceof CompletionException ? throwable.getCause() : throwable;
+                        if (cause instanceof RequestTimeoutException) {
+                            this.state = QueryState.TIMED_OUT;
+                        }
+                    }
+                })
                 .thenApply(result -> {
                     QueryResult<T> queryResult;
                     try {
@@ -280,6 +291,8 @@ public class Query {
                 throw new ClientException("Statement has not yet been run");
             case RUN_DONE:
                 throw new ClientException("Statement has already been fully run");
+            case TIMED_OUT:
+                throw new ClientException("Statement cannot be used after a request timed out");
             default:
         }
 
@@ -294,6 +307,14 @@ public class Query {
         this.rowsToFetch = rowsToFetch;
 
         return job.send(objectMapper.writeValueAsString(fetchMoreRequest))
+                .whenComplete((result, throwable) -> {
+                    if (throwable != null) {
+                        Throwable cause = throwable instanceof CompletionException ? throwable.getCause() : throwable;
+                        if (cause instanceof RequestTimeoutException) {
+                            this.state = QueryState.TIMED_OUT;
+                        }
+                    }
+                })
                 .thenApply(result -> {
                     QueryResult<T> queryResult;
                     try {

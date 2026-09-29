@@ -23,7 +23,13 @@ import org.junit.jupiter.api.Timeout;
 import io.github.mapepire_ibmi.types.JobStatus;
 import io.github.mapepire_ibmi.types.PoolOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
+import io.github.mapepire_ibmi.types.QueryState;
+import io.github.mapepire_ibmi.types.exceptions.ClientException;
 import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
+
+import static org.mockito.Mockito.doAnswer;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Tests for client-side request timeouts. These do not require a Mapepire
@@ -153,5 +159,66 @@ class TimeoutTest {
 
         assertThrows(WebsocketNotConnectedException.class, () -> job.send(request("failed1")));
         assertEquals(0, job.getRunningCount());
+    }
+
+    @Test
+    void executeTimeoutMarksQueryTimedOut() throws Exception {
+        job.setRequestTimeout(100);
+        Query query = job.query("SELECT 1 FROM SYSIBM.SYSDUMMY1");
+
+        CompletableFuture<QueryResult<Object>> future = query.execute();
+        assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
+
+        assertEquals(QueryState.TIMED_OUT, query.getState());
+    }
+
+    @Test
+    void executeAfterTimeoutThrows() throws Exception {
+        job.setRequestTimeout(100);
+        Query query = job.query("SELECT 1 FROM SYSIBM.SYSDUMMY1");
+
+        CompletableFuture<QueryResult<Object>> future = query.execute();
+        assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS));
+
+        assertEquals(QueryState.TIMED_OUT, query.getState());
+        ClientException ex = assertThrows(ClientException.class, () -> query.execute());
+        assertTrue(ex.getMessage().contains("timed out"));
+    }
+
+    @Test
+    void fetchMoreTimeoutMarksQueryTimedOut() throws Exception {
+        // Capture the request ID that execute() actually uses so we can feed back a
+        // realistic response without guessing the ID counter value.
+        AtomicReference<String> capturedId = new AtomicReference<>();
+        doAnswer(invocation -> {
+            String sent = (String) invocation.getArguments()[0];
+            // strip trailing newline added by send()
+            String json = sent.trim();
+            // extract "id":"..." from the raw JSON without a full parse
+            int start = json.indexOf("\"id\":\"") + 6;
+            int end = json.indexOf("\"", start);
+            capturedId.set(json.substring(start, end));
+            return null;
+        }).when(socket).send(anyString());
+
+        job.setRequestTimeout(500);
+        Query query = job.query("SELECT 1 FROM SYSIBM.SYSDUMMY1");
+
+        // execute() — reply immediately so the query reaches RUN_MORE_DATA_AVAILABLE
+        CompletableFuture<QueryResult<Object>> executeFuture = query.execute();
+        String executeId = capturedId.get();
+        job.handleMessage(
+                "{\"id\":\"" + executeId + "\",\"success\":true,\"is_done\":false,\"data\":[],\"has_results\":true}");
+        executeFuture.get(5, TimeUnit.SECONDS);
+        assertEquals(QueryState.RUN_MORE_DATA_AVAILABLE, query.getState());
+
+        // Now let fetchMore time out
+        job.setRequestTimeout(100);
+        CompletableFuture<QueryResult<Object>> fetchFuture = query.fetchMore();
+        assertThrows(ExecutionException.class, () -> fetchFuture.get(5, TimeUnit.SECONDS));
+
+        assertEquals(QueryState.TIMED_OUT, query.getState());
+        ClientException ex = assertThrows(ClientException.class, () -> query.fetchMore());
+        assertTrue(ex.getMessage().contains("timed out"));
     }
 }
