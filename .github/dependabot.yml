@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # Checkstyle 10+ requires Java 11; CI builds on JDK 8
+      - dependency-name: "com.puppycrawl.tools:checkstyle"
+        versions: [">=10"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
