@@ -3,10 +3,14 @@ package io.github.mapepire_ibmi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.mapepire_ibmi.types.GetClDocResult;
 import io.github.mapepire_ibmi.types.QueryResult;
 
 class CLTest extends MapepireTest {
@@ -39,5 +43,37 @@ class CLTest extends MapepireTest {
         assertEquals(-443, result.getSqlRc());
         assertEquals("38501", result.getSqlState());
         assertEquals("[CPF0006] Errors occurred in command.", result.getError());
+    }
+
+    @Test
+    void validCLCommandDocumentation() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        GetClDocResult result = job.getClDoc("/QSYS.LIB/CRTLIB.CMD").get();
+        job.close();
+
+        assertTrue(result.getSuccess());
+        assertTrue(result.getHtml().contains("<title>Create Library  (CRTLIB)</title>"));
+        assertTrue(result.getUim().contains("Help for command CRTLIB"));
+    }
+
+    @Test
+    void invalidCLCommandDocumentation() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        SQLException e = assertThrowsExactly(SQLException.class, () -> {
+            try {
+                job.getClDoc("/QSYS.LIB/INVALID.CMD").get();
+            } catch (Exception ex) {
+                throw ex.getCause();
+            } finally {
+                job.close();
+            }
+        });
+
+        assertTrue(e.getMessage()
+                .contains("CPF9801 Object INVALID in library QSYS not found."));
     }
 }
