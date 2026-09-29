@@ -2,6 +2,7 @@ package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import io.github.mapepire_ibmi.types.JDBCOptions;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.exceptions.ClientException;
+import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Naming;
 
 @SuppressWarnings("unchecked")
@@ -28,6 +31,25 @@ class SqlTest extends MapepireTest {
     public static void beforeAll() throws Exception {
         MapepireTest.setupCreds();
         MapepireTest.setupTestSchema();
+    }
+
+    @Test
+    void queryTimesOut() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        job.setRequestTimeout(1);
+        ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> {
+            job.query("SELECT * FROM SAMPLE.DEPARTMENT").execute().get();
+        });
+        assertInstanceOf(RequestTimeoutException.class, e.getCause());
+        assertEquals(0, job.getRunningCount());
+
+        job.setRequestTimeout(0);
+        QueryResult<Object> result = job.query("SELECT * FROM SAMPLE.DEPARTMENT").execute().get();
+        job.close();
+
+        assertTrue(result.getSuccess());
     }
 
     @Test

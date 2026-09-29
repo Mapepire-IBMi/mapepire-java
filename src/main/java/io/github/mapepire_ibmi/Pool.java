@@ -121,8 +121,13 @@ public class Pool {
             cleanup();
         }
 
-        SqlJob newSqlJob = options.getExistingJob() != null ? options.getExistingJob()
-                : new SqlJob(this.options.getOpts());
+        SqlJob newSqlJob;
+        if (options.getExistingJob() != null) {
+            newSqlJob = options.getExistingJob();
+        } else {
+            newSqlJob = new SqlJob(this.options.getOpts());
+            newSqlJob.setRequestTimeout(this.options.getRequestTimeout());
+        }
 
         if (!options.getPoolIgnore()) {
             this.jobs.add(newSqlJob);

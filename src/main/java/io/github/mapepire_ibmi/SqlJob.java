@@ -2,6 +2,7 @@ package io.github.mapepire_ibmi;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.SocketException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
@@ -51,6 +56,7 @@ import io.github.mapepire_ibmi.types.ServerTraceLevel;
 import io.github.mapepire_ibmi.types.SetConfigResult;
 import io.github.mapepire_ibmi.types.TransactionEndType;
 import io.github.mapepire_ibmi.types.VersionCheckResult;
+import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 import io.github.mapepire_ibmi.types.exceptions.UnknownServerException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Option;
 import io.github.mapepire_ibmi.types.jdbcOptions.TransactionIsolation;
@@ -63,6 +69,11 @@ public class SqlJob {
      * A counter to generate unique IDs for each SQLJob instance.
      */
     private static int uniqueIdCounter;
+
+    /**
+     * A shared scheduler used to time out pending requests.
+     */
+    private static final ScheduledThreadPoolExecutor TIMEOUT_SCHEDULER = createTimeoutScheduler();
 
     /**
      * The socket used to communicate with the Mapepire Server component.
@@ -103,7 +114,13 @@ public class SqlJob {
     /**
      * A map to handle asynchronous socket communication when sending and recieving.
      */
-    private final Map<String, CompletableFuture<String>> responseMap = new HashMap<>();
+    private final Map<String, CompletableFuture<String>> responseMap = new ConcurrentHashMap<>();
+
+    /**
+     * The default timeout in milliseconds for requests sent to the server. A value
+     * of 0 means requests never time out.
+     */
+    private long requestTimeout;
 
     /**
      * TODO: Currently unused but we will inevitably need a unique ID assigned to
@@ -144,6 +161,45 @@ public class SqlJob {
      */
     public static synchronized String getNewUniqueId(String prefix) {
         return prefix + (++uniqueIdCounter);
+    }
+
+    /**
+     * Create the scheduler used to time out pending requests.
+     *
+     * @return The scheduler.
+     */
+    private static ScheduledThreadPoolExecutor createTimeoutScheduler() {
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1, runnable -> {
+            Thread thread = new Thread(runnable, "mapepire-request-timeout");
+            thread.setDaemon(true);
+            return thread;
+        });
+        scheduler.setRemoveOnCancelPolicy(true);
+        return scheduler;
+    }
+
+    /**
+     * Get the default timeout for requests sent to the server.
+     *
+     * @return The timeout in milliseconds, or 0 if requests never time out.
+     */
+    public long getRequestTimeout() {
+        return this.requestTimeout;
+    }
+
+    /**
+     * Set the default timeout for requests sent to the server. A request that does
+     * not receive a response in time completes exceptionally with a
+     * {@link RequestTimeoutException}. This applies to every request sent by this
+     * job, including connecting, executing queries, and fetching more rows.
+     *
+     * @param timeoutMillis The timeout in milliseconds, or 0 to never time out.
+     */
+    public void setRequestTimeout(long timeoutMillis) {
+        if (timeoutMillis < 0) {
+            throw new IllegalArgumentException("Request timeout must not be negative");
+        }
+        this.requestTimeout = timeoutMillis;
     }
 
     /**
@@ -264,25 +320,7 @@ public class SqlJob {
 
             @Override
             public void onMessage(String message) {
-                if (isTracingChannelData) {
-                    System.out.println("\n<< " + message);
-                }
-
-                try {
-                    ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-                    Map<String, Object> response = objectMapper.readValue(message, Map.class);
-                    String id = (String) response.get("id");
-
-                    CompletableFuture<String> future = responseMap.get(id);
-                    if (future != null) {
-                        Thread thread = new Thread(() -> {
-                            future.complete(message);
-                        });
-                        thread.start();
-                    }
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                handleMessage(message);
             }
 
             @Override
@@ -319,12 +357,58 @@ public class SqlJob {
     }
 
     /**
+     * Complete the pending request that a message from the server responds to.
+     * Messages for requests that are no longer pending (for example, because they
+     * timed out) are ignored.
+     *
+     * @param message The message received from the server.
+     */
+    void handleMessage(String message) {
+        if (isTracingChannelData) {
+            System.out.println("\n<< " + message);
+        }
+
+        try {
+            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+            Map<String, Object> response = objectMapper.readValue(message, Map.class);
+            String id = (String) response.get("id");
+
+            CompletableFuture<String> future = id != null ? responseMap.get(id) : null;
+            if (future != null) {
+                Thread thread = new Thread(() -> {
+                    future.complete(message);
+                });
+                thread.start();
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Send a message to the connected database server.
      *
      * @param content The message content to send.
      * @return A CompletableFuture that resolves to the server's response.
      */
     public CompletableFuture<String> send(String content) throws Exception {
+        return this.send(content, this.requestTimeout);
+    }
+
+    /**
+     * Send a message to the connected database server with a specific timeout. If
+     * no response is received in time, the returned CompletableFuture completes
+     * exceptionally with a {@link RequestTimeoutException}.
+     *
+     * @param content       The message content to send.
+     * @param timeoutMillis The timeout in milliseconds, or 0 to never time out.
+     * @return A CompletableFuture that resolves to the server's response.
+     */
+    public CompletableFuture<String> send(String content, long timeoutMillis) throws Exception {
+        if (timeoutMillis < 0) {
+            throw new IllegalArgumentException("Request timeout must not be negative");
+        }
+
         if (this.isTracingChannelData) {
             System.out.println("\n>> " + content);
         }
@@ -336,12 +420,28 @@ public class SqlJob {
         CompletableFuture<String> future = new CompletableFuture<>();
         responseMap.put(id, future);
 
-        this.socket.send(content + "\n");
+        try {
+            this.socket.send(content + "\n");
+        } catch (Exception e) {
+            responseMap.remove(id);
+            throw e;
+        }
         this.status = JobStatus.Busy;
 
+        ScheduledFuture<?> timeoutTask = timeoutMillis > 0
+                ? TIMEOUT_SCHEDULER.schedule(
+                        () -> future.completeExceptionally(new RequestTimeoutException(id, timeoutMillis)),
+                        timeoutMillis, TimeUnit.MILLISECONDS)
+                : null;
+
         return future.whenComplete((message, throwable) -> {
+            if (timeoutTask != null) {
+                timeoutTask.cancel(false);
+            }
             responseMap.remove(id);
-            this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
+            if (this.status == JobStatus.Ready || this.status == JobStatus.Busy) {
+                this.status = this.getRunningCount() == 0 ? JobStatus.Ready : JobStatus.Busy;
+            }
         });
     }
 
@@ -437,6 +537,13 @@ public class SqlJob {
                     this.isTracingChannelData = false;
 
                     return connectResult;
+                })
+                .whenComplete((connectResult, error) -> {
+                    // A connect that failed without a server response (such as a timeout)
+                    // must not leave the job looking usable
+                    if (error != null && this.status != JobStatus.NotStarted) {
+                        this.dispose();
+                    }
                 });
     }
 
@@ -866,12 +973,20 @@ public class SqlJob {
     }
 
     /**
-     * Close the socket and set the status to be ended.
+     * Close the socket and set the status to be ended. Any pending requests in the
+     * response map are failed immediately so callers do not hang forever.
      */
     private void dispose() {
+        this.status = JobStatus.Ended;
         if (this.socket != null) {
             this.socket.close();
         }
-        this.status = JobStatus.Ended;
+        if (!this.responseMap.isEmpty()) {
+            Exception cause = new SocketException("Connection closed");
+            for (CompletableFuture<String> pending : this.responseMap.values()) {
+                pending.completeExceptionally(cause);
+            }
+            this.responseMap.clear();
+        }
     }
 }

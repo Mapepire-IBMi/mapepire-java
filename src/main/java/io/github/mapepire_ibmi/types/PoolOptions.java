@@ -28,6 +28,12 @@ public class PoolOptions {
     private int startingSize;
 
     /**
+     * The default timeout in milliseconds for requests sent by jobs created by
+     * the pool. A value of 0 means requests never time out.
+     */
+    private long requestTimeout;
+
+    /**
      * Construct a new PoolOptions instance.
      * 
      * @param creds        The credentials required to connect to the daemon server.
@@ -129,5 +135,28 @@ public class PoolOptions {
      */
     public void setStartingSize(int startingSize) {
         this.startingSize = startingSize;
+    }
+
+    /**
+     * Get the default timeout for requests sent by jobs created by the pool.
+     *
+     * @return The timeout in milliseconds, or 0 if requests never time out.
+     */
+    public long getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    /**
+     * Set the default timeout for requests sent by jobs created by the pool,
+     * including connecting. Jobs added to the pool with
+     * {@link PoolAddOptions#setExistingJob} keep their own timeout.
+     *
+     * @param requestTimeout The timeout in milliseconds, or 0 to never time out.
+     */
+    public void setRequestTimeout(long requestTimeout) {
+        if (requestTimeout < 0) {
+            throw new IllegalArgumentException("Request timeout must not be negative");
+        }
+        this.requestTimeout = requestTimeout;
     }
 }

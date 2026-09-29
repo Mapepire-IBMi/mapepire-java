@@ -24,7 +24,14 @@ public enum QueryState {
     /**
      * Indicates that an error occurred during the query execution.
      */
-    ERROR(4);
+    ERROR(4),
+
+    /**
+     * Indicates that a request for this query timed out. The server may have
+     * processed the request anyway, so the query state is now unknown and the
+     * query cannot be used further.
+     */
+    TIMED_OUT(5);
 
     /**
      * The query state.

@@ -1,5 +1,7 @@
 package io.github.mapepire_ibmi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.ConnectionResult;
 import io.github.mapepire_ibmi.types.DaemonServer;
+import io.github.mapepire_ibmi.types.JobStatus;
+import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 
 class ConnectTest extends MapepireTest {
     @Test
@@ -78,6 +82,20 @@ class ConnectTest extends MapepireTest {
             }
         });
         assertTrue(e.getCause().getMessage().contains("No subject alternative"));
+    }
+
+    @Test
+    void connectTimesOut() throws Exception {
+        DaemonServer creds = MapepireTest.getCreds();
+        SqlJob job = new SqlJob();
+        job.setRequestTimeout(1);
+
+        ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> {
+            job.connect(creds).get();
+        });
+        assertInstanceOf(RequestTimeoutException.class, e.getCause());
+        assertEquals(0, job.getRunningCount());
+        assertNotEquals(JobStatus.Ready, job.getStatus());
     }
 
     @Test
