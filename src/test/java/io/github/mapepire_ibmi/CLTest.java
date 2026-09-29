@@ -67,8 +67,9 @@ class CLTest extends MapepireTest {
             try {
                 job.getClDoc("/QSYS.LIB/INVALID.CMD").get();
             } catch (Exception ex) {
-                job.close();
                 throw ex.getCause();
+            } finally {
+                job.close();
             }
         });
 
