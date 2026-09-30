@@ -145,7 +145,7 @@ class SqlTest extends MapepireTest {
                 + ".GERMAN_TEXT (id, text) values(1, 'grün'), (2, 'weiß'), (3, 'Perücke')");
         QueryResult<Object> resultC = queryC.execute().get();
 
-        Query queryD = job.query("SELECT * FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT");
+        Query queryD = job.query("SELECT * FROM " + MapepireTest.getTestSchema() + ".GERMAN_TEXT ORDER BY id");
         QueryResult<Object> resultD = queryD.execute().get();
 
         queryA.close().get();
