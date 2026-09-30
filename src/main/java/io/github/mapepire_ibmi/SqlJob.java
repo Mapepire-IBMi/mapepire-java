@@ -590,11 +590,13 @@ public class SqlJob {
     public <T> CompletableFuture<QueryResult<T>> execute(String sql, QueryOptions opts) throws Exception {
         Query query = query(sql, opts);
         return query.<T>execute()
-                .thenCompose(queryResult -> {
+                .whenComplete((queryResult, throwable) -> {
                     try {
-                        return query.close().thenApply(v -> queryResult);
+                        query.close();
                     } catch (Exception e) {
-                        throw new CompletionException(e);
+                        if (throwable == null) {
+                            throw new CompletionException(e);
+                        }
                     }
                 }).thenApply(queryResult -> {
                     if (!queryResult.getSuccess()) {

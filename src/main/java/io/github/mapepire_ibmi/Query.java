@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.github.mapepire_ibmi.types.JobStatus;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.QueryState;
@@ -73,6 +74,11 @@ public class Query {
     private boolean isTerseResults;
 
     /**
+     * Whether a close request has already been sent for this query.
+     */
+    private boolean isClosed;
+
+    /**
      * Construct a new Query instance.
      * 
      * @param job   The SQL job that this query will be executed in.
@@ -94,6 +100,10 @@ public class Query {
         globalQueryList.add(query);
     }
 
+    private static synchronized void removeQuery(Query query) {
+        globalQueryList.remove(query);
+    }
+
     /**
      * Get a Query instance by its correlation ID.
      * 
@@ -106,7 +116,7 @@ public class Query {
         } else {
             return Query.globalQueryList
                     .stream()
-                    .filter(query -> query.correlationId.equals(id))
+                    .filter(query -> id.equals(query.correlationId))
                     .findFirst()
                     .orElse(null);
         }
@@ -142,9 +152,15 @@ public class Query {
      * 
      * @return A CompletableFuture that resolves when the cleanup is complete.
      */
-    public synchronized CompletableFuture<Void> cleanup() throws Exception {
-        List<CompletableFuture<Void>> futures = globalQueryList.stream()
-                .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
+    public CompletableFuture<Void> cleanup() throws Exception {
+        List<Query> toClose;
+        synchronized (Query.class) {
+            toClose = globalQueryList.stream()
+                    .filter(query -> query.getState() == QueryState.RUN_DONE || query.getState() == QueryState.ERROR)
+                    .collect(Collectors.toList());
+        }
+
+        List<CompletableFuture<Void>> futures = toClose.stream()
                 .map(query -> CompletableFuture.runAsync(() -> {
                     try {
                         query.close();
@@ -154,12 +170,7 @@ public class Query {
                 }))
                 .collect(Collectors.toList());
 
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenRun(() -> {
-                    globalQueryList = globalQueryList.stream()
-                            .filter(q -> q.getState() != QueryState.RUN_DONE)
-                            .collect(Collectors.toList());
-                });
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     /**
@@ -235,6 +246,9 @@ public class Query {
                     this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
                             : QueryState.RUN_MORE_DATA_AVAILABLE;
 
+                    // The server holds the statement for a failed query until it receives a close request.
+                    this.correlationId = queryResult.getId();
+
                     if (!queryResult.getSuccess() && !this.isCLCommand) {
                         this.state = QueryState.ERROR;
 
@@ -259,7 +273,6 @@ public class Query {
                                 new SQLException(String.join(", ", errorList), queryResult.getSqlState()));
                     }
 
-                    this.correlationId = queryResult.getId();
                     return queryResult;
                 });
     }
@@ -347,23 +360,25 @@ public class Query {
      * 
      * @return A CompletableFuture that resolves when the query is closed.
      */
-    public CompletableFuture<String> close() throws Exception {
-        if (correlationId != null && state != QueryState.RUN_DONE) {
-            state = QueryState.RUN_DONE;
+    public synchronized CompletableFuture<String> close() throws Exception {
+        state = QueryState.RUN_DONE;
+        Query.removeQuery(this);
 
-            ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
-            ObjectNode closeRequest = objectMapper.createObjectNode();
-            closeRequest.put("id", SqlJob.getNewUniqueId("sqlclose"));
-            closeRequest.put("cont_id", correlationId);
-            closeRequest.put("type", "sqlclose");
-
-            return job.send(objectMapper.writeValueAsString(closeRequest));
-        } else if (correlationId == null) {
-            state = QueryState.RUN_DONE;
-            return CompletableFuture.completedFuture(null);
-        } else {
+        // The server keeps each statement open until it receives sqlclose, even once all
+        // rows have been fetched, so a close must be sent for every query it knows about.
+        // CL commands are not tracked by the server.
+        if (correlationId == null || isClosed || isCLCommand || job.getStatus() == JobStatus.Ended) {
             return CompletableFuture.completedFuture(null);
         }
+        isClosed = true;
+
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+        ObjectNode closeRequest = objectMapper.createObjectNode();
+        closeRequest.put("id", SqlJob.getNewUniqueId("sqlclose"));
+        closeRequest.put("cont_id", correlationId);
+        closeRequest.put("type", "sqlclose");
+
+        return job.send(objectMapper.writeValueAsString(closeRequest));
     }
 
     /**
