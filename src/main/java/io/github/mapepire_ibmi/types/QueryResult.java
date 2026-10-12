@@ -3,6 +3,7 @@ package io.github.mapepire_ibmi.types;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+// BlobRef is in the same package; no explicit import needed but referenced in Javadoc.
 
 /**
  * Represents a standard query result.
@@ -34,6 +35,11 @@ public class QueryResult<T> extends ServerResponse {
 
     /**
      * The data returned from the query.
+     *
+     * <p>In daemon mode, BLOB/binary columns are represented as
+     * {@link BlobRef} objects rather than raw bytes. Call
+     * {@link io.github.mapepire_ibmi.SqlJob#fetchBlob(BlobRef)} to retrieve
+     * the actual binary content.
      */
     @JsonProperty("data")
     private List<T> data;
