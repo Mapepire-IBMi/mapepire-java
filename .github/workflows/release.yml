@@ -64,7 +64,7 @@ jobs:
         run: cat $HOME/.m2/settings.xml
 
       - name: Publish Maven Package
-        run: mvn --batch-mode -Dmaven.test.skip=true clean deploy --file pom.xml
+        run: mvn --batch-mode -Prelease -Dmaven.test.skip=true clean deploy --file pom.xml
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
