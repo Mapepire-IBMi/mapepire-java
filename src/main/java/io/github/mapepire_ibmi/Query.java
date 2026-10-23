@@ -243,8 +243,14 @@ public class Query {
                         throw new CompletionException(e);
                     }
 
-                    this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
-                            : QueryState.RUN_MORE_DATA_AVAILABLE;
+                    if (this.isCLCommand) {
+                        // CL responses are not cursors. Server 2.5 no longer sends is_done,
+                        // which would otherwise leave the command looking fetchable.
+                        this.state = QueryState.RUN_DONE;
+                    } else {
+                        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
+                                : QueryState.RUN_MORE_DATA_AVAILABLE;
+                    }
 
                     // The server holds the statement for a failed query until it receives a close request.
                     this.correlationId = queryResult.getId();

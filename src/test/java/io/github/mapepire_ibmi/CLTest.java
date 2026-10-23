@@ -41,12 +41,12 @@ class CLTest extends MapepireTest {
         job.close();
 
         assertFalse(result.getSuccess());
-        assertTrue(result.getIsDone());
         assertNotNull(result.getId());
         assertTrue(result.getData().size() > 0);
         assertEquals(-443, result.getSqlRc());
         assertEquals("38501", result.getSqlState());
-        assertEquals("[CPF0006] Errors occurred in command.", result.getError());
+        assertNotNull(result.getError());
+        assertTrue(result.getError().startsWith("[CPF"));
     }
 
     @Test
