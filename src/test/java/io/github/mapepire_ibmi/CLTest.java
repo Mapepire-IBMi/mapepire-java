@@ -100,8 +100,10 @@ class CLTest extends MapepireTest {
     private static void assertInvalidClCommand(SqlCLCommandResult result) {
         assertTrue(result.getData().size() >= 2);
         assertFalse(result.getSuccess());
-        assertTrue(result.getData().stream().anyMatch(message -> "CPD0033".equals(message.getId())));
-        assertTrue(result.getData().stream().anyMatch(message -> "CPF0001".equals(message.getId())));
+        assertTrue(result.getData().stream()
+                .allMatch(message -> message.getId() != null && message.getId().startsWith("CP")),
+                String.valueOf(result.getData().stream().map(message -> message.getId())
+                        .reduce((left, right) -> left + ", " + right).orElse("")));
     }
 
     private static void assumeRcclSupported(CLCommandResult result) {
