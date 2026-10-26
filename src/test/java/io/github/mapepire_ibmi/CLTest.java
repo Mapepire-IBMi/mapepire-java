@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.GetClDocResult;
 import io.github.mapepire_ibmi.types.QueryResult;
+import io.github.mapepire_ibmi.types.QueryState;
 
 class CLTest extends MapepireTest {
     private static final String GET_CL_DOC_UNSUPPORTED = "Unknown request type: getcldoc";
@@ -87,6 +88,17 @@ class CLTest extends MapepireTest {
 
         assertTrue(e.getMessage()
                 .contains("CPF9801 Object INVALID in library QSYS not found."));
+    }
+
+    @Test 
+    void clCommandSetsRunDoneState() throws Exception {
+        SqlJob job = new SqlJob();
+        job.connect(MapepireTest.getCreds()).get();
+
+        Query query = job.clCommand("WRKACTJOB");
+        query.execute().get();
+        job.close();
+        assertEquals(QueryState.RUN_DONE, query.getState(), "CL command should set run done state");
     }
 
     private static void assumeGetClDocSupported(Throwable error) {
