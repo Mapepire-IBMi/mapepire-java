@@ -15,12 +15,6 @@ public class QueryOptions {
     private boolean isTerseResults;
 
     /**
-     * Whether the command is a CL command.
-     */
-    @JsonProperty("isClCommand")
-    private boolean isClCommand;
-
-    /**
      * The parameters for the query.
      */
     @JsonProperty("parameters")
@@ -37,12 +31,10 @@ public class QueryOptions {
      * Construct a new QueryOptions instance.
      * 
      * @param isTerseResults Whether to return terse results.
-     * @param isClCommand    Whether the command is a CL command.
      * @param parameters     The parameters for the query.
      */
-    public QueryOptions(boolean isTerseResults, boolean isClCommand, List<Object> parameters) {
+    public QueryOptions(boolean isTerseResults, List<Object> parameters) {
         this.isTerseResults = isTerseResults;
-        this.isClCommand = isClCommand;
         this.parameters = parameters;
     }
 
@@ -62,24 +54,6 @@ public class QueryOptions {
      */
     public void setIsTerseResults(boolean isTerseResults) {
         this.isTerseResults = isTerseResults;
-    }
-
-    /**
-     * Get whether the command is a CL command.
-     * 
-     * @return Whether the command is a CL command.
-     */
-    public boolean getIsClCommand() {
-        return isClCommand;
-    }
-
-    /**
-     * Set whether the command is a CL command.
-     * 
-     * @param isClCommand Whether the command is a CL command.
-     */
-    public void setIsClCommand(boolean isClCommand) {
-        this.isClCommand = isClCommand;
     }
 
     /**

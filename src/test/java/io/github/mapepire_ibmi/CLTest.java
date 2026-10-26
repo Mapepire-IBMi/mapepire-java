@@ -12,24 +12,26 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.mapepire_ibmi.types.CLCommandResult;
 import io.github.mapepire_ibmi.types.GetClDocResult;
-import io.github.mapepire_ibmi.types.QueryResult;
-import io.github.mapepire_ibmi.types.QueryState;
+import io.github.mapepire_ibmi.types.SqlCLCommandResult;
 
 class CLTest extends MapepireTest {
     private static final String GET_CL_DOC_UNSUPPORTED = "Unknown request type: getcldoc";
+    private static final String RCCL_UNSUPPORTED = "Unknown request type: rccl";
 
     @Test
     void validCLCommand() throws Exception {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query query = job.clCommand("WRKACTJOB");
-        QueryResult<Object> result = query.execute().get();
+        CLCommandResult resultCl = job.rcclCommand("CHKOBJ OBJ(QSYS) OBJTYPE(*LIB)").get();
+        SqlCLCommandResult resultSql = job.clCommand("CHKOBJ OBJ(QSYS) OBJTYPE(*LIB)").get();
         job.close();
 
-        assertTrue(result.getSuccess());
-        assertNotNull(result.getData());
+        assertClCommandSucceeded(resultSql);
+        assumeRcclSupported(resultCl);
+        assertClCommandSucceeded(resultCl);
     }
 
     @Test
@@ -37,17 +39,16 @@ class CLTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        Query query = job.clCommand("INVALIDCOMMAND");
-        QueryResult<Object> result = query.execute().get();
+        CLCommandResult resultCl = job.rcclCommand("SNDMSG").get();
+        SqlCLCommandResult resultSql = job.clCommand("SNDMSG").get();
         job.close();
 
-        assertFalse(result.getSuccess());
-        assertNotNull(result.getId());
-        assertTrue(result.getData().size() > 0);
-        assertEquals(-443, result.getSqlRc());
-        assertEquals("38501", result.getSqlState());
-        assertNotNull(result.getError());
-        assertTrue(result.getError().startsWith("[CPF"));
+        assumeClMessagesSupported(resultSql);
+        assertInvalidClCommand(resultSql);
+        assertEquals(-443, resultSql.getSqlRc());
+        assertEquals("38501", resultSql.getSqlState());
+        assumeRcclSupported(resultCl);
+        assertInvalidClCommand(resultCl);
     }
 
     @Test
@@ -90,15 +91,28 @@ class CLTest extends MapepireTest {
                 .contains("CPF9801 Object INVALID in library QSYS not found."));
     }
 
-    @Test 
-    void clCommandSetsRunDoneState() throws Exception {
-        SqlJob job = new SqlJob();
-        job.connect(MapepireTest.getCreds()).get();
+    private static void assertClCommandSucceeded(SqlCLCommandResult result) {
+        assertTrue(result.getSuccess());
+        assertNotNull(result.getData());
+        assertEquals(0, result.getData().size());
+    }
 
-        Query query = job.clCommand("WRKACTJOB");
-        query.execute().get();
-        job.close();
-        assertEquals(QueryState.RUN_DONE, query.getState(), "CL command should set run done state");
+    private static void assertInvalidClCommand(SqlCLCommandResult result) {
+        assertTrue(result.getData().size() >= 2);
+        assertFalse(result.getSuccess());
+        assertTrue(result.getData().stream().anyMatch(message -> "CPD0033".equals(message.getId())));
+        assertTrue(result.getData().stream().anyMatch(message -> "CPF0001".equals(message.getId())));
+    }
+
+    private static void assumeRcclSupported(CLCommandResult result) {
+        assumeFalse(result.getError() != null && result.getError().contains(RCCL_UNSUPPORTED),
+                "Server does not support rccl");
+    }
+
+    private static void assumeClMessagesSupported(SqlCLCommandResult result) {
+        boolean legacyMessages = result.getData() != null
+                && result.getData().stream().anyMatch(message -> message.getId() == null);
+        assumeFalse(legacyMessages, "Server does not return the current CL message format");
     }
 
     private static void assumeGetClDocSupported(Throwable error) {

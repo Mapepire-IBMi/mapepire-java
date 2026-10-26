@@ -59,11 +59,6 @@ public class Query {
     private int rowsToFetch = 100;
 
     /**
-     * Whether the query is a CL command.
-     */
-    private boolean isCLCommand;
-
-    /**
      * The current state of the query execution.
      */
     private QueryState state = QueryState.NOT_YET_RUN;
@@ -90,7 +85,6 @@ public class Query {
         this.sql = query;
         this.isPrepared = opts.getParameters() != null;
         this.parameters = opts.getParameters();
-        this.isCLCommand = opts.getIsClCommand();
         this.isTerseResults = opts.getIsTerseResults();
 
         Query.addQuery(this);
@@ -207,22 +201,16 @@ public class Query {
 
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
         ObjectNode executeRequest = objectMapper.createObjectNode();
-        if (this.isCLCommand) {
-            executeRequest.put("id", SqlJob.getNewUniqueId("clcommand"));
-            executeRequest.put("type", "cl");
-            executeRequest.put("terse", this.isTerseResults);
-            executeRequest.put("cmd", this.sql);
-        } else {
-            executeRequest.put("id", SqlJob.getNewUniqueId("query"));
-            executeRequest.put("type", this.isPrepared ? "prepare_sql_execute" : "sql");
-            executeRequest.put("sql", this.sql);
-            executeRequest.put("terse", this.isTerseResults);
-            executeRequest.put("rows", rowsToFetch);
-            if (this.parameters != null) {
-                JsonNode parameters = objectMapper.valueToTree(this.parameters);
-                executeRequest.set("parameters", parameters);
-            }
+        executeRequest.put("id", SqlJob.getNewUniqueId("query"));
+        executeRequest.put("type", this.isPrepared ? "prepare_sql_execute" : "sql");
+        executeRequest.put("sql", this.sql);
+        executeRequest.put("terse", this.isTerseResults);
+        executeRequest.put("rows", rowsToFetch);
+        if (this.parameters != null) {
+            JsonNode parameters = objectMapper.valueToTree(this.parameters);
+            executeRequest.set("parameters", parameters);
         }
+        
 
         this.rowsToFetch = rowsToFetch;
 
@@ -243,19 +231,13 @@ public class Query {
                         throw new CompletionException(e);
                     }
 
-                    if (this.isCLCommand) {
-                        // CL responses are not cursors. Server 2.5 no longer sends is_done,
-                        // which would otherwise leave the command looking fetchable.
-                        this.state = QueryState.RUN_DONE;
-                    } else {
-                        this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
-                                : QueryState.RUN_MORE_DATA_AVAILABLE;
-                    }
+                    this.state = queryResult.getIsDone() ? QueryState.RUN_DONE
+                            : QueryState.RUN_MORE_DATA_AVAILABLE;
 
                     // The server holds the statement for a failed query until it receives a close request.
                     this.correlationId = queryResult.getId();
 
-                    if (!queryResult.getSuccess() && !this.isCLCommand) {
+                    if (!queryResult.getSuccess()) {
                         this.state = QueryState.ERROR;
 
                         List<String> errorList = new ArrayList<>();
@@ -267,9 +249,9 @@ public class Query {
                         if (sqlState != null) {
                             errorList.add(sqlState);
                         }
-                        String sqlRc = String.valueOf(queryResult.getSqlRc());
+                        Integer sqlRc = queryResult.getSqlRc();
                         if (sqlRc != null) {
-                            errorList.add(sqlRc);
+                            errorList.add(String.valueOf(sqlRc));
                         }
                         if (errorList.isEmpty()) {
                             errorList.add("Failed to run query");
@@ -373,7 +355,7 @@ public class Query {
         // The server keeps each statement open until it receives sqlclose, even once all
         // rows have been fetched, so a close must be sent for every query it knows about.
         // CL commands are not tracked by the server.
-        if (correlationId == null || isClosed || isCLCommand || job.getStatus() == JobStatus.Ended) {
+        if (correlationId == null || isClosed || job.getStatus() == JobStatus.Ended) {
             return CompletableFuture.completedFuture(null);
         }
         isClosed = true;

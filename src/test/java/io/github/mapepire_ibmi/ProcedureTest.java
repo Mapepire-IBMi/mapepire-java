@@ -42,7 +42,7 @@ class ProcedureTest extends MapepireTest {
         queryA.execute().get();
         queryA.close().get();
 
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList(6, 4, 0));
+        QueryOptions options = new QueryOptions(false, Arrays.asList(6, 4, 0));
         Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
@@ -96,7 +96,7 @@ class ProcedureTest extends MapepireTest {
         queryA.execute().get();
         queryA.close().get();
 
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", ""));
+        QueryOptions options = new QueryOptions(false, Arrays.asList("a", "b", ""));
         Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
@@ -156,7 +156,7 @@ class ProcedureTest extends MapepireTest {
         queryA.execute().get();
         queryA.close().get();
 
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList("a", "b", "c"));
+        QueryOptions options = new QueryOptions(false, Arrays.asList("a", "b", "c"));
         Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_VARCHAR(?, ?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
@@ -218,7 +218,7 @@ class ProcedureTest extends MapepireTest {
         for (int i = 0; i < 262144; i++) {
             sb.append("test");
         }
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList(sb.toString(), ""));
+        QueryOptions options = new QueryOptions(false, Arrays.asList(sb.toString(), ""));
         Query queryB = job.query("CALL " + MapepireTest.getTestSchema() + ".PROCEDURE_TEST_CLOB(?, ?)", options);
         QueryResult<Object> result = queryB.execute().get();
         queryB.close().get();
