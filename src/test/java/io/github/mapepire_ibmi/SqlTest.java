@@ -110,7 +110,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(true, false, null);
+        QueryOptions options = new QueryOptions(true, null);
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS", options);
         QueryResult<Object> result = query.execute(5).get();
         ArrayList<String> row = (ArrayList<String>) result.getData().get(0);
@@ -305,7 +305,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList("N"));
+        QueryOptions options = new QueryOptions(false, Arrays.asList("N"));
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE IS_NULLABLE = ?", options);
         QueryResult<Object> result = query.execute(5).get();
 
@@ -323,7 +323,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(false, false, Arrays.asList("LONG_COMMENT"));
+        QueryOptions options = new QueryOptions(false, Arrays.asList("LONG_COMMENT"));
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
         QueryResult<Object> result = query.execute(10).get();
 
@@ -343,7 +343,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(true, false, Arrays.asList("TABLE_NAME"));
+        QueryOptions options = new QueryOptions(true, Arrays.asList("TABLE_NAME"));
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
         QueryResult<Object> result = query.execute(1).get();
         ArrayList<String> row = (ArrayList<String>) result.getData().get(0);
@@ -365,7 +365,7 @@ class SqlTest extends MapepireTest {
         SqlJob job = new SqlJob();
         job.connect(MapepireTest.getCreds()).get();
 
-        QueryOptions options = new QueryOptions(false, false,
+        QueryOptions options = new QueryOptions(false,
                 Arrays.asList("TABLE_NAME", "LONG_COMMENT", "CONSTRAINT_NAME"));
         Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME IN (?, ?, ?)", options);
         QueryResult<Object> result = query.execute(30).get();
@@ -387,7 +387,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            QueryOptions options = new QueryOptions(false, false, Collections.emptyList());
+            QueryOptions options = new QueryOptions(false, Collections.emptyList());
             Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
 
             try {
@@ -409,7 +409,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            QueryOptions options = new QueryOptions(false, false, Arrays.asList("A", "B"));
+            QueryOptions options = new QueryOptions(false, Arrays.asList("A", "B"));
             Query query = job.query("SELECT * FROM SAMPLE.SYSCOLUMNS WHERE COLUMN_NAME = ?", options);
 
             try {
@@ -430,7 +430,7 @@ class SqlTest extends MapepireTest {
         job.connect(MapepireTest.getCreds()).get();
 
         SQLException e = assertThrowsExactly(SQLException.class, () -> {
-            QueryOptions options = new QueryOptions(false, false, Arrays.asList("FAKE_COLUMN"));
+            QueryOptions options = new QueryOptions(false, Arrays.asList("FAKE_COLUMN"));
             Query query = job.query("SELECT * FROM FAKE_SCHEMA.FAKE_TABLE WHERE COLUMN_NAME = ?", options);
 
             try {

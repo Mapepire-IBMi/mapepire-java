@@ -40,6 +40,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.github.mapepire_ibmi.types.CLCommandResult;
 import io.github.mapepire_ibmi.types.ConnectionResult;
 import io.github.mapepire_ibmi.types.DaemonServer;
 import io.github.mapepire_ibmi.types.ExplainResults;
@@ -47,13 +48,13 @@ import io.github.mapepire_ibmi.types.ExplainType;
 import io.github.mapepire_ibmi.types.GetClDocResult;
 import io.github.mapepire_ibmi.types.GetTraceDataResult;
 import io.github.mapepire_ibmi.types.JDBCOptions;
-import io.github.mapepire_ibmi.types.JobLogEntry;
 import io.github.mapepire_ibmi.types.JobStatus;
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 import io.github.mapepire_ibmi.types.ServerTraceDest;
 import io.github.mapepire_ibmi.types.ServerTraceLevel;
 import io.github.mapepire_ibmi.types.SetConfigResult;
+import io.github.mapepire_ibmi.types.SqlCLCommandResult;
 import io.github.mapepire_ibmi.types.TransactionEndType;
 import io.github.mapepire_ibmi.types.VersionCheckResult;
 import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
@@ -870,15 +871,50 @@ public class SqlJob {
     }
 
     /**
-     * Create a CL command query.
+     * Run a CL command through SQL.
      *
-     * @param cmd The CL command.
-     * @return A new Query instance for the command.
+     * @param cmd The CL command to execute.
+     * @return A CompletableFuture that resolves to the command's execution result.
      */
-    public Query clCommand(String cmd) {
-        QueryOptions options = new QueryOptions();
-        options.setIsClCommand(true);
-        return new Query(this, cmd, options);
+    public CompletableFuture<SqlCLCommandResult> clCommand(String cmd) throws Exception {
+        return this.runClCommand(cmd, true, SqlCLCommandResult.class);
+    }
+
+    /**
+     * Run a CL command in the dedicated remote command job.
+     *
+     * @param cmd The CL command to execute.
+     * @return A CompletableFuture that resolves to the command's execution result.
+     */
+    public CompletableFuture<CLCommandResult> rcclCommand(String cmd) throws Exception {
+        return this.runClCommand(cmd, false, CLCommandResult.class);
+    }
+
+    /**
+     * Run a CL command.
+     *
+     * @param <T>        The result type.
+     * @param cmd        The CL command to execute.
+     * @param useSql     Whether to run the command through SQL.
+     * @param resultType The class of the result.
+     * @return A CompletableFuture that resolves to the command's execution result.
+     */
+    private <T extends SqlCLCommandResult> CompletableFuture<T> runClCommand(String cmd, boolean useSql,
+            Class<T> resultType) throws Exception {
+        ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("id", SqlJob.getNewUniqueId((useSql ? "sql" : "") + "clcommand"));
+        request.put("type", useSql ? "cl" : "rccl");
+        request.put("cmd", cmd);
+
+        return this.send(objectMapper.writeValueAsString(request))
+                .thenApply(result -> {
+                    try {
+                        return objectMapper.readValue(result, resultType);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
+                });
     }
 
     /**
@@ -932,7 +968,7 @@ public class SqlJob {
      * @return A CompletableFuture that resolves to the result of the transaction
      *         operation.
      */
-    public CompletableFuture<QueryResult<JobLogEntry>> endTransaction(TransactionEndType type) throws Exception {
+    public CompletableFuture<QueryResult<Object>> endTransaction(TransactionEndType type) throws Exception {
         String query;
 
         switch (type) {
