@@ -25,13 +25,13 @@ public class ServerResponse {
     private String error;
 
     /**
-     * The SQL return code.
+     * The SQL return code, if the response includes one.
      */
     @JsonProperty("sql_rc")
-    private int sqlRc;
+    private Integer sqlRc;
 
     /**
-     * The SQL state code.
+     * The SQL state code, if the response includes one.
      */
     @JsonProperty("sql_state")
     private String sqlState;
@@ -55,11 +55,12 @@ public class ServerResponse {
      * @param id            The unique identifier for the request.
      * @param success       Whether the request was successful.
      * @param error         The error message, if any.
-     * @param sqlRc         The SQL return code.
-     * @param sqlState      The SQL state code.
+     * @param sqlRc         The SQL return code, if any.
+     * @param sqlState      The SQL state code, if any.
      * @param executionTime The execution time in milliseconds.
      */
-    public ServerResponse(String id, boolean success, String error, int sqlRc, String sqlState, long executionTime) {
+    public ServerResponse(String id, boolean success, String error, Integer sqlRc, String sqlState,
+            long executionTime) {
         this.id = id;
         this.success = success;
         this.error = error;
@@ -125,25 +126,25 @@ public class ServerResponse {
     /**
      * Get the SQL return code.
      * 
-     * @return The SQL return code.
+     * @return The SQL return code, or null if the response has none.
      */
-    public int getSqlRc() {
+    public Integer getSqlRc() {
         return sqlRc;
     }
 
     /**
      * Set the SQL return code.
      * 
-     * @param sqlRc The SQL return code.
+     * @param sqlRc The SQL return code, or null if the response has none.
      */
-    public void setSqlRc(int sqlRc) {
+    public void setSqlRc(Integer sqlRc) {
         this.sqlRc = sqlRc;
     }
 
     /**
      * Get the SQL state code.
      * 
-     * @return The SQL state code.
+     * @return The SQL state code, or null if the response has none.
      */
     public String getSqlState() {
         return sqlState;
@@ -152,7 +153,7 @@ public class ServerResponse {
     /**
      * Set the SQL state code.
      * 
-     * @param sqlState The SQL state code.
+     * @param sqlState The SQL state code, or null if the response has none.
      */
     public void setSqlState(String sqlState) {
         this.sqlState = sqlState;
