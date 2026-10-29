@@ -12,12 +12,18 @@ env:
   CONFIG_PROPERTIES: ./src/test/resources/config.properties
   CONFIG_PROPERTIES_SAMPLE: ./src/test/resources/config.properties.sample
 
+permissions:
+  contents: read
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     environment: OSSBUILD
+
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout Repository
