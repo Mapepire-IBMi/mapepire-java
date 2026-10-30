@@ -9,6 +9,9 @@ env:
   CONFIG_PROPERTIES: ./src/test/resources/config.properties
   CONFIG_PROPERTIES_SAMPLE: ./src/test/resources/config.properties.sample
 
+permissions:
+  contents: write
+
 jobs:
   release:
 
