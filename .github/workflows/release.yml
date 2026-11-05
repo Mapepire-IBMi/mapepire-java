@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get Maven Project Version
         run: |
@@ -41,7 +41,7 @@ jobs:
           gpg --list-public-keys --keyid-format LONG
 
       - name: Set up JDK 8
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '8'
           distribution: 'temurin'
@@ -109,7 +109,7 @@ jobs:
       #     asset_content_type: application/zip
 
       - name: Create the tag and release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ env.PROJECT_VERSION }}
           name: v${{ env.PROJECT_VERSION }}
