@@ -338,18 +338,18 @@ public class SqlJob {
                 if (isTracingChannelData) {
                     System.out.println("Closed connection");
                 }
-                dispose();
-                // First-wins with onError: whichever completes the future first sticks.
+                // Complete before dispose, same as onError: first-wins on the open
+                // future, so cleanup cannot open a window for the other callback.
                 String message = "Connection closed (code=" + code
                         + ", reason=" + (reason == null || reason.isEmpty() ? "none" : reason)
                         + ", remote=" + remote + ")";
                 failOpenedConnectionFuture(new SocketException(message));
+                dispose();
             }
 
             @Override
             public void onError(Exception e) {
-                // Complete before logging/dispose so a racing onClose is less likely
-                // to win with a generic close exception.
+                // Complete before logging/dispose, same as onClose: first-wins.
                 failOpenedConnectionFuture(e);
                 e.printStackTrace();
                 dispose();
