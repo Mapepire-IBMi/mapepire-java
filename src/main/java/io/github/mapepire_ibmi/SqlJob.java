@@ -338,17 +338,21 @@ public class SqlJob {
                 if (isTracingChannelData) {
                     System.out.println("Closed connection");
                 }
+                // Complete before dispose, same as onError: first-wins on the open
+                // future, so cleanup cannot open a window for the other callback.
+                String message = "Connection closed (code=" + code
+                        + ", reason=" + (reason == null || reason.isEmpty() ? "none" : reason)
+                        + ", remote=" + remote + ")";
+                failOpenedConnectionFuture(new SocketException(message));
                 dispose();
             }
 
             @Override
             public void onError(Exception e) {
+                // Complete before logging/dispose, same as onClose: first-wins.
+                failOpenedConnectionFuture(e);
                 e.printStackTrace();
                 dispose();
-
-                if (openedConnectionFuture != null) {
-                    openedConnectionFuture.completeExceptionally(e);
-                }
             }
         };
         SSLSocketFactory factory = sslContext.getSocketFactory();
@@ -1007,7 +1011,19 @@ public class SqlJob {
      * Close the job.
      */
     public void close() {
+        failOpenedConnectionFuture(new SocketException("Connection closed"));
         this.dispose();
+    }
+
+    /**
+     * Fail the opened-connection future if it is still pending.
+     *
+     * @param cause The exception to complete the future with.
+     */
+    private void failOpenedConnectionFuture(Exception cause) {
+        if (this.openedConnectionFuture != null && !this.openedConnectionFuture.isDone()) {
+            this.openedConnectionFuture.completeExceptionally(cause);
+        }
     }
 
     /**

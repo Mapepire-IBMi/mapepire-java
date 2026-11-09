@@ -220,6 +220,8 @@ public class Query {
                         Throwable cause = throwable instanceof CompletionException ? throwable.getCause() : throwable;
                         if (cause instanceof RequestTimeoutException) {
                             this.state = QueryState.TIMED_OUT;
+                        } else {
+                            this.state = QueryState.ERROR;
                         }
                     }
                 })
@@ -313,6 +315,8 @@ public class Query {
                         Throwable cause = throwable instanceof CompletionException ? throwable.getCause() : throwable;
                         if (cause instanceof RequestTimeoutException) {
                             this.state = QueryState.TIMED_OUT;
+                        } else {
+                            this.state = QueryState.ERROR;
                         }
                     }
                 })
