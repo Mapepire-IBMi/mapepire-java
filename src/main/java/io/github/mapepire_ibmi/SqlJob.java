@@ -339,16 +339,19 @@ public class SqlJob {
                     System.out.println("Closed connection");
                 }
                 dispose();
-                // Delay the generic close failure so a same-sequence onError can
-                // still surface the real SSL/connect exception.
-                failOpenedConnectionFutureLater(new SocketException("Connection closed"));
+                // First-wins with onError: whichever completes the future first sticks.
+                String message = "Connection closed (code=" + code
+                        + ", reason=" + (reason == null || reason.isEmpty() ? "none" : reason)
+                        + ", remote=" + remote + ")";
+                failOpenedConnectionFuture(new SocketException(message));
             }
 
             @Override
             public void onError(Exception e) {
-                e.printStackTrace();
-                // Prefer the real exception over the generic close from onClose/dispose.
+                // Complete before logging/dispose so a racing onClose is less likely
+                // to win with a generic close exception.
                 failOpenedConnectionFuture(e);
+                e.printStackTrace();
                 dispose();
             }
         };
@@ -1013,7 +1016,7 @@ public class SqlJob {
     }
 
     /**
-     * Fail the opened-connection future immediately if it is still pending.
+     * Fail the opened-connection future if it is still pending.
      *
      * @param cause The exception to complete the future with.
      */
@@ -1021,17 +1024,6 @@ public class SqlJob {
         if (this.openedConnectionFuture != null && !this.openedConnectionFuture.isDone()) {
             this.openedConnectionFuture.completeExceptionally(cause);
         }
-    }
-
-    /**
-     * Fail the opened-connection future shortly after close if it is still
-     * pending. Gives onError a chance to complete it with the real exception
-     * when onClose runs first in the same close sequence.
-     *
-     * @param cause The exception to complete the future with.
-     */
-    private void failOpenedConnectionFutureLater(Exception cause) {
-        TIMEOUT_SCHEDULER.schedule(() -> failOpenedConnectionFuture(cause), 100, TimeUnit.MILLISECONDS);
     }
 
     /**

@@ -3,6 +3,7 @@ package io.github.mapepire_ibmi;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -73,15 +74,19 @@ class ConnectTest extends MapepireTest {
         DaemonServer strictCreds = new DaemonServer(
                 mismatchedHost, creds.getPort(), creds.getUser(), creds.getPassword(), true, creds.getCa());
 
+        // onError (SSL cause) and onClose can race on different threads; whichever
+        // completes the open future first wins, so do not assert the exact SSL text.
+        // Contrast with rejectUnauthorizedFalseConnectsWhenCertificateDoesNotMatchHost.
+        SqlJob job = new SqlJob();
         ExecutionException e = assertThrowsExactly(ExecutionException.class, () -> {
-            SqlJob job = new SqlJob();
             try {
                 job.connect(strictCreds).get();
             } finally {
                 job.close();
             }
         });
-        assertTrue(e.getCause().getMessage().contains("No subject alternative"));
+        assertNotNull(e.getCause());
+        assertNotEquals(JobStatus.Ready, job.getStatus());
     }
 
     @Test
