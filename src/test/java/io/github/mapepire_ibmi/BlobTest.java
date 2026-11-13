@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -56,6 +58,8 @@ import io.github.mapepire_ibmi.types.QueryResult;
  *   <li>HTTP GET with a completely bogus token — returns 404</li>
  *   <li>blob_url path format — token portion is a valid UUID (RFC 4122)</li>
  *   <li>Terse-results mode — BlobRef is still returned when isTerseResults=true</li>
+ *   <li>rejectUnauthorized=false — fetchBlob succeeds when connecting via a
+ *       hostname that does not match the server certificate</li>
  * </ol>
  *
  * <p>Prerequisites (run once on the server):
@@ -184,7 +188,7 @@ class BlobTest extends MapepireTest {
 
     /**
      * Execute a raw HTTPS GET to the mapepire server using the provided password.
-     * Returns the HTTP status code.
+     * Returns the HTTP status code. Uses the same TLS policy as {@link SqlJob#fetchBlob}.
      */
     private static int httpGetStatus(String path, String password) throws Exception {
         String auth = creds.getUser() + ":" + password;
@@ -193,6 +197,7 @@ class BlobTest extends MapepireTest {
 
         URL url = new URL("https://" + creds.getHost() + ":" + creds.getPort() + path);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+        SqlJob.applyHttpsTls(conn, creds);
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
         conn.setConnectTimeout(10_000);
@@ -268,7 +273,7 @@ class BlobTest extends MapepireTest {
     @Test
     @Order(1)
     void test1_insertBlobViaPreparedStatement() throws Exception {
-        QueryOptions opts = new QueryOptions(false, false, Arrays.asList(TEST_BASE64));
+        QueryOptions opts = new QueryOptions(false, Arrays.asList(TEST_BASE64));
         QueryResult<Object> res = job.execute(
                 "INSERT INTO " + smallTable() + " (JBLOB) VALUES (?)", opts).get();
 
@@ -363,7 +368,7 @@ class BlobTest extends MapepireTest {
 
         try {
             // INSERT the large BLOB
-            QueryOptions insOpts = new QueryOptions(false, false, Arrays.asList(LARGE_BLOB_BASE64));
+            QueryOptions insOpts = new QueryOptions(false, Arrays.asList(LARGE_BLOB_BASE64));
             QueryResult<Object> insRes = job.execute(
                     "INSERT INTO " + largeTable() + " (JBLOB) VALUES (?)", insOpts).get();
             assertTrue(insRes.getSuccess());
@@ -409,7 +414,7 @@ class BlobTest extends MapepireTest {
         job.execute("CREATE TABLE " + binaryTable() + " ( JBLOB BLOB(1024) )").get();
 
         try {
-            QueryOptions insOpts = new QueryOptions(false, false, Arrays.asList(BINARY_BASE64));
+            QueryOptions insOpts = new QueryOptions(false, Arrays.asList(BINARY_BASE64));
             QueryResult<Object> insRes = job.execute(
                     "INSERT INTO " + binaryTable() + " (JBLOB) VALUES (?)", insOpts).get();
             assertTrue(insRes.getSuccess());
@@ -449,9 +454,9 @@ class BlobTest extends MapepireTest {
                 .encodeToString("third blob value".getBytes(StandardCharsets.UTF_8));
 
         job.execute("INSERT INTO " + smallTable() + " (JBLOB) VALUES (?)",
-                new QueryOptions(false, false, Arrays.asList(second))).get();
+                new QueryOptions(false, Arrays.asList(second))).get();
         job.execute("INSERT INTO " + smallTable() + " (JBLOB) VALUES (?)",
-                new QueryOptions(false, false, Arrays.asList(third))).get();
+                new QueryOptions(false, Arrays.asList(third))).get();
 
         QueryResult<Object> res = job.execute(
                 "SELECT JBLOB FROM " + smallTable() + " WHERE JBLOB IS NOT NULL").get();
@@ -555,7 +560,7 @@ class BlobTest extends MapepireTest {
         try {
             // INSERT the original row
             job.execute("INSERT INTO " + updateTable() + " (JBLOB) VALUES (?)",
-                    new QueryOptions(false, false, Arrays.asList(origBase64))).get();
+                    new QueryOptions(false, Arrays.asList(origBase64))).get();
 
             // Retrieve the auto-generated ID
             QueryResult<Object> idRes = job.execute(
@@ -566,14 +571,14 @@ class BlobTest extends MapepireTest {
             // UPDATE the BLOB
             QueryResult<Object> updRes = job.execute(
                     "UPDATE " + updateTable() + " SET JBLOB = ? WHERE ID = ?",
-                    new QueryOptions(false, false, Arrays.asList(newBase64, rowId))).get();
+                    new QueryOptions(false, Arrays.asList(newBase64, rowId))).get();
             assertTrue(updRes.getSuccess());
             assertEquals(1, updRes.getUpdateCount());
 
             // SELECT the updated row
             QueryResult<Object> selRes = job.execute(
                     "SELECT ID, JBLOB FROM " + updateTable() + " WHERE ID = ?",
-                    new QueryOptions(false, false, Arrays.asList(rowId))).get();
+                    new QueryOptions(false, Arrays.asList(rowId))).get();
             assertTrue(selRes.getSuccess());
             assertEquals(1, selRes.getData().size());
 
@@ -640,7 +645,7 @@ class BlobTest extends MapepireTest {
     @Test
     @Order(16)
     void test16_blobRefInTerseResultsMode() throws Exception {
-        QueryOptions opts = new QueryOptions(true, false, null);
+        QueryOptions opts = new QueryOptions(true, null);
         QueryResult<Object> res = job.execute(
                 "SELECT JBLOB FROM " + smallTable() + " WHERE JBLOB IS NOT NULL FETCH FIRST 1 ROW ONLY",
                 opts).get();
@@ -668,6 +673,45 @@ class BlobTest extends MapepireTest {
             job.fetchBlob(ref).get();
         } catch (Exception ignored) {
             // token already consumed or expired — ignore
+        }
+    }
+
+    /**
+     * 17. rejectUnauthorized=false — WebSocket connect and fetchBlob both succeed
+     * when the connection host does not match the certificate hostname.
+     */
+    @Test
+    @Order(17)
+    void test17_fetchBlobWithRejectUnauthorizedFalse() throws Exception {
+        String host = creds.getHost();
+        String mismatchedHost = InetAddress.getByName(host).getHostAddress();
+        Assumptions.assumeTrue(!mismatchedHost.equals(host));
+
+        DaemonServer relaxedCreds = new DaemonServer(
+                mismatchedHost, creds.getPort(), creds.getUser(), creds.getPassword(), false);
+        SqlJob relaxedJob = new SqlJob();
+        try {
+            relaxedJob.connect(relaxedCreds).get();
+
+            // Ensure there is at least one row to select
+            job.execute("INSERT INTO " + smallTable() + " (JBLOB) VALUES (?)",
+                    new QueryOptions(false, Arrays.asList(TEST_BASE64))).get();
+
+            QueryResult<Object> res = relaxedJob.execute(
+                    "SELECT JBLOB FROM " + smallTable()
+                            + " WHERE JBLOB IS NOT NULL FETCH FIRST 1 ROW ONLY")
+                    .get();
+            assertTrue(res.getSuccess());
+            assertTrue(res.getData().size() >= 1);
+
+            BlobRef ref = mapToBlobRef(toMap(res.getData().get(0)).get("JBLOB"));
+            assertNotNull(ref);
+
+            byte[] bytes = relaxedJob.fetchBlob(ref).get();
+            assertNotNull(bytes);
+            assertTrue(bytes.length > 0);
+        } finally {
+            relaxedJob.close();
         }
     }
 }

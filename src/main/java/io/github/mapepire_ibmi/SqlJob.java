@@ -217,13 +217,16 @@ public class SqlJob {
     }
 
     /**
-     * Get a WebSocketClient instance which can be used to connect to the specified
-     * DB2 server.
+     * Build an {@link SSLContext} using the same TLS policy as the WebSocket
+     * channel: optional custom CA merged with the JDK trust store, and
+     * {@code rejectUnauthorized=false} skipping certificate trust checks.
      *
-     * @param db2Server The server details for the connection.
-     * @return A CompletableFuture that resolves to the WebSocketClient instance.
+     * <p>Package-private so tests can reuse the policy for HTTPS helpers.
+     *
+     * @param db2Server The server details that carry CA / rejectUnauthorized.
+     * @return An initialized TLS context.
      */
-    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
+    static SSLContext createSslContext(DaemonServer db2Server) throws Exception {
         TrustManagerFactory tmf;
         X509TrustManager customTrustManager = null;
         X509TrustManager jdkTrustManager = null;
@@ -310,6 +313,35 @@ public class SqlJob {
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[] { mapepireTrustManager }, new SecureRandom());
+        return sslContext;
+    }
+
+    /**
+     * Apply the WebSocket TLS policy to an HTTPS connection used for blob
+     * fetches (socket factory + hostname verification when
+     * {@code rejectUnauthorized} is false).
+     *
+     * @param conn      The HTTPS connection to configure.
+     * @param db2Server The server details that carry CA / rejectUnauthorized.
+     */
+    static void applyHttpsTls(HttpsURLConnection conn, DaemonServer db2Server) throws Exception {
+        SSLContext sslContext = createSslContext(db2Server);
+        conn.setSSLSocketFactory(sslContext.getSocketFactory());
+        if (!db2Server.getRejectUnauthorized()) {
+            conn.setHostnameVerifier((hostname, session) -> true);
+        }
+    }
+
+    /**
+     * Get a WebSocketClient instance which can be used to connect to the specified
+     * DB2 server.
+     *
+     * @param db2Server The server details for the connection.
+     * @return A CompletableFuture that resolves to the WebSocketClient instance.
+     */
+    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
+        SSLContext sslContext = createSslContext(db2Server);
+        // Preserve existing WebSocket behavior that also installs this as the JVM default.
         SSLContext.setDefault(sslContext);
         URI uri = new URI("wss://" + db2Server.getHost() + ":" + db2Server.getPort() + "/db/");
         Map<String, String> httpHeaders = new HashMap<>();
@@ -578,6 +610,9 @@ public class SqlJob {
      * with the same {@code BlobRef} will throw a {@code RuntimeException}
      * wrapping an HTTP 404 error.
      *
+     * <p>TLS for the HTTPS GET follows the same {@link DaemonServer} policy as
+     * the WebSocket channel ({@code ca} and {@code rejectUnauthorized}).
+     *
      * @param blobRef The {@link BlobRef} object returned in query result data.
      * @return A CompletableFuture that resolves to the raw blob bytes.
      * @throws IllegalStateException If the job is not connected.
@@ -603,28 +638,7 @@ public class SqlJob {
                 URL url = new URL("https://" + server.getHost() + ":" + server.getPort()
                         + blobRef.getBlobUrl());
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-
-                // Apply TLS trust settings for HTTPS blob fetches.
-                // Never disable certificate/hostname validation.
-                if (server.getCa() != null) {
-                    // Use the same custom CA certificate as the WebSocket channel
-                    InputStream caStream = new ByteArrayInputStream(
-                            server.getCa().getBytes(StandardCharsets.UTF_8));
-                    X509Certificate caCert = (X509Certificate) CertificateFactory
-                            .getInstance("X509").generateCertificate(caStream);
-
-                    KeyStore ks = KeyStore.getInstance("PKCS12");
-                    ks.load(null, null);
-                    ks.setCertificateEntry("mapepire-ca", caCert);
-
-                    TrustManagerFactory tmf = TrustManagerFactory
-                            .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                    tmf.init(ks);
-
-                    javax.net.ssl.SSLContext sslCtx = javax.net.ssl.SSLContext.getInstance("TLS");
-                    sslCtx.init(null, tmf.getTrustManagers(), new SecureRandom());
-                    conn.setSSLSocketFactory(sslCtx.getSocketFactory());
-                }
+                applyHttpsTls(conn, server);
 
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
