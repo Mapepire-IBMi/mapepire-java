@@ -1,6 +1,7 @@
 package io.github.mapepire_ibmi;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.URI;
@@ -25,6 +26,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import java.net.URL;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
@@ -41,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.github.mapepire_ibmi.types.CLCommandResult;
+import io.github.mapepire_ibmi.types.BlobRef;
 import io.github.mapepire_ibmi.types.ConnectionResult;
 import io.github.mapepire_ibmi.types.DaemonServer;
 import io.github.mapepire_ibmi.types.ExplainResults;
@@ -80,6 +86,13 @@ public class SqlJob {
      * The socket used to communicate with the Mapepire Server component.
      */
     private WebSocketClient socket;
+
+    /**
+     * The server details used for the current connection.
+     * Retained so that {@link #fetchBlob(BlobRef)} can re-use the credentials
+     * and TLS configuration when issuing the HTTPS GET for a blob token.
+     */
+    private DaemonServer db2Server;
 
     /**
      * The job status.
@@ -204,13 +217,16 @@ public class SqlJob {
     }
 
     /**
-     * Get a WebSocketClient instance which can be used to connect to the specified
-     * DB2 server.
+     * Build an {@link SSLContext} using the same TLS policy as the WebSocket
+     * channel: optional custom CA merged with the JDK trust store, and
+     * {@code rejectUnauthorized=false} skipping certificate trust checks.
      *
-     * @param db2Server The server details for the connection.
-     * @return A CompletableFuture that resolves to the WebSocketClient instance.
+     * <p>Package-private so tests can reuse the policy for HTTPS helpers.
+     *
+     * @param db2Server The server details that carry CA / rejectUnauthorized.
+     * @return An initialized TLS context.
      */
-    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
+    static SSLContext createSslContext(DaemonServer db2Server) throws Exception {
         TrustManagerFactory tmf;
         X509TrustManager customTrustManager = null;
         X509TrustManager jdkTrustManager = null;
@@ -297,6 +313,35 @@ public class SqlJob {
 
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[] { mapepireTrustManager }, new SecureRandom());
+        return sslContext;
+    }
+
+    /**
+     * Apply the WebSocket TLS policy to an HTTPS connection used for blob
+     * fetches (socket factory + hostname verification when
+     * {@code rejectUnauthorized} is false).
+     *
+     * @param conn      The HTTPS connection to configure.
+     * @param db2Server The server details that carry CA / rejectUnauthorized.
+     */
+    static void applyHttpsTls(HttpsURLConnection conn, DaemonServer db2Server) throws Exception {
+        SSLContext sslContext = createSslContext(db2Server);
+        conn.setSSLSocketFactory(sslContext.getSocketFactory());
+        if (!db2Server.getRejectUnauthorized()) {
+            conn.setHostnameVerifier((hostname, session) -> true);
+        }
+    }
+
+    /**
+     * Get a WebSocketClient instance which can be used to connect to the specified
+     * DB2 server.
+     *
+     * @param db2Server The server details for the connection.
+     * @return A CompletableFuture that resolves to the WebSocketClient instance.
+     */
+    private CompletableFuture<WebSocketClient> getChannel(DaemonServer db2Server) throws Exception {
+        SSLContext sslContext = createSslContext(db2Server);
+        // Preserve existing WebSocket behavior that also installs this as the JVM default.
         SSLContext.setDefault(sslContext);
         URI uri = new URI("wss://" + db2Server.getHost() + ":" + db2Server.getPort() + "/db/");
         Map<String, String> httpHeaders = new HashMap<>();
@@ -476,6 +521,7 @@ public class SqlJob {
      */
     public CompletableFuture<ConnectionResult> connect(DaemonServer db2Server) throws Exception {
         this.status = JobStatus.Connecting;
+        this.db2Server = db2Server;
         ObjectMapper objectMapper = SingletonObjectMapper.getInstance();
 
         return this.getChannel(db2Server)
@@ -550,6 +596,85 @@ public class SqlJob {
                         this.dispose();
                     }
                 });
+    }
+
+    /**
+     * Fetches the binary content of a BLOB from the server.
+     *
+     * <p>When a query returns a BLOB or binary column in daemon mode, each cell
+     * value is a {@link BlobRef} containing a {@code blob_url} and {@code size}.
+     * Pass that object here to retrieve the raw bytes as a {@code byte[]}.
+     *
+     * <p>The token embedded in {@code blobRef.getBlobUrl()} is
+     * <b>single-use</b> — calling this method consumes it. Subsequent calls
+     * with the same {@code BlobRef} will throw a {@code RuntimeException}
+     * wrapping an HTTP 404 error.
+     *
+     * <p>TLS for the HTTPS GET follows the same {@link DaemonServer} policy as
+     * the WebSocket channel ({@code ca} and {@code rejectUnauthorized}).
+     *
+     * @param blobRef The {@link BlobRef} object returned in query result data.
+     * @return A CompletableFuture that resolves to the raw blob bytes.
+     * @throws IllegalStateException If the job is not connected.
+     * @throws RuntimeException      If the token has expired or already been
+     *                               consumed (HTTP 404), credentials are invalid
+     *                               (HTTP 401), or any other HTTP/IO error.
+     */
+    public CompletableFuture<byte[]> fetchBlob(BlobRef blobRef) {
+        if (this.db2Server == null) {
+            CompletableFuture<byte[]> failed = new CompletableFuture<>();
+            failed.completeExceptionally(new IllegalStateException("SqlJob is not connected"));
+            return failed;
+        }
+
+        final DaemonServer server = this.db2Server;
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String auth = server.getUser() + ":" + server.getPassword();
+                String encodedAuth = Base64.getEncoder()
+                        .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+
+                URL url = new URL("https://" + server.getHost() + ":" + server.getPort()
+                        + blobRef.getBlobUrl());
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                applyHttpsTls(conn, server);
+
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Basic " + encodedAuth);
+                conn.setConnectTimeout(10_000);
+                conn.setReadTimeout(120_000);
+                conn.connect();
+
+                int status = conn.getResponseCode();
+                if (status == 200) {
+                    try (InputStream in = conn.getInputStream()) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buf = new byte[8192];
+                        int n;
+                        while ((n = in.read(buf)) != -1) {
+                            baos.write(buf, 0, n);
+                        }
+                        return baos.toByteArray();
+                    }
+                } else if (status == 404) {
+                    throw new RuntimeException(
+                            "Blob token not found or expired (404): " + blobRef.getBlobUrl());
+                } else if (status == 401) {
+                    throw new RuntimeException(
+                            "Unauthorized fetching blob — credentials mismatch (401): "
+                                    + blobRef.getBlobUrl());
+                } else {
+                    throw new RuntimeException(
+                            "Unexpected response fetching blob: HTTP " + status
+                                    + " for " + blobRef.getBlobUrl());
+                }
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to fetch blob: " + e.getMessage(), e);
+            }
+        });
     }
 
     /**
