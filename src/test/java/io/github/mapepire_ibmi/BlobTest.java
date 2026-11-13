@@ -62,14 +62,9 @@ import io.github.mapepire_ibmi.types.QueryResult;
  *       hostname that does not match the server certificate</li>
  * </ol>
  *
- * <p>Prerequisites (run once on the server):
- * <pre>
- *   CREATE TABLE &lt;user&gt;.TEMPBLOB ( ID INTEGER GENERATED ALWAYS AS IDENTITY,
- *                                    JBLOB BLOB(100) )
- * </pre>
- *
- * <p>Tests 7, 8, and 12 create and drop their own tables so no manual DDL is
- * required for those scenarios.
+ * <p>Tables are created under {@link MapepireTest#getTestSchema()} (ensured by
+ * {@link MapepireTest#setupTestSchema()}). Tests 7, 8, and 12 create and drop
+ * their own tables so no manual DDL is required for those scenarios.
  */
 @SuppressWarnings("unchecked")
 @Timeout(60)
@@ -148,14 +143,14 @@ class BlobTest extends MapepireTest {
     @BeforeAll
     public static void beforeAll() throws Exception {
         MapepireTest.setupCreds();
+        MapepireTest.setupTestSchema();
         creds = MapepireTest.getCreds();
-        schema = creds.getUser().toUpperCase();
+        schema = MapepireTest.getTestSchema();
 
         job = new SqlJob();
         job.connect(creds).get();
 
-        // Drop and recreate the small BLOB table so every run starts clean
-        // and we own the schema (no dependency on a pre-existing table).
+        // Drop and recreate the small BLOB table so every run starts clean.
         silentExecute("DROP TABLE " + smallTable());
         job.execute(
                 "CREATE TABLE " + smallTable()
