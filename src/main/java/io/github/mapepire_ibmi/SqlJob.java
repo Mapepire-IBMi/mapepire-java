@@ -657,7 +657,8 @@ public class SqlJob {
             return failed;
         }
 
-        if (this.db2Server == null) {
+        if (this.db2Server == null
+                || this.status != JobStatus.Ready && this.status != JobStatus.Busy) {
             CompletableFuture<byte[]> failed = new CompletableFuture<>();
             failed.completeExceptionally(new IllegalStateException("SqlJob is not connected"));
             return failed;
@@ -1195,6 +1196,7 @@ public class SqlJob {
      */
     private void dispose() {
         this.status = JobStatus.Ended;
+        this.db2Server = null;
         if (this.socket != null) {
             this.socket.close();
         }

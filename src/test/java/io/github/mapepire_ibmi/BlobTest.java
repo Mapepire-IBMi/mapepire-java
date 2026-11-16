@@ -56,6 +56,7 @@ import io.github.mapepire_ibmi.types.QueryResult;
  *   <li>UPDATE BLOB value — SELECT after UPDATE returns new content</li>
  *   <li>fetchBlob() on an unconnected job — throws with "not connected" error</li>
  *   <li>Malformed blob_url values that could redirect the request host are rejected</li>
+ *   <li>fetchBlob() after close() — throws with "not connected" error</li>
  *   <li>HTTP GET with a completely bogus token — returns 404</li>
  *   <li>blob_url path format — token portion is a valid UUID (RFC 4122)</li>
  *   <li>Terse-results mode — BlobRef is still returned when isTerseResults=true</li>
@@ -608,6 +609,27 @@ class BlobTest extends MapepireTest {
         }
     }
 
+    /** 13c. fetchBlob() after close() throws a "not connected" error */
+    @Test
+    @Order(13)
+    void test13c_fetchBlobAfterCloseThrows() throws Exception {
+        SqlJob closedJob = new SqlJob();
+        closedJob.connect(creds).get();
+        closedJob.close();
+
+        BlobRef fakeRef = new BlobRef("/blob/fake-token", 1);
+        try {
+            closedJob.fetchBlob(fakeRef).get();
+            fail("Expected ExecutionException for closed job");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof IllegalStateException,
+                    "Expected IllegalStateException but got: " + ex.getCause());
+            String msg = ex.getCause().getMessage().toLowerCase();
+            assertTrue(msg.contains("not connected"),
+                    "Expected 'not connected' in error message but got: " + ex.getCause().getMessage());
+        }
+    }
+
     /** 13b. Malformed blob_url values that could redirect the request host are rejected */
     @Test
     @Order(13)
@@ -615,16 +637,16 @@ class BlobTest extends MapepireTest {
         assertEquals("/blob/ok-token", SqlJob.requireSafeBlobPath("/blob/ok-token"));
 
         String[] unsafe = {
-                null,
-                "",
-                "@evil.com/steal",
-                "/blob/@evil.com",
-                "https://evil.com/blob/x",
-                "/blob/../etc/passwd",
-                "/blob/token?x=1",
-                "/blob/token#frag",
-                "blob/missing-slash",
-                "/other/path"
+            null,
+            "",
+            "@evil.com/steal",
+            "/blob/@evil.com",
+            "https://evil.com/blob/x",
+            "/blob/../etc/passwd",
+            "/blob/token?x=1",
+            "/blob/token#frag",
+            "blob/missing-slash",
+            "/other/path"
         };
         for (String path : unsafe) {
             try {
