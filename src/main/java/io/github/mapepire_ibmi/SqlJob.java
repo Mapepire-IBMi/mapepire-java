@@ -333,6 +333,31 @@ public class SqlJob {
     }
 
     /**
+     * Validate that a blob URL is a relative {@code /blob/...} path that cannot
+     * alter the request host when composed into an HTTPS URL.
+     *
+     * @param blobUrl The {@code blob_url} from a {@link BlobRef}.
+     * @return The validated path.
+     * @throws IllegalArgumentException If the path is missing or unsafe.
+     */
+    static String requireSafeBlobPath(String blobUrl) {
+        if (blobUrl == null || blobUrl.isEmpty()) {
+            throw new IllegalArgumentException("Blob URL is null or empty");
+        }
+        if (!blobUrl.startsWith("/blob/")
+                || blobUrl.contains("@")
+                || blobUrl.contains("://")
+                || blobUrl.contains("..")
+                || blobUrl.indexOf('?') >= 0
+                || blobUrl.indexOf('#') >= 0
+                || blobUrl.indexOf('\\') >= 0) {
+            throw new IllegalArgumentException(
+                    "Blob URL must be a relative /blob/... path: " + blobUrl);
+        }
+        return blobUrl;
+    }
+
+    /**
      * Get a WebSocketClient instance which can be used to connect to the specified
      * DB2 server.
      *
@@ -615,12 +640,23 @@ public class SqlJob {
      *
      * @param blobRef The {@link BlobRef} object returned in query result data.
      * @return A CompletableFuture that resolves to the raw blob bytes.
+     * @throws IllegalArgumentException If {@code blob_url} is missing or not a
+     *                                  safe relative {@code /blob/...} path.
      * @throws IllegalStateException If the job is not connected.
      * @throws RuntimeException      If the token has expired or already been
      *                               consumed (HTTP 404), credentials are invalid
      *                               (HTTP 401), or any other HTTP/IO error.
      */
     public CompletableFuture<byte[]> fetchBlob(BlobRef blobRef) {
+        final String blobPath;
+        try {
+            blobPath = requireSafeBlobPath(blobRef != null ? blobRef.getBlobUrl() : null);
+        } catch (IllegalArgumentException e) {
+            CompletableFuture<byte[]> failed = new CompletableFuture<>();
+            failed.completeExceptionally(e);
+            return failed;
+        }
+
         if (this.db2Server == null) {
             CompletableFuture<byte[]> failed = new CompletableFuture<>();
             failed.completeExceptionally(new IllegalStateException("SqlJob is not connected"));
@@ -635,8 +671,10 @@ public class SqlJob {
                 String encodedAuth = Base64.getEncoder()
                         .encodeToString(auth.getBytes(StandardCharsets.UTF_8));
 
-                URL url = new URL("https://" + server.getHost() + ":" + server.getPort()
-                        + blobRef.getBlobUrl());
+                // Build scheme/host/port/path separately so a crafted blob_url
+                // cannot override the request host (e.g. via "@evil.com/...").
+                URL url = new URI("https", null, server.getHost(), server.getPort(),
+                        blobPath, null, null).toURL();
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 applyHttpsTls(conn, server);
 
@@ -659,15 +697,15 @@ public class SqlJob {
                     }
                 } else if (status == 404) {
                     throw new RuntimeException(
-                            "Blob token not found or expired (404): " + blobRef.getBlobUrl());
+                            "Blob token not found or expired (404): " + blobPath);
                 } else if (status == 401) {
                     throw new RuntimeException(
                             "Unauthorized fetching blob — credentials mismatch (401): "
-                                    + blobRef.getBlobUrl());
+                                    + blobPath);
                 } else {
                     throw new RuntimeException(
                             "Unexpected response fetching blob: HTTP " + status
-                                    + " for " + blobRef.getBlobUrl());
+                                    + " for " + blobPath);
                 }
             } catch (RuntimeException e) {
                 throw e;

@@ -55,6 +55,7 @@ import io.github.mapepire_ibmi.types.QueryResult;
  *   <li>Column metadata reports the column type as BLOB</li>
  *   <li>UPDATE BLOB value — SELECT after UPDATE returns new content</li>
  *   <li>fetchBlob() on an unconnected job — throws with "not connected" error</li>
+ *   <li>Malformed blob_url values that could redirect the request host are rejected</li>
  *   <li>HTTP GET with a completely bogus token — returns 404</li>
  *   <li>blob_url path format — token portion is a valid UUID (RFC 4122)</li>
  *   <li>Terse-results mode — BlobRef is still returned when isTerseResults=true</li>
@@ -604,6 +605,43 @@ class BlobTest extends MapepireTest {
             String msg = ex.getCause().getMessage().toLowerCase();
             assertTrue(msg.contains("not connected"),
                     "Expected 'not connected' in error message but got: " + ex.getCause().getMessage());
+        }
+    }
+
+    /** 13b. Malformed blob_url values that could redirect the request host are rejected */
+    @Test
+    @Order(13)
+    void test13b_malformedBlobUrlIsRejected() throws Exception {
+        assertEquals("/blob/ok-token", SqlJob.requireSafeBlobPath("/blob/ok-token"));
+
+        String[] unsafe = {
+                null,
+                "",
+                "@evil.com/steal",
+                "/blob/@evil.com",
+                "https://evil.com/blob/x",
+                "/blob/../etc/passwd",
+                "/blob/token?x=1",
+                "/blob/token#frag",
+                "blob/missing-slash",
+                "/other/path"
+        };
+        for (String path : unsafe) {
+            try {
+                SqlJob.requireSafeBlobPath(path);
+                fail("Expected IllegalArgumentException for blob_url: " + path);
+            } catch (IllegalArgumentException expected) {
+                // ok
+            }
+        }
+
+        SqlJob disconnectedJob = new SqlJob();
+        try {
+            disconnectedJob.fetchBlob(new BlobRef("@evil.com/steal", 1)).get();
+            fail("Expected ExecutionException for host-injection blob_url");
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof IllegalArgumentException,
+                    "Expected IllegalArgumentException but got: " + ex.getCause());
         }
     }
 
