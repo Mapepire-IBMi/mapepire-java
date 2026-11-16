@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.QueryOptions;
 import io.github.mapepire_ibmi.types.QueryResult;
 
+@Tag("integration")
 class ProcedureTest extends MapepireTest {
     @BeforeAll
     public static void beforeAll() throws Exception {

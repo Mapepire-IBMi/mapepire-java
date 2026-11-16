@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -16,6 +17,7 @@ import io.github.mapepire_ibmi.types.GetTraceDataResult;
 import io.github.mapepire_ibmi.types.ServerTraceLevel;
 
 @Timeout(100)
+@Tag("integration")
 class TraceTest extends MapepireTest {
     private String time;
     private String invalidQuery;

@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.JDBCOptions;
@@ -26,6 +27,7 @@ import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 import io.github.mapepire_ibmi.types.jdbcOptions.Naming;
 
 @SuppressWarnings("unchecked")
+@Tag("integration")
 class SqlTest extends MapepireTest {
     @BeforeAll
     public static void beforeAll() throws Exception {

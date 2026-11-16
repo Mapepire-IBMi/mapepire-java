@@ -10,12 +10,14 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.CLCommandResult;
 import io.github.mapepire_ibmi.types.GetClDocResult;
 import io.github.mapepire_ibmi.types.SqlCLCommandResult;
 
+@Tag("integration")
 class CLTest extends MapepireTest {
     private static final String GET_CL_DOC_UNSUPPORTED = "Unknown request type: getcldoc";
     private static final String RCCL_UNSUPPORTED = "Unknown request type: rccl";
