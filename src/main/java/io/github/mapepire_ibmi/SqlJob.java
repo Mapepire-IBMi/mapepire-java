@@ -696,7 +696,19 @@ public class SqlJob {
                         }
                         return baos.toByteArray();
                     }
-                } else if (status == 404) {
+                }
+
+                // Drain/close the error body so keep-alive can reuse the socket.
+                try (InputStream err = conn.getErrorStream()) {
+                    if (err != null) {
+                        byte[] buf = new byte[8192];
+                        while (err.read(buf) != -1) {
+                            continue;
+                        }
+                    }
+                }
+
+                if (status == 404) {
                     throw new RuntimeException(
                             "Blob token not found or expired (404): " + blobPath);
                 } else if (status == 401) {
