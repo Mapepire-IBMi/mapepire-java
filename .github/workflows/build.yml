@@ -61,7 +61,7 @@ jobs:
       env:
         IBMI_HOST: ${{ secrets.IBMI_HOST }}
       run: |
-        if [[ "$IBMI_HOST" == *.* ]]; then
+        if [[ -n "$IBMI_HOST" ]]; then
           echo "run=true" >> "$GITHUB_OUTPUT"
           echo "IBM i secrets available; running integration tests."
         else
