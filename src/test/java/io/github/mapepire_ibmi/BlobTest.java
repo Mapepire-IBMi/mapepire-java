@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
@@ -68,6 +69,7 @@ import io.github.mapepire_ibmi.types.QueryResult;
  * {@link MapepireTest#setupTestSchema()}). Tests 7, 8, and 12 create and drop
  * their own tables so no manual DDL is required for those scenarios.
  */
+@Tag("integration")
 @SuppressWarnings("unchecked")
 @Timeout(60)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

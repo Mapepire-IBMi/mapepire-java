@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.ExecutionException;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.github.mapepire_ibmi.types.DaemonServer;
 
+@Tag("integration")
 class TlsTest extends MapepireTest {
     @Test
     void canGetCertCorrectly() throws Exception {

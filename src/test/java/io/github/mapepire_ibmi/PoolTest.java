@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -25,6 +26,7 @@ import io.github.mapepire_ibmi.types.exceptions.RequestTimeoutException;
 
 @Timeout(100)
 @SuppressWarnings("unchecked")
+@Tag("integration")
 class PoolTest extends MapepireTest {
     @Test
     void executeOnPool() throws Exception {
