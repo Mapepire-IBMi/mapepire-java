@@ -90,10 +90,7 @@ class TraceTest extends MapepireTest {
         String traceData = result.getTraceData();
         String expectedError = "com.ibm.as400.access.AS400JDBCSQLSyntaxErrorException: [SQL0104] Token ." + time;
         if (traceExists) {
-            // Older servers return "<prohibited>" instead of the trace data
-            // (https://github.com/Mapepire-IBMi/mapepire-server/pull/120), while newer servers return it again
-            assertTrue(traceData.contains("<prohibited>") || traceData.contains(expectedError),
-                    "Trace data contains neither \"<prohibited>\" nor the expected error");
+            assertTrue(traceData.contains(expectedError));
         } else {
             assertFalse(traceData.contains(expectedError));
         }
