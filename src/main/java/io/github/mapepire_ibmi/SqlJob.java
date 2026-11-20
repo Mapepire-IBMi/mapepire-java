@@ -1122,7 +1122,17 @@ public class SqlJob {
                 "  where JOB_NAME = qsys2.job_name and",
                 "    (local_record_changes_pending = 'YES' or local_object_changes_pending = 'YES')"));
 
-        return this.query(transactionCountQuery).execute(1)
+        Query query = this.query(transactionCountQuery);
+        return query.execute(1)
+                .whenComplete((queryResult, throwable) -> {
+                    try {
+                        query.close();
+                    } catch (Exception e) {
+                        if (throwable == null) {
+                            throw new CompletionException(e);
+                        }
+                    }
+                })
                 .thenApply(queryResult -> {
                     if (queryResult.getSuccess() && queryResult.getData() != null
                             && queryResult.getData().size() == 1) {
@@ -1149,20 +1159,20 @@ public class SqlJob {
      *         operation.
      */
     public CompletableFuture<QueryResult<Object>> endTransaction(TransactionEndType type) throws Exception {
-        String query;
+        String sql;
 
         switch (type) {
             case COMMIT:
-                query = "COMMIT";
+                sql = "COMMIT";
                 break;
             case ROLLBACK:
-                query = "ROLLBACK";
+                sql = "ROLLBACK";
                 break;
             default:
                 throw new IllegalArgumentException("TransactionEndType " + type + " not valid");
         }
 
-        return this.query(query).execute();
+        return this.execute(sql);
     }
 
     /**
