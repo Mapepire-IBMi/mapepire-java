@@ -60,18 +60,31 @@ jobs:
       id: should_run
       env:
         IBMI_HOST: ${{ secrets.IBMI_HOST }}
+        IBMI_PORT: ${{ secrets.IBMI_PORT }}
       run: |
-        if [[ -n "$IBMI_HOST" ]]; then
-          echo "run=true" >> "$GITHUB_OUTPUT"
-          echo "IBM i secrets available; running integration tests."
-        else
+        skip() {
           echo "run=false" >> "$GITHUB_OUTPUT"
-          echo "IBM i secrets not available; skipping integration tests."
+          echo "$1"
           {
             echo "## Integration tests"
-            echo "Skipped: IBM i secrets were not available in this environment."
+            echo "Skipped: $1"
           } >> "$GITHUB_STEP_SUMMARY"
+        }
+
+        if [[ -z "$IBMI_HOST" || -z "$IBMI_PORT" ]]; then
+          skip "IBM i secrets were not available in this environment."
+          exit 0
         fi
+
+        # Require the Mapepire host to accept TCP before running the suite so a
+        # down / unreachable machine skips instead of failing the job.
+        if ! nc -z -w 10 "$IBMI_HOST" "$IBMI_PORT" 2>/dev/null; then
+          skip "IBM i machine ${IBMI_HOST}:${IBMI_PORT} was not reachable."
+          exit 0
+        fi
+
+        echo "run=true" >> "$GITHUB_OUTPUT"
+        echo "IBM i secrets available and ${IBMI_HOST}:${IBMI_PORT} reachable; running integration tests."
 
     - name: Set Test Secrets
       if: steps.should_run.outputs.run == 'true'
