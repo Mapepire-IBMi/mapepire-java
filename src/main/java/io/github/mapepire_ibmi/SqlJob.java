@@ -1172,7 +1172,17 @@ public class SqlJob {
                 throw new IllegalArgumentException("TransactionEndType " + type + " not valid");
         }
 
-        return this.execute(sql);
+        Query query = this.query(sql);
+        return query.execute()
+                .whenComplete((queryResult, throwable) -> {
+                    try {
+                        query.close();
+                    } catch (Exception e) {
+                        if (throwable == null) {
+                            throw new CompletionException(e);
+                        }
+                    }
+                });
     }
 
     /**
