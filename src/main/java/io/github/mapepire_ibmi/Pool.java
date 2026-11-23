@@ -217,7 +217,15 @@ public class Pool {
                     return newJob;
                 });
             } else {
-                return CompletableFuture.completedFuture(this.getJob());
+                // getJob() may throw; keep failures on the returned future
+                // rather than escaping waitForJob() synchronously.
+                CompletableFuture<SqlJob> future = new CompletableFuture<>();
+                try {
+                    future.complete(this.getJob());
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+                return future;
             }
         }
 

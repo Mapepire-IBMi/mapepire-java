@@ -1,9 +1,13 @@
 package io.github.mapepire_ibmi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -61,7 +65,7 @@ class PoolUnitTest {
     }
 
     @Test
-    void waitForJobThrowsWhenPoolFullWithNoReadyOrBusyJobs() throws Exception {
+    void waitForJobFailsFutureWhenPoolFullWithNoReadyOrBusyJobs() throws Exception {
         DaemonServer creds = new DaemonServer("localhost", 8076, "user", "password", false);
         Pool pool = new Pool(new PoolOptions(creds, 1, 1));
 
@@ -70,8 +74,13 @@ class PoolUnitTest {
         addExistingJob(pool, connecting);
         assertEquals(false, pool.hasSpace());
 
-        ClientException e = assertThrowsExactly(ClientException.class, () -> pool.waitForJob().get());
-        assertEquals(NO_JOBS_MESSAGE, e.getMessage());
+        // waitForJob must return a future; getJob failures stay on that future.
+        CompletableFuture<SqlJob> future = pool.waitForJob();
+        assertTrue(future.isCompletedExceptionally());
+
+        ExecutionException e = assertThrowsExactly(ExecutionException.class, future::get);
+        ClientException cause = assertInstanceOf(ClientException.class, e.getCause());
+        assertEquals(NO_JOBS_MESSAGE, cause.getMessage());
     }
 
     @Test
