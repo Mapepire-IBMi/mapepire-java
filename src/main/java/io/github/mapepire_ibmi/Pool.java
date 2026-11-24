@@ -162,6 +162,7 @@ public class Pool {
      * full but all jobs are busy.
      *
      * @return The retrieved job.
+     * @throws ClientException If no ready or busy jobs are available in the pool.
      */
     public synchronized SqlJob getJob() throws Exception {
         SqlJob job = this.getReadyJob();
@@ -180,9 +181,12 @@ public class Pool {
                 this.addJob();
             }
 
+            if (freeist == null) {
+                throw new ClientException("No jobs are available. Please wait for a job to "
+                        + "become available or increase the starting size of the pool.");
+            }
             return freeist;
         }
-
         return job;
     }
 
@@ -213,7 +217,15 @@ public class Pool {
                     return newJob;
                 });
             } else {
-                return CompletableFuture.completedFuture(this.getJob());
+                // getJob() may throw; keep failures on the returned future
+                // rather than escaping waitForJob() synchronously.
+                CompletableFuture<SqlJob> future = new CompletableFuture<>();
+                try {
+                    future.complete(this.getJob());
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+                return future;
             }
         }
 

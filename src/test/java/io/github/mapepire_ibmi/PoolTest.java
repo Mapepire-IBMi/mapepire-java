@@ -302,4 +302,33 @@ class PoolTest extends MapepireTest {
         allFutures.get();
         poolSpy.end();
     }
+
+    @Test
+    void getJobThrowsAfterEnd() throws Exception {
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 1);
+        Pool pool = new Pool(options);
+        pool.init().get();
+        assertEquals(1, pool.getActiveJobCount());
+
+        pool.end();
+        assertEquals(0, pool.getActiveJobCount());
+
+        ClientException e = assertThrowsExactly(ClientException.class, pool::getJob);
+        assertEquals("No jobs are available. Please wait for a job to "
+                + "become available or increase the starting size of the pool.", e.getMessage());
+    }
+
+    @Test
+    void executeThrowsAfterEnd() throws Exception {
+        PoolOptions options = new PoolOptions(MapepireTest.getCreds(), 2, 1);
+        Pool pool = new Pool(options);
+        pool.init().get();
+        pool.end();
+        assertEquals(0, pool.getActiveJobCount());
+
+        ClientException e = assertThrowsExactly(ClientException.class,
+                () -> pool.execute("values (1)"));
+        assertEquals("No jobs are available. Please wait for a job to "
+                + "become available or increase the starting size of the pool.", e.getMessage());
+    }
 }
